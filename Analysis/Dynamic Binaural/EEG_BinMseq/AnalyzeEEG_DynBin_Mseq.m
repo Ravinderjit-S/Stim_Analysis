@@ -10,6 +10,9 @@ IAC_pow20 = [];
 load('Mseq_4096fs_compensated.mat')
 Mseq_ITD = Mseq_sig; 
 fs = 4096; % EEG fs
+dataPath = '../../../../Data/EEG_DynBin/';
+addpath(dataPath)
+
 
 load(['IAC_evoked20_' subj '.mat']) 
 load(['ITD_evoked20_' subj '.mat'])
@@ -193,7 +196,7 @@ for pp= 1:numel(Aud_channels)
 end
 
 %% Save variables
-save([subj '_DynBinMseqAnalyzed.mat'],'Rev_IAC','Rev_ITD','NoiseFloors_IAC','NoiseFloors_ITD','Aud_channels')
+save([dataPath subj '_DynBinMseqAnalyzed.mat'],'Rev_IAC','Rev_ITD','NoiseFloors_IAC','NoiseFloors_ITD','Aud_channels')
 
 
 
