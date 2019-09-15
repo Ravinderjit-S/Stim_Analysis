@@ -4,21 +4,38 @@ clear all; close all hidden; clc; %#ok<CLALL>
 path = '../CommonExperiment';
 p = genpath(path);
 addpath(p); %add path to commonly used functions
-
+addpath('Stim_Dev')
 subj = input('Please subject ID:', 's');
 
 
 %% Stim & Experimental parameters
 
-
-%load()
 rng(s)
 L = 70; %dB SPL
 respList = []; %vector that will contain the subject's responses 
 jitlist = rand(1, ntrials*nconds)*0.2; %small jit to prevent any periodic background noise becoming in phase with desired signal
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs
 TypePhones = 'earphones';
-stim_dur = 0.7; %This is set by Stim_bind function, need to regenerate stimuli to change this
+stim_dur = 2.8; %This is set by Stim_bind function, need to regenerate stimuli to change this
+f_start = 100;
+f_end = 8000;
+Tones_num = 16;
+fs = 48828;
+
+Corr_inds{1} = [];
+Corr_inds{2} = 15:16;
+Corr_inds{3} = 13:16;
+Corr_inds{4} = 11:16;
+Corr_inds{5} = 9:16;
+Corr_inds{6} = [1,6,11,16];
+Corr_inds{7} = [1,4,7,10,13,16];
+
+nconds = length(Corr_inds);
+ntrials = 125; %trials per cond
+
+CorrSet = repmat(1:nconds,1,ntrials);
+CorrSet = CorrSet(randperm(length(CorrSet)));
+
 
 
 %% Startup parameters
@@ -40,14 +57,6 @@ invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
 
-
-% % Turns EEG Saving off ('Pause on')
-% invoke(RZ, 'SetTagVal', 'trgname', 254);
-% invoke(RZ, 'SetTagVal', 'onsetdel',100);
-% invoke(RZ, 'SoftTrg', 6);
-
-
-
 %% Welcome to experiment
 textlocH = PS.rect(3)/4;
 textlocV = PS.rect(4)/3;
@@ -62,21 +71,24 @@ invoke(PS.RP, 'SoftTrg', 6);
 pause(2.0);
 
     
-%% Iterating through rest of stimuli
+%% Experiment Begins
 
-for i=1:numel(Corr_indsPlayed) %600 trials
+stim = Stim_Bind_ABAB(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
+stim = [stim;stim];
+
+for i=1:nconds*ntrials
     
-    
+    %% Break
     if mod(i,80) == 0 % optional break every 80 trials
         % % Turns EEG Saving off ('Pause on')
         invoke(PS.RP, 'SetTagVal', 'trgname', 254);
         invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
         invoke(PS.RP, 'SoftTrg', 6);
         
-        info = sprintf('You are about to start trial %d.',i);
-        info2 = sprintf('Break %d/7: Take a break or push a button twice to continue',i/80); %7 breaks
+        fprintf(1,'Break ----------- \n')
+        
+        info = sprintf('You are about to start trial %d out of %d',i,nconds*ntrials);
         Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
-        Screen('DrawText',PS.window,info2,textlocH,textlocV+line2line,PS.white);
         Screen('Flip',PS.window);
         if buttonBox  %Subject pushes button twice
             getResponse(PS.RP);
@@ -92,26 +104,33 @@ for i=1:numel(Corr_indsPlayed) %600 trials
         pause(2.0);
     end
 
-    
+    %% Play Stim
     fprintf(1, 'Running Trial #%d/%d\n',i, numel(order));
    
-    trig_i = Stim_Trigger{i};
-    stim_i = stim{i};
-    for j = 1:3
-        PlayStim(stim_i(j,:),fs,risetime, PS, L, useTDT, num2str(j),trig_i(j),TypePhones);
-        WaitSecs(stim_dur + 0.3); %stim is 0.7 seconds long so 1.2 wait time gives 0.3 seconds between each stim
+    
+    trig_i = CorrSet(i);
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
+    
+    if i~=nconds*ntrials
+       stim = Stim_Bind_ABAB(Corr_inds{CorrSet(i+1)},fs,f_start, f_end, Tones_num, []);
+       stim = [stim;stim];
     end
-
+    
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %  Response Frame
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    WaitSecs(0.3)
     resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct_ans(i),textlocH,textlocV,line2line);
-    
+
     fprintf(1, 'Response = %d, correct =%d \n', resp, correct_ans(i));
     respList = [respList, resp]; %#ok<AGROW>
-    WaitSecs(jitlist(i)); %probably unnecessary b/c of variable response time by subjects but adding just in case
+
+    WaitSecs(0.4 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
+    
 end
-save(strcat(subj, '_BindingBehEEG'), 'respList');
+save(strcat(subj, '_BindingEEG_beh'), 'respList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);

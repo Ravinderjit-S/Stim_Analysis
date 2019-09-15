@@ -1,14 +1,13 @@
-function [] = PlayStim(stim,fs,risetime,PS,L, useTDT, StimText, Stim_Trig, TypePhones,passive)
+function [] = PlayStim(stim,fs,risetime,PS,L, useTDT, StimText, Stim_Trig, TypePhones)
 %%This function will play a Stim once
 %stim = Stim to be played, [2 x nsamps]
 %fs = sampling rate
 %risetime = risetime for stimulus 
 %PS = psychstarter variable
 %L = level to be played at in dB SPL
-%StimText = text displayed on screen while stim is played 
+%StimText = text displayed on screen while stim is played ... if 'NONE', nothing is shown
 %TypePhones = 'headphones' or 'earphones'
 %Stim_Trig = assign stimulus a trigger value the TDT will output (typically used for EEG) 
-%Passive = is 1 if no text needs to be displayed ... a passive EEG experiment
 
  %% AB: to show information about the current repetition on screen to the subject, 
     % and to get the subject's response to proceed the task 
@@ -63,7 +62,7 @@ function [] = PlayStim(stim,fs,risetime,PS,L, useTDT, StimText, Stim_Trig, TypeP
         invoke(PS.RP, 'WriteTagVEX', 'datainL', 0, 'F32', wavedata(1, :)); %Write to buffer left ear
         invoke(PS.RP, 'WriteTagVEX', 'datainR', 0, 'F32', wavedata(2, :)); %Write to buffer right ear
         WaitSecs(0.1);
-        if ~passive
+        if ~strcmp(StimText,'NONE')
             [nx, ny, ~] = DrawFormattedText(PS.window, StimText,'center','center');
             %Screen('DrawText',PS.window,StimText,nx,ny,PS.white);
             Screen('Flip',PS.window);
