@@ -9,11 +9,11 @@ subj = input('Please subject ID:', 's');
 
 
 %% Stim & Experimental parameters
-
+load('s.mat')
 rng(s)
+
 L = 70; %dB SPL
 respList = []; %vector that will contain the subject's responses 
-jitlist = rand(1, ntrials*nconds)*0.2; %small jit to prevent any periodic background noise becoming in phase with desired signal
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs
 TypePhones = 'earphones';
 stim_dur = 2.8; %This is set by Stim_bind function, need to regenerate stimuli to change this
@@ -23,12 +23,13 @@ Tones_num = 16;
 fs = 48828;
 
 Corr_inds{1} = [];
-Corr_inds{2} = 15:16;
-Corr_inds{3} = 13:16;
-Corr_inds{4} = 11:16;
-Corr_inds{5} = 9:16;
+Corr_inds{2} = 15:16; %2
+Corr_inds{3} = 13:16; %4
+Corr_inds{4} = 11:16; %6
+Corr_inds{5} = 9:16;  %8
 Corr_inds{6} = [1,6,11,16];
 Corr_inds{7} = [1,4,7,10,13,16];
+Corr_inds{8} = 3:16;
 
 nconds = length(Corr_inds);
 ntrials = 125; %trials per cond
@@ -36,6 +37,7 @@ ntrials = 125; %trials per cond
 CorrSet = repmat(1:nconds,1,ntrials);
 CorrSet = CorrSet(randperm(length(CorrSet)));
 
+jitlist = rand(1, ntrials*nconds)*0.2; %small jit to prevent any periodic background noise becoming in phase with desired signal
 
 
 %% Startup parameters
@@ -63,6 +65,7 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
+Screen('Flip',PS.window);
 
 % Turns EEG Saving on ('Pause off')
 invoke(PS.RP, 'SetTagVal', 'trgname',253);
@@ -76,7 +79,7 @@ pause(2.0);
 stim = Stim_Bind_ABAB(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
 stim = [stim;stim];
 
-for i=1:nconds*ntrials
+for i=1:10
     
     %% Break
     if mod(i,80) == 0 % optional break every 80 trials
@@ -87,8 +90,10 @@ for i=1:nconds*ntrials
         
         fprintf(1,'Break ----------- \n')
         
-        info = sprintf('You are about to start trial %d out of %d',i,nconds*ntrials);
+        info = sprintf('Break! You are about to start trial %d out of %d',i,nconds*ntrials);
+        info2 = sprintf('Press any button twice to resume');
         Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+        Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
         Screen('Flip',PS.window);
         if buttonBox  %Subject pushes button twice
             getResponse(PS.RP);
@@ -97,6 +102,7 @@ for i=1:nconds*ntrials
             getResponseKb; %#ok<UNRCH>
             getResponseKb;
         end
+        Screen('Flip',PS.window);
         % Turns EEG Saving on ('Pause off')
         invoke(PS.RP, 'SetTagVal', 'trgname',253);
         invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
@@ -105,29 +111,38 @@ for i=1:nconds*ntrials
     end
 
     %% Play Stim
-    fprintf(1, 'Running Trial #%d/%d\n',i, numel(order));
+    fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
    
     
     trig_i = CorrSet(i);
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
     
+    stimGenT = 0;
     if i~=nconds*ntrials
+       tic()
        stim = Stim_Bind_ABAB(Corr_inds{CorrSet(i+1)},fs,f_start, f_end, Tones_num, []);
        stim = [stim;stim];
+       stimGenT =toc();
     end
-    
+    WaitSecs(stim_dur - stimGenT);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %  Response Frame
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    WaitSecs(0.3)
-    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct_ans(i),textlocH,textlocV,line2line);
-
-    fprintf(1, 'Response = %d, correct =%d \n', resp, correct_ans(i));
+    if CorrSet(i) ==1
+        correct =1;
+    else
+        correct =2;
+    end
+    
+    WaitSecs(0.3); %wait until show dot for response 
+    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct);
+    
+    fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correct, Corr_inds{CorrSet(i)});
     respList = [respList, resp]; %#ok<AGROW>
 
-    WaitSecs(0.4 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
+    WaitSecs(0.3 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
 save(strcat(subj, '_BindingEEG_beh'), 'respList','Corr_inds','CorrSet');

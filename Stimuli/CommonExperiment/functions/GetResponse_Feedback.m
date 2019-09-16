@@ -30,6 +30,6 @@ function [resp] = GetResponse_Feedback(PS,feedback, feedbackDuration,buttonBox,c
     end
     Screen('Flip',PS.window);
     WaitSecs(feedbackDuration);
-
+    Screen('Flip',PS.window);
 
 end
