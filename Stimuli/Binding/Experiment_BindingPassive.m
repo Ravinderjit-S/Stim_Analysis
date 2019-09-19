@@ -59,14 +59,6 @@ invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
 
-%% Welcome to experiment
-textlocH = PS.rect(3)/4;
-textlocV = PS.rect(4)/3;
-line2line = 50;
-
-ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
-Screen('Flip',PS.window);
-
 % Turns EEG Saving on ('Pause off')
 invoke(PS.RP, 'SetTagVal', 'trgname',253);
 invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
@@ -79,36 +71,7 @@ pause(2.0);
 stim = Stim_Bind_ABAB(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
 stim = [stim;stim];
 
-for i=1:nconds*ntrials
-    
-    %% Break
-    if mod(i,80) == 0 % optional break every 80 trials
-        % % Turns EEG Saving off ('Pause on')
-        invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-        invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-        invoke(PS.RP, 'SoftTrg', 6);
-        
-        fprintf(1,'Break ----------- \n')
-        
-        info = sprintf('Break! You are about to start trial %d out of %d',i,nconds*ntrials);
-        info2 = sprintf('Press any button twice to resume');
-        Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
-        Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
-        Screen('Flip',PS.window);
-        if buttonBox  %Subject pushes button twice
-            getResponse(PS.RP);
-            getResponse(PS.RP);
-        else
-            getResponseKb; %#ok<UNRCH>
-            getResponseKb;
-        end
-        Screen('Flip',PS.window);
-        % Turns EEG Saving on ('Pause off')
-        invoke(PS.RP, 'SetTagVal', 'trgname',253);
-        invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-        invoke(PS.RP, 'SoftTrg', 6);
-        pause(2.0);
-    end
+for i=1:1:nconds*ntrials
 
     %% Play Stim
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
@@ -124,25 +87,7 @@ for i=1:nconds*ntrials
        stim = [stim;stim];
        stimGenT =toc();
     end
-    WaitSecs(stim_dur - stimGenT);
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %  Response Frame
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    if CorrSet(i) ==1
-        correct =1;
-    else
-        correct =2;
-    end
-    
-    WaitSecs(0.3); %wait until show dot for response 
-    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct);
-    
-    fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correct, Corr_inds{CorrSet(i)});
-    respList = [respList, resp]; %#ok<AGROW>
-
-    WaitSecs(0.3 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
+    WaitSecs(stim_dur - stimGenT + 1.0 + jitlist(i));
     
 end
 save(strcat(subj, '_BindingEEG_beh'), 'respList','Corr_inds','CorrSet');
