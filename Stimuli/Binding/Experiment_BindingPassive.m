@@ -7,6 +7,11 @@ addpath(p); %add path to commonly used functions
 addpath('Stim_Dev')
 subj = input('Please subject ID:', 's');
 
+fig_num=99;
+USB_ch=1;
+FS_tag = 3;
+[f1RZ,PS.RP,FS]=load_play_circuit(FS_tag,fig_num,USB_ch);
+
 
 %% Stim & Experimental parameters
 load('s.mat')
@@ -51,7 +56,6 @@ buttonBox = 1;
 
 feedbackDuration = 0.2;
 
-PS = psychStarter(useTDT,screenDist,screenWidth,useTrigs,FsampTDT);
 
 %Clearing I/O memory buffers:
 invoke(PS.RP,'ZeroTag','datainL');
@@ -75,11 +79,8 @@ for i=1:1:nconds*ntrials
 
     %% Play Stim
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
-   
-    
     trig_i = CorrSet(i);
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
-    
     stimGenT = 0;
     if i~=nconds*ntrials
        tic()
@@ -90,24 +91,16 @@ for i=1:1:nconds*ntrials
     WaitSecs(stim_dur - stimGenT + 1.0 + jitlist(i));
     
 end
-save(strcat(subj, '_BindingEEG_beh'), 'respList','Corr_inds','CorrSet');
 
-Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
-Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
-Screen('Flip',PS.window);
-WaitSecs(5.0);
+% Turns EEG Saving off ('Pause on')
+invoke(PS.RP, 'SetTagVal', 'trgname', 254);
+invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
+invoke(PS.RP, 'SoftTrg', 6);
 
 %Clearing I/O memory buffers:
 invoke(PS.RP,'ZeroTag','datainL');
 invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
-% Pause On
-invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-invoke(PS.RP, 'SoftTrg', 6);
-
-close_play_circuit(PS.f1,PS.RP);
 fprintf(1,'\n Done with data collection!\n');
-sca;
 
