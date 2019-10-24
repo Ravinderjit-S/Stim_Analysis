@@ -4,7 +4,7 @@ filt = designfilt('bandpassfir', 'StopbandFrequency1', 100, 'PassbandFrequency1'
 noise = filter(filt,noise);
 
 
-fm = 8;
+fm = 150;
 t = 0:1/fs:1-1/fs;
 A = 0.5*(cos(2*pi*fm.*t)+1); 
 tone = sin(2*pi*800*t);

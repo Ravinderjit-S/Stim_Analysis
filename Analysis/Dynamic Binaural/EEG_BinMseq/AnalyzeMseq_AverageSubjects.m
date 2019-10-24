@@ -1,6 +1,9 @@
 % Look at some processed binaural EEG data mseq
 clear
 Subjects = [{'S001'},{'S132'},{'S203'},{'S204'},{'S205'},{'S206'},{'S207'},{'S208'}];
+data_path = '../../../../Data/EEG_DynBin/';
+Fig_path = '../../../../Figures/DynBin/';
+addpath(data_path)
 load('Mseq_4096fs_compensated.mat')
 
 fs = 4096;
@@ -133,7 +136,7 @@ yticks([-90:10:-60])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_EEGPower','-dpng','-r0')
+%print('IAC_EEGPower','-dpng','-r0')
 
 
 
@@ -152,11 +155,11 @@ xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_EEGPower','-dpng','-r0')
+%print('ITD_EEGPower','-dpng','-r0')
 
 
 figure(), hold on
-plot(f,AcrossSubjectHf_IAC-NFmean_IAC,'k','linewidth',3), xlim([0 20]), ylim([0 12]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')
+plot(f,AcrossSubjectHf_IAC-NFmean_IAC,'k','linewidth',5,'HandleVisibility','off'), xlim([0 20]), ylim([0 12]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')
 Index_log = 2:length(f); %fill doesn't work on logscale if you include x data point of 0
 plotsem = fill([f(Index_log);flipud(f(Index_log))],[AcrossSubjectHf_IAC(Index_log)-AcrossSubjectHf_IAC_SEM(Index_log)-NFmean_IAC(Index_log);flipud(AcrossSubjectHf_IAC(Index_log)+AcrossSubjectHf_IAC_SEM(Index_log)-NFmean_IAC(Index_log))],'k','linestyle','none');
 set(plotsem,'facealpha',0.5)
@@ -165,6 +168,7 @@ plotstd = fill([f(Index_log);flipud(f(Index_log))],[zeros(length(f(Index_log)),1
 set(plotstd,'facealpha',0.5)
 % title('IAC Across Subjects')
 % legend('Response Power', 'CI>95%')
+legend('Mean w/ 95% CI','Noise Floor w/ 95% CI','location','northeast')
 set(gca,'fontsize',25)
 set(gca,'XScale','log')
 yticks([0:2:10])
@@ -172,7 +176,7 @@ xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_EEGResponsePower','-dpng','-r0')
+print([Fig_path 'IAC_EEGResponsePower'],'-dpng','-r0')
 
 figure(), hold on
 plot(f,AcrossSubjectHf_ITD-NFmean_ITD,'b','linewidth',2), xlim([0 20]), ylim([0,7]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')
@@ -186,7 +190,7 @@ xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_EEGResponsePower','-dpng','-r0')
+%print('ITD_EEGResponsePower','-dpng','-r0')
 
 
 

@@ -1,5 +1,5 @@
 clear all
-
+Fig_path = '../../../../Figures/DynBin/';
 Subjects = [{'S001'},{'S132'},{'S205'},{'S206'},{'S207'},{'S208'},{'S203'},{'S204'},{'S211'}];
 
 responseTracks = {};
@@ -116,18 +116,19 @@ fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
 print('IACtsquareToneFig','-dpng','-r0')
 
-figure, hold on,%plot((0:1/fs:1.6)*1000,FittedCurve,'r','linewidth',2), hold on
-errorbar(WindowSizes(2:end).^-1, AcrossSubjectsSNR(2:end) - AcrossSubjectsSNR(1), AcrossSubjectsSEM(2:end),'ko','linewidth',3), ylim([-0.5 11]), xlim([0.5 25])
-plot(WindowSizes(9).^-1,MedianSNR(9,strcmp(Subjects,'S132')),'xr','MarkerSize',15,'linewidth',4)
+figure('Position',[1, 1, 1000, 637]), hold on,%plot((0:1/fs:1.6)*1000,FittedCurve,'r','linewidth',2), hold on
+Individ = plot(WindowSizes(2:end).^-1, MedianSNR(2:end,:)-repmat(MedianSNR(1,:),9,1),'Color',[0.8,0.8,0.8],'linewidth',1);
+PerfAvg = errorbar(WindowSizes(2:end).^-1, AcrossSubjectsSNR(2:end) - AcrossSubjectsSNR(1), AcrossSubjectsSEM(2:end),'k-o','linewidth',3); ylim([0 13]), xlim([0.5 25])
+%Outlier = plot(WindowSizes(9).^-1,MedianSNR(9,strcmp(Subjects,'S132'))-MedianSNR(1,strcmp(Subjects,'S132')),'xr','MarkerSize',15,'linewidth',4);
 set(gca,'XScale','log')
 set(gca,'XTick', [1 5 10 20])
 xlabel('(1/WindowSize) Hz '), ylabel('Detection Improvement (dB)')
-legend(['Performance ' char(177) ' SEM'], 'outlier','location','SouthWest')
-set(gca,'fontsize',25)
+legend([PerfAvg,Individ(1)],{ ['Performance ' char(177) ' SEM'], 'Individuals'},'location','NorthEast')
+set(gca,'fontsize',15)
 fig = gcf;
 fig.PaperUnits = 'inches';
-fig.PaperPosition = [0 0 11 8];
-print('IACtsquareToneFigfreq','-dpng','-r0')
+fig.PaperPosition = [0 0 9 6];
+print([Fig_path 'IACtsquareToneFigfreq'],'-dpng','-r0')
 
 % [f_all2, gf_all2, o_all2] = fit(WindowSizes',FitAcrossSubjects,ft3,'lower',[0.1,0,0,0,0],'upper',[20,1,1,1,1],'StartPoint',[FitAcrossSubjects(end),0.5,0.5,0.1,0.1]);
 

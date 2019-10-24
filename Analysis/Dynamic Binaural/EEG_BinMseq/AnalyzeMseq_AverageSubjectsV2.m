@@ -1,6 +1,9 @@
+
 % Look at some processed binaural EEG data mseq
 clear
 Subjects = [{'S001'},{'S132'},{'S203'},{'S204'},{'S205'},{'S206'},{'S207'},{'S208'}];
+data_path = '../../../../Data/EEG_DynBin/';
+addpath(data_path)
 load('Mseq_4096fs_compensated.mat')
 
 fs = 4096;
@@ -78,7 +81,7 @@ AcrossSubjectHf_ITD = mean(SubjHf_ITD,2);
 AcrossSubjectHf_IAC_SEM = 1.96*std(SubjHf_IAC,[],2)./sqrt(numel(Subjects));
 AcrossSubjectHf_ITD_SEM = 1.96*std(SubjHf_ITD,[],2)./sqrt(numel(Subjects));
 
-AcrossSubjectHf_IAC_SEMup = pow2dB(;
+AcrossSubjectHf_IAC_SEMup = 10*(log10(AcrossSubjectHf_IAC + AcrossSubjectHf_IAC_SEM));
 AcrossSubjectHf_IAC_SEMdown = 10*(log10(AcrossSubjectHf_IAC)./log10(AcrossSubjectHf_IAC_SEM));
 
 figure(), hold on
