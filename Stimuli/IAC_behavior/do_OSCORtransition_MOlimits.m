@@ -14,12 +14,10 @@ subj = input('Please subject ID:', 's');
 
 %% Stim & Experimental parameters
 L=70; %dB SPL
-Direction
-nconds = numel(FMs_test);
 series_n = 3;
 series = [repmat('A',1,series_n) repmat('D',1,series_n)];
 series = series(randperm(length(series))); %randomize order of ascending and descending trials
-startF = [5 20]; %starting frequencies for ascending and descending
+startF = [5 15]; %starting frequencies for ascending and descending
 
 
 risetime = 0.050;
@@ -55,9 +53,6 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
-
-
-resp =1; %initializing for while loop
 for i=1:length(series)
     if series(i) == 'A'
         OSCOR_fm = startF(1);
@@ -67,9 +62,20 @@ for i=1:length(series)
     stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,0);
     respList = [];
     fplayed = [];
-    while resp ==1
-        
+    respchange =0; %initializing for while loop
+    
+    info = sprintf('Press any button twice to start block %d/%d',i,length(series));
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    if buttonBox  %Subject pushes button twice to begin
+        getResponse(PS.RP);
+        getResponse(PS.RP);
+    end
+    Screen('Flip',PS.window);
+    
+    while respchange == 0
         PlayStim(stim,fs,risetime,PS,L,useTDT,'NONE',[], TypePhones);
+        WaitSecs(stim_dur + 0.2)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %  Response Frame
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,18 +83,25 @@ for i=1:length(series)
 
         fprintf(1, 'Response =%d, OSCORfm = %d \n', resp, OSCOR_fm);
         respList = [respList, resp]; %#ok<AGROW>
-        fplayed = [f_played, OSCOR_fm];
+        fplayed = [fplayed, OSCOR_fm]; %#ok<AGROW>
         if series(i) == 'A'
             OSCOR_fm = OSCOR_fm +1;
+            if resp == 2 
+                respchange = 1; 
+            end
         else
             OSCOR_fm = OSCOR_fm -1;
+            if resp ==1
+                respchange =1;
+            end
         end
+       stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,0);
     end
     A_respList{i} = respList;
     A_fplayed{i} = fplayed;
 end
 
-save([subj '_OSCORtransition.mat'], A_respList, A_fplayed)
+save([subj '_OSCORtransition.mat'], 'A_respList', 'A_fplayed','series')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
