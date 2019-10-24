@@ -1,8 +1,10 @@
 %3 AFC to find highest detectable OSCOR fm
 
 clear all; close all hidden; clc; %#ok<CLALL>
-p = genpath('.');
+path = '../CommonExperiment';
+p = genpath(path);
 addpath(p);
+addpath('Stimuli Dev')
 load('s.mat')
 rng(s)
 
@@ -20,7 +22,6 @@ FMs = repmat(FMs_test,1,ntrials);
 FMs = FMs(randperm(length(FMs)));
 
 risetime = 0.050;
-digDrop = 5;
 TypePhones = 'earphones';
 stim_dur = 1; %duration of each noise, 3 will be played per trial
 fs =48828.125;

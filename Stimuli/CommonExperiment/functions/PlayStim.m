@@ -7,7 +7,7 @@ function [] = PlayStim(stim,fs,risetime,PS,L, useTDT, StimText, Stim_Trig, TypeP
 %L = level to be played at in dB SPL
 %StimText = text displayed on screen while stim is played ... if 'NONE', nothing is shown
 %TypePhones = 'headphones' or 'earphones'
-%Stim_Trig = assign stimulus a trigger value the TDT will output (typically used for EEG) 
+%Stim_Trig = assign stimulus a trigger value the TDT will output (typically used for EEG), leave empty if not using 
 
  %% AB: to show information about the current repetition on screen to the subject, 
     % and to get the subject's response to proceed the task 
