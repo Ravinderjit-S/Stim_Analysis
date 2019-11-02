@@ -15,8 +15,6 @@ subj = input('Please subject ID:', 's');
 %% Stim & Experimental parameters
 L=70; %dB SPL
 series_n = 3;
-series = [repmat('A',1,series_n) repmat('D',1,series_n)];
-series = series(randperm(length(series))); %randomize order of ascending and descending trials
 startF = [2 20]; %starting frequencies for ascending and descending
 
 
@@ -53,18 +51,16 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
-for i=1:length(series)
-    if series(i) == 'A'
-        OSCOR_fm = startF(1) + randi(4);
-    else
-        OSCOR_fm = startF(2) - randi(4);
-    end
-    stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,0);
+for i=1:length(series_n)
+    OSCOR_fm_A = startF(1) + randi(4);
+    OSCOR_fm_D = startF(2) - randi(4);
+    series_opt = ['A' 'D'];
     respList = [];
     fplayed = [];
-    respchange =0; %initializing for while loop
+    splayed = []; %the series for that run ... either Ascending or descending
+    respchange = [0 0]; %initializing for while loop ... this is looking at if resp has change for Ascending or Descending trials
     
-    info = sprintf('Press any button twice to start block %d/%d',i,length(series));
+    info = sprintf('Press any button twice to start block %d/%d',i,length(series_n));
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
     Screen('Flip',PS.window);
     if buttonBox  %Subject pushes button twice to begin
@@ -73,7 +69,15 @@ for i=1:length(series)
     end
     Screen('Flip',PS.window);
     
-    while respchange == 0
+    if series_opt(randi(length(series_opt))) == 'A'
+        stim = OSCOR(stim_dur,fs,OSCOR_fm_A,BPfilt,0);
+        series_cur = 'A';
+    else
+        stim = OSCOR(stim_dur,fs,OSCOR_fm_B,BPfilt,0);
+        series_cur = 'B';
+    end
+    
+    while any(respchange == 0)
         PlayStim(stim,fs,risetime,PS,L,useTDT,'NONE',[], TypePhones);
         WaitSecs(stim_dur + 0.2)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,27 +85,36 @@ for i=1:length(series)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, []);
 
-        fprintf(1, 'Response =%d, OSCORfm = %d \n', resp, OSCOR_fm);
+        fprintf(1, 'Response =%d, OSCORfm = %d, Series = %s \n', resp, OSCOR_fm,series_cur);
         respList = [respList, resp]; %#ok<AGROW>
         fplayed = [fplayed, OSCOR_fm]; %#ok<AGROW>
-        if series(i) == 'A'
+        splayed = [splayed, series_cur]; %#ok<AGROW>
+        if series_cur == 'A'
             OSCOR_fm = OSCOR_fm +1;
             if resp == 2 
-                respchange = 1; 
+                respchange(1) = 1; 
             end
         else
             OSCOR_fm = OSCOR_fm -1;
             if resp ==1
-                respchange =1;
+                respchange(2) =1;
             end
         end
-       stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,0);
+        
+        if series_opt(randi(length(series_opt))) == 'A' && respchange(1) == 0 || respchange(2) == 1
+            stim = OSCOR(stim_dur,fs,OSCOR_fm_A,BPfilt,0);
+            series_cur = 'A';
+        else
+            stim = OSCOR(stim_dur,fs,OSCOR_fm_B,BPfilt,0);
+            series_cur = 'B';
+        end
     end
     A_respList{i} = respList;
     A_fplayed{i} = fplayed;
+    A_splayed{i} = splayed
 end
 
-save([subj '_OSCORtransition.mat'], 'A_respList', 'A_fplayed','series')
+save([subj '_OSCORtransition_MOLinterleave.mat'], 'A_respList', 'A_fplayed','A_splayed')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
