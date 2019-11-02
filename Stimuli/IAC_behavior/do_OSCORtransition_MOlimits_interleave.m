@@ -14,7 +14,7 @@ subj = input('Please subject ID:', 's');
 
 %% Stim & Experimental parameters
 L=70; %dB SPL
-series_n = 3;
+series_n = 1;
 startF = [2 20]; %starting frequencies for ascending and descending
 
 
@@ -69,33 +69,38 @@ for i=1:length(series_n)
     end
     Screen('Flip',PS.window);
     
-    if series_opt(randi(length(series_opt))) == 'A'
+    if series_opt(randi(length(series_opt))) == series_opt(1)
         stim = OSCOR(stim_dur,fs,OSCOR_fm_A,BPfilt,0);
-        series_cur = 'A';
+        series_cur = series_opt(1);
     else
-        stim = OSCOR(stim_dur,fs,OSCOR_fm_B,BPfilt,0);
-        series_cur = 'B';
+        stim = OSCOR(stim_dur,fs,OSCOR_fm_D,BPfilt,0);
+        series_cur = series_opt(2);
     end
     
     while any(respchange == 0)
         PlayStim(stim,fs,risetime,PS,L,useTDT,'NONE',[], TypePhones);
-        WaitSecs(stim_dur + 0.2)
+        WaitSecs(stim_dur + 0.2);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %  Response Frame
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, []);
 
+        if series_cur == series_opt(1)
+            OSCOR_fm = OSCOR_fm_A;
+        else
+            OSCOR_fm = OSCOR_fm_D;
+        end
         fprintf(1, 'Response =%d, OSCORfm = %d, Series = %s \n', resp, OSCOR_fm,series_cur);
         respList = [respList, resp]; %#ok<AGROW>
         fplayed = [fplayed, OSCOR_fm]; %#ok<AGROW>
         splayed = [splayed, series_cur]; %#ok<AGROW>
-        if series_cur == 'A'
-            OSCOR_fm = OSCOR_fm +1;
+        if series_cur == series_opt(1)
+            OSCOR_fm_A = OSCOR_fm_A +1;
             if resp == 2 
                 respchange(1) = 1; 
             end
         else
-            OSCOR_fm = OSCOR_fm -1;
+            OSCOR_fm_D = OSCOR_fm_D -1;
             if resp ==1
                 respchange(2) =1;
             end
@@ -103,15 +108,15 @@ for i=1:length(series_n)
         
         if series_opt(randi(length(series_opt))) == 'A' && respchange(1) == 0 || respchange(2) == 1
             stim = OSCOR(stim_dur,fs,OSCOR_fm_A,BPfilt,0);
-            series_cur = 'A';
+            series_cur = series_opt(1);
         else
-            stim = OSCOR(stim_dur,fs,OSCOR_fm_B,BPfilt,0);
-            series_cur = 'B';
+            stim = OSCOR(stim_dur,fs,OSCOR_fm_D,BPfilt,0);
+            series_cur = series_opt(2);
         end
     end
     A_respList{i} = respList;
     A_fplayed{i} = fplayed;
-    A_splayed{i} = splayed
+    A_splayed{i} = splayed;
 end
 
 save([subj '_OSCORtransition_MOLinterleave.mat'], 'A_respList', 'A_fplayed','A_splayed')
