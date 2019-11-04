@@ -75,7 +75,7 @@ for i=1:length(series)
     
     while respchange == 0
         PlayStim(stim,fs,risetime,PS,L,useTDT,'NONE',[], TypePhones);
-        WaitSecs(stim_dur + 0.2)
+        WaitSecs(stim_dur + 0.2);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %  Response Frame
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,7 +101,7 @@ for i=1:length(series)
     A_fplayed{i} = fplayed;
 end
 
-save([subj '_OSCORtransition.mat'], 'A_respList', 'A_fplayed','series')
+save([subj '_OSCORtransition_MOL.mat'], 'A_respList', 'A_fplayed','series')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);

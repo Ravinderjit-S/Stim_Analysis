@@ -14,7 +14,7 @@ subj = input('Please subject ID:', 's');
 
 %% Stim & Experimental parameters
 L=70; %dB SPL
-series_n = 1;
+series_n = 3;
 startF = [2 20]; %starting frequencies for ascending and descending
 
 
@@ -51,7 +51,7 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
-for i=1:length(series_n)
+for i=1:series_n
     OSCOR_fm_A = startF(1) + randi(4);
     OSCOR_fm_D = startF(2) - randi(4);
     series_opt = ['A' 'D'];
