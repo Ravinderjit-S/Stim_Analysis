@@ -60,7 +60,7 @@ for i=1:series_n
     splayed = []; %the series for that run ... either Ascending or descending
     respchange = [0 0]; %initializing for while loop ... this is looking at if resp has change for Ascending or Descending trials
     
-    info = sprintf('Press any button twice to start block %d/%d',i,length(series_n));
+    info = sprintf('Press any button twice to start block %d/%d',i,series_n);
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
     Screen('Flip',PS.window);
     if buttonBox  %Subject pushes button twice to begin
