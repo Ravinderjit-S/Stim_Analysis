@@ -2,7 +2,7 @@ function [stim, A_envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_sta
 % IF ERB_spacing is given, that will be used instead of Tones_num
 % This version of the binding stimulus will return one stim in ABAB format
 
-    T_a = 0.7; %Time of a part of the stimulus
+    T_a = 1.0; %Time of a part of the stimulus
     
     bw = [4 24]; %bandwidth of envelope
     lpf = 40; %low pass filter
@@ -39,6 +39,9 @@ function [stim, A_envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_sta
         
         env = fftfilt(Lp_Filt,env);
         env = env(length(env_A1)+1:end-length(env_A1));
+        if length(env) ~= length(sig_tone)
+            env = env(2:end-1); %works for T_a = 1.0 ... this is essentially due to needing fractional samples and concatenating 4 supposedly 1 second (exactly) signals
+        end
         stim = stim+sig_tone.*env;
         A_envs(:,k) = env;
     end

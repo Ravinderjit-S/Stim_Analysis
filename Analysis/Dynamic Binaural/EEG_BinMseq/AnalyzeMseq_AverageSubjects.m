@@ -177,7 +177,7 @@ xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-%print([Fig_path 'IAC_EEGResponsePower'],'-dpng','-r0')
+print([Fig_path 'IAC_EEGResponsePower'],'-dpng','-r0')
 
 figure(), hold on
 plot(f,AcrossSubjectHf_ITD-NFmean_ITD,'b','linewidth',2), xlim([0 20]), ylim([0,7]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')

@@ -8,18 +8,23 @@ function [envelope, lp_filt] = create_envelope(bw,lpf,Tlen,fs)
 %fs = sampling rate in Hz
 
     T = 0:1/fs:Tlen-1/fs;
-    noise = randn(1, 3*length(T)); %generating longer signal to chop off ends to deal with filter transients
+    extraNoise = fs*1; %extra 1 second of noise to add to beginning and end to deal with transients
+    noise = randn(1, length(T) + 2*extraNoise); %generating longer signal to chop off ends to deal with filter transients
     lb = bw(1); %lower bound
     ub = bw(2); %upper bound
-    bp_fo = round(1/lb * 4 *fs); %filter order
+    bp_fo = round(1/lb * 4 *fs); %filter order    
     bp_filt = fir1(bp_fo, [lb*2/fs ub*2/fs], 'bandpass');
+    
+    if bp_fo > extraNoise
+        warning('Filter transient partially present')
+    end
 
     noise_bp = fftfilt(bp_filt, noise);
     noise_bp = max(noise_bp, 0); %half-wave rectify bandpass noise
 
     lp_filt = allPosFilt(lpf, fs);
     envelope = fftfilt(lp_filt, noise_bp);
-    envelope = envelope(length(T)+1:2*length(T));
+    envelope = envelope(extraNoise+1:extraNoise+length(T));
 
 
 end

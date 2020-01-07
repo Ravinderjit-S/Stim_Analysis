@@ -1,6 +1,6 @@
 fs = 48828;
 %Corr_inds = [12:16];
-Corr_inds = [1:4];
+Corr_inds = [1:12];
 f_start = 100;
 f_end = 8000; 
 Tones_num = 16;
@@ -16,7 +16,7 @@ toc()
 
 
 sound(stimAAAA,fs)
-pause(3.2)
+pause(4.4)
 sound(stimABAB,fs)
 
 t = 0:1/fs:2.8-1/fs;

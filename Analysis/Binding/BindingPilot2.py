@@ -69,7 +69,7 @@ data_eeg.plot(events=blinks_eeg,scalings=scalings,show_options=True,title = 'Bin
 channels = [31,4,26,25,30]
 ylim_vals = [-3.5,3]
 ts = -0.3
-te = 3.1  #stim should be 0-2.8
+te = 3.7  #stim should be 0-2.8
 
 epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2, 3,4,5,6,7,8], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6)) #, baseline=(-0.2, 0.)) 
 evokedAll = epochsAll.average()
@@ -91,7 +91,7 @@ plt.plot(t,evk_np,c='r')
 
 #mod(val,256)
 
-Proj_OnOFF = True
+Proj_OnOFF = True #True means projections are on
 
 epochs_e1 = mne.Epochs(data_eeg, data_evnt, [1], tmin= ts, tmax= te, proj=Proj_OnOFF,reject=dict(eeg=200e-6)) 
 evoked_e1 = epochs_e1.average()
@@ -130,12 +130,13 @@ evoked_e8.plot(picks=channels,titles = '8')
 
 
 freqs = np.arange(1.,100.,1.)
-n_cycles = freqs/10
-time_bandwidth = 2.0
-vmin = -5
-vmax = 5
+T = 1./5
+n_cycles = freqs*T
+time_bandwidth = 2
+vmin = -3
+vmax = 3
 
-channels = np.arange(0,31)
+channels = np.arange(0,32)
 
 power_e1 = mne.time_frequency.tfr_multitaper(epochs_e1, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
 power_e1.plot_topo(baseline =(-0.3,0),mode= 'zlogratio', title = 'e1', vmin=vmin,vmax=vmax)
@@ -166,23 +167,23 @@ power_e8.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e8', vmin=
 power_e1_in = mne.time_frequency.tfr_multitaper(epochs_e1.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
 power_e1_in.plot_topo(baseline =(-0.3,0),mode= 'zlogratio', title = 'e1_induced', vmin=vmin,vmax=vmax)
 
-power_e2_in = mne.time_frequency.tfr_multitaper(epochs_e2.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e2_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e2_induced', vmin=vmin,vmax=vmax)
-
-power_e3_in = mne.time_frequency.tfr_multitaper(epochs_e3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e3_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e3_induced', vmin=vmin,vmax=vmax)
-
-power_e4_in = mne.time_frequency.tfr_multitaper(epochs_e4.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e4_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e4_induced', vmin=vmin,vmax=vmax)
-
-power_e5_in = mne.time_frequency.tfr_multitaper(epochs_e5.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e5_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e5_induced', vmin=vmin,vmax=vmax)
-
-power_e6_in = mne.time_frequency.tfr_multitaper(epochs_e6.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e6_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e6_induced', vmin=vmin,vmax=vmax)
-
-power_e7_in = mne.time_frequency.tfr_multitaper(epochs_e7.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
-power_e7_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e7_induced', vmin=vmin,vmax=vmax)
+#power_e2_in = mne.time_frequency.tfr_multitaper(epochs_e2.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e2_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e2_induced', vmin=vmin,vmax=vmax)
+#
+#power_e3_in = mne.time_frequency.tfr_multitaper(epochs_e3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e3_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e3_induced', vmin=vmin,vmax=vmax)
+#
+#power_e4_in = mne.time_frequency.tfr_multitaper(epochs_e4.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e4_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e4_induced', vmin=vmin,vmax=vmax)
+#
+#power_e5_in = mne.time_frequency.tfr_multitaper(epochs_e5.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e5_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e5_induced', vmin=vmin,vmax=vmax)
+#
+#power_e6_in = mne.time_frequency.tfr_multitaper(epochs_e6.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e6_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e6_induced', vmin=vmin,vmax=vmax)
+#
+#power_e7_in = mne.time_frequency.tfr_multitaper(epochs_e7.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
+#power_e7_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e7_induced', vmin=vmin,vmax=vmax)
 
 power_e8_in = mne.time_frequency.tfr_multitaper(epochs_e8.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels)
 power_e8_in.plot_topo( baseline = (-0.3, 0), mode= 'zlogratio', title = 'e8_induced', vmin=vmin,vmax=vmax)
