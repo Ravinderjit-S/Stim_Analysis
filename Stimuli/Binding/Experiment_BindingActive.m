@@ -145,7 +145,7 @@ for i=1:nconds*ntrials
     WaitSecs(0.3 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
-save(strcat(subj, '_BindingEEG_beh'), 'respList','Corr_inds','CorrSet');
+save(strcat(subj, '_BindingEEG_Act'), 'respList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
