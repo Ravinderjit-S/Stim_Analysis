@@ -25,5 +25,5 @@ t = 0:1/fs:2.8-1/fs;
 
 
 figure()
-spectrogram(stimABAB,fs/50,[],[],fs,'yaxis'), ylim([0 10])
+spectrogram(stimAAAA,fs/50,[],[],fs,'yaxis'), ylim([0 10])
 

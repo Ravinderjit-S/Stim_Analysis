@@ -23,16 +23,11 @@ f_end = 8000;
 Tones_num = 16;
 fs = 48828;
 
-Corr_inds{1} = 1:2;
-Corr_inds{2} = 1:4;
-Corr_inds{3} = 1:6;
-Corr_inds{4} = 1:8;
-Corr_inds{5} = 15:16;
-Corr_inds{6} = 13:16;
-Corr_inds{7} = 11:16;
-Corr_inds{8} = 9:16;
-Corr_inds{9} = [1, 6, 11, 16];
-Corr_inds{10} = [1, 4, 7, 10, 13, 16];
+Corr_inds{1} = 13:16;
+Corr_inds{2} = 11:16;
+Corr_inds{3} = 9:16;
+Corr_inds{4} = [1, 6, 11, 16];
+Corr_inds{5} = [1, 4, 7, 10, 13, 16];
 
 
 nconds = length(Corr_inds);
@@ -122,17 +117,15 @@ for i=1:nconds*ntrials
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %  Response Frame
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    WaitSecs(0.3); %wait until show dot for response 
-    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct);
+    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
     
     fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correct, Corr_inds{CorrSet(i)});
     respList = [respList, resp]; %#ok<AGROW>
 
-    WaitSecs(0.3 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
+    WaitSecs(0.3); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
-save(strcat(subj, '_BindingEEG_Act'), 'respList','Corr_inds','CorrSet');
+save(strcat(subj, '_BindingBehavior'), 'respList','correctList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
@@ -143,11 +136,6 @@ WaitSecs(5.0);
 invoke(PS.RP,'ZeroTag','datainL');
 invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
-
-% Pause On
-invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-invoke(PS.RP, 'SoftTrg', 6);
 
 close_play_circuit(PS.f1,PS.RP);
 fprintf(1,'\n Done with data collection!\n');

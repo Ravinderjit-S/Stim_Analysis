@@ -60,6 +60,10 @@ invoke(PS.RP,'ZeroTag','datainL');
 invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
+%% Generate First stimulus
+[stimA, stimB, stimA2, ~, ~, ~, ~, ~] = Stim_Bind_ABA(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
+stims = vertcat(stimA, stimA2, stimB);
+
 
 %% Welcome to experiment
 textlocH = PS.rect(3)/4;
@@ -73,9 +77,6 @@ pause(2.0);
 
     
 %% Experiment Begins
-
-[stimA, stimB, stimA2, ~, ~, ~, ~, ~] = Stim_Bind_ABA(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
-stims = vertcat(stimA, stimA2, stimB);
 
 for i=1:nconds*ntrials
     
@@ -124,7 +125,7 @@ for i=1:nconds*ntrials
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
     
-    fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correct, Corr_inds{CorrSet(i)});
+    fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correctList(end), Corr_inds{CorrSet(i)});
     respList = [respList, resp]; %#ok<AGROW>
 
     WaitSecs(0.3); % jit probably unnecessary b/c of variable response time by subjects but adding just in case

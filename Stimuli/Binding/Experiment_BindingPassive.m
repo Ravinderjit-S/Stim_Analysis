@@ -21,23 +21,28 @@ L = 70; %dB SPL
 respList = []; %vector that will contain the subject's responses 
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs
 TypePhones = 'earphones';
-stim_dur = 2.8; %This is set by Stim_bind function, need to regenerate stimuli to change this
+stim_dur = 4.0; %This is set by Stim_bind function, need to regenerate stimuli to change this
 f_start = 100;
 f_end = 8000;
 Tones_num = 16;
 fs = 48828;
 
+% Corr_inds{1} = [];
+% Corr_inds{2} = 15:16; %2
+% Corr_inds{3} = 13:16; %4
+% Corr_inds{4} = 11:16; %6
+% Corr_inds{5} = 9:16;  %8
+% Corr_inds{6} = [1,6,11,16];
+% Corr_inds{7} = [1,4,7,10,13,16];
+% Corr_inds{8} = 3:16;
+
+% For Pilot, only 3 conditions
 Corr_inds{1} = [];
-Corr_inds{2} = 15:16; %2
-Corr_inds{3} = 13:16; %4
-Corr_inds{4} = 11:16; %6
-Corr_inds{5} = 9:16;  %8
-Corr_inds{6} = [1,6,11,16];
-Corr_inds{7} = [1,4,7,10,13,16];
-Corr_inds{8} = 3:16;
+Corr_inds{2} = 13:16;
+Corr_inds{3} = 9:16;
 
 nconds = length(Corr_inds);
-ntrials = 125; %trials per cond
+ntrials = 150; %trials per cond
 
 CorrSet = repmat(1:nconds,1,ntrials);
 CorrSet = CorrSet(randperm(length(CorrSet)));

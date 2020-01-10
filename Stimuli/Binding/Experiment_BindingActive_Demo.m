@@ -38,7 +38,7 @@ Corr_inds{3} = 9:16;
 
 
 nconds = length(Corr_inds);
-ntrials = 150; %trials per cond
+ntrials = 3; %trials per cond
 
 CorrSet = repmat(1:nconds,1,ntrials);
 CorrSet = CorrSet(randperm(length(CorrSet)));
@@ -65,7 +65,7 @@ invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
 %% Generate first stimulus
-stim = Stim_Bind_ABAB(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
+stim = Stim_Bind_ABAB(9:16,fs,f_start, f_end, Tones_num, []);
 stim = [stim;stim];
 
 
@@ -77,45 +77,73 @@ line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 Screen('Flip',PS.window);
 
-% Turns EEG Saving on ('Pause off')
-invoke(PS.RP, 'SetTagVal', 'trgname',253);
-invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-invoke(PS.RP, 'SoftTrg', 6);
-pause(2.0);
+
+%% Demo, just listen
+
+demo1 = true;
+
+while demo1
+    info = sprintf('you will hear ABAB');
+    info2 = sprintf('Press any button twice to play stim');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+    Screen('Flip',PS.window);
+
+    if buttonBox  %Subject pushes button twice
+        getResponse(PS.RP);
+        getResponse(PS.RP);
+    else
+        getResponseKb; %#ok<UNRCH>
+        getResponseKb;
+    end
+
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo1 = false;
+    end
+    
+end
+
+demo2 = true;
+stim = Stim_Bind_ABAB([],fs,f_start, f_end, Tones_num, []);
+stim = [stim;stim];
+
+while demo2
+    info = sprintf('you will hear AAAA');
+    info2 = sprintf('Press any button twice to play stim');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+    Screen('Flip',PS.window);
+
+    if buttonBox  %Subject pushes button twice
+        getResponse(PS.RP);
+        getResponse(PS.RP);
+    else
+        getResponseKb; %#ok<UNRCH>
+        getResponseKb;
+    end
+
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo2 = false;
+    end
+    
+end
 
     
-%% Experiment Begins
+%% Demo Experiment Begins
 
 for i=1:nconds*ntrials
-    
-    %% Break
-    if mod(i,80) == 0 % optional break every 80 trials
-        % % Turns EEG Saving off ('Pause on')
-        invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-        invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-        invoke(PS.RP, 'SoftTrg', 6);
-        
-        fprintf(1,'Break ----------- \n')
-        
-        info = sprintf('Break! You are about to start trial %d out of %d',i,nconds*ntrials);
-        info2 = sprintf('Press any button twice to resume');
-        Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
-        Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
-        Screen('Flip',PS.window);
-        if buttonBox  %Subject pushes button twice
-            getResponse(PS.RP);
-            getResponse(PS.RP);
-        else
-            getResponseKb; %#ok<UNRCH>
-            getResponseKb;
-        end
-        Screen('Flip',PS.window);
-        % Turns EEG Saving on ('Pause off')
-        invoke(PS.RP, 'SetTagVal', 'trgname',253);
-        invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-        invoke(PS.RP, 'SoftTrg', 6);
-        pause(2.0);
-    end
 
     %% Play Stim
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
@@ -164,10 +192,6 @@ invoke(PS.RP,'ZeroTag','datainL');
 invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
-% Pause On
-invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-invoke(PS.RP, 'SoftTrg', 6);
 
 close_play_circuit(PS.f1,PS.RP);
 fprintf(1,'\n Done with data collection!\n');
