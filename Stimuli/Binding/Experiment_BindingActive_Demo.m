@@ -96,8 +96,9 @@ while demo1
         getResponseKb; %#ok<UNRCH>
         getResponseKb;
     end
-
-    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
+    Screen('Flip',PS.window);
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', [], TypePhones);
+    WaitSecs(stim_dur);
     
     info = sprintf('To hear again, press 1. To continue, press 2');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -109,6 +110,7 @@ while demo1
     
 end
 
+Screen('Flip',PS.window);
 demo2 = true;
 stim = Stim_Bind_ABAB([],fs,f_start, f_end, Tones_num, []);
 stim = [stim;stim];
@@ -127,9 +129,9 @@ while demo2
         getResponseKb; %#ok<UNRCH>
         getResponseKb;
     end
-
-    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
-    
+    Screen('Flip',PS.window);
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', [], TypePhones);
+    WaitSecs(stim_dur);
     info = sprintf('To hear again, press 1. To continue, press 2');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
     Screen('Flip',PS.window);
@@ -138,6 +140,20 @@ while demo2
         demo2 = false;
     end
     
+end
+
+info = sprintf('Now for a full practice run!');
+info2 = sprintf('Press any button twice when ready');
+Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+Screen('Flip',PS.window);
+
+if buttonBox  %Subject pushes button twice
+    getResponse(PS.RP);
+    getResponse(PS.RP);
+else
+    getResponseKb; %#ok<UNRCH>
+    getResponseKb;
 end
 
     
@@ -149,8 +165,7 @@ for i=1:nconds*ntrials
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
    
     
-    trig_i = CorrSet(i);
-    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', [], TypePhones);
     
     stimGenT = 0;
     if i~=nconds*ntrials
@@ -180,7 +195,6 @@ for i=1:nconds*ntrials
     WaitSecs(0.3 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
-save(strcat(subj, '_BindingEEG_Act_Pilot'), 'respList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);

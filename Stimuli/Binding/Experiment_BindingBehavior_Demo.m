@@ -93,7 +93,7 @@ while demo1
         getResponseKb; %#ok<UNRCH>
         getResponseKb;
     end
-
+    Screen('Flip',PS.window);
     for j = 1:3
             stim = [stims(j,:); stims(j,:)];
             PlayStim(stim,fs,risetime,PS,L,useTDT, num2str(j), [], TypePhones);
@@ -116,13 +116,12 @@ while demo1
         demo1 = false;
     end
 end
-
+Screen('Flip',PS.window);
 demo2 = true;
 [stimA, stimB, stimA2, ~, ~, ~, ~, ~] = Stim_Bind_ABA(13:16,fs,f_start, f_end, Tones_num, []);
 stims = vertcat(stimA, stimA2, stimB);
 
 while demo2
-
     info = sprintf('you will hear, A, A, B');
     info2 = sprintf('Press any button twice to play stim');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -136,7 +135,7 @@ while demo2
         getResponseKb; %#ok<UNRCH>
         getResponseKb;
     end
-
+    Screen('Flip',PS.window);
     for j = 1:3
             stim = [stims(j,:); stims(j,:)];
             PlayStim(stim,fs,risetime,PS,L,useTDT, num2str(j), [], TypePhones);
