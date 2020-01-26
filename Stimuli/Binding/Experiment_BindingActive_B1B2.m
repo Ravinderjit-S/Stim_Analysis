@@ -14,6 +14,7 @@ rng(s)
 
 L = 70; %dB SPL
 respList = []; %vector that will contain the subject's responses 
+correctList = [];
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs
 TypePhones = 'earphones';
 stim_dur = 4.0; %This is set by Stim_bind function, need to regenerate stimuli to change this
@@ -145,8 +146,9 @@ for i=1:nconds*ntrials
     
     fprintf(1, ['Response = %d, correct = %d, Corr_set= %d  \n'], resp,correct, CorrSet(i));
     respList = [respList, resp]; %#ok<AGROW>
+    correctList = [correctList, correct]; %#ok<AGROW>
 
-    WaitSecs(0.5 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
+    WaitSecs(1.0 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
 save(strcat(subj, '_BindingEEG_Act_B1B2'), 'respList','Corr_inds','CorrSet');

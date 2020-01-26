@@ -35,7 +35,7 @@ Corr_inds{4,2} = 1:16;
 
 
 nconds = length(Corr_inds);
-ntrials = 3; %trials per cond
+ntrials = 5; %trials per cond
 
 CorrSet = repmat(1:nconds,1,ntrials);
 CorrSet = CorrSet(randperm(length(CorrSet)));
@@ -222,11 +222,25 @@ while demo4
     end
 end
 
+info = sprintf('Now for a full practice run!');
+info2 = sprintf('Press any button twice when ready');
+Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+Screen('Flip',PS.window);
 
-
-
+if buttonBox  %Subject pushes button twice
+    getResponse(PS.RP);
+    getResponse(PS.RP);
+else
+    getResponseKb; %#ok<UNRCH>
+    getResponseKb;
+end
+Screen('Flip',PS.window);
     
 %% Experiment Begins
+
+stim = Stim_Bind_AB1AB2(Corr_inds{CorrSet(1),1}, Corr_inds{CorrSet(1),2},fs,f_start, f_end, Tones_num, []);
+stim = [stim;stim];
 
 for i=1:nconds*ntrials
     %% Play Stim
@@ -264,7 +278,6 @@ for i=1:nconds*ntrials
     WaitSecs(0.5 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
-save(strcat(subj, '_BindingEEG_Act_B1B2'), 'respList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
@@ -275,11 +288,6 @@ WaitSecs(5.0);
 invoke(PS.RP,'ZeroTag','datainL');
 invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
-
-% Pause On
-invoke(PS.RP, 'SetTagVal', 'trgname', 254);
-invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
-invoke(PS.RP, 'SoftTrg', 6);
 
 close_play_circuit(PS.f1,PS.RP);
 fprintf(1,'\n Done with data collection!\n');
