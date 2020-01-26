@@ -1,6 +1,6 @@
 fs = 48828;
 %Corr_inds = [12:16];
-Corr_inds = [1:12];
+Corr_inds = [1:8];
 f_start = 100;
 f_end = 8000; 
 Tones_num = 16;
@@ -10,7 +10,7 @@ tic()
 [stimABAB, envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing);
 toc()
 tic()
-Corr_inds = [];
+Corr_inds = [1:2:16];
 [stimAAAA, envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing);
 toc()
 
@@ -25,5 +25,5 @@ t = 0:1/fs:2.8-1/fs;
 
 
 figure()
-spectrogram(stimAAAA,fs/50,[],[],fs,'yaxis'), ylim([0 10])
+spectrogram(stimABAB,fs/50,[],[],fs,'yaxis'), ylim([0 10])
 
