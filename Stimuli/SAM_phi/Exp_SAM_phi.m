@@ -23,7 +23,7 @@ rand_order = randperm(length(AMs));
 AMs = AMs(rand_order);
 phis = phis(rand_order);
 
-risetime = 0.010;
+risetime = 0.100;
 TypePhones = 'earphones';
 stim_dur = 1.0; %duration of each SAM, 3 will be played per trial
 fs =48828.125;
@@ -81,7 +81,7 @@ for i =1:ntrials*nconds
     PlayOrder= randperm(3);
     stim = stim(PlayOrder);
     for j = 1:3
-        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        PlayStim([stim{j};stim{j}],fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
         tic();
         if j == 3 && i~= ntrials*nconds
             f1 = randi(1800) + 200; 
@@ -98,7 +98,7 @@ for i =1:ntrials*nconds
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %  Response Frame
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end),textlocH,textlocV,line2line);
+    resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
     
     fprintf(1, 'Response =%d, answer =%d, Correct = %d, fm = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), AMs(i), phis(i));
     respList = [respList, resp]; %#ok<AGROW>
