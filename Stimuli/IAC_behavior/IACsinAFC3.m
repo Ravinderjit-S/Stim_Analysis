@@ -16,13 +16,14 @@ nbn3(2,:) = A.*nbn3(1,:) + B.* nbn3(2,:);
 
 lenNBN = round(dur*fs);
 
-nbn1 = filter(BPfilt, nbn1');
+if ~isempty(BPfilt)
+    nbn1 = filter(BPfilt, nbn1');
+    nbn2 = filter(BPfilt, nbn2');
+    nbn3 = filter(BPfilt, nbn3');
+end
+
 nbn1 = nbn1(lenNBN+1:2*lenNBN,:)';
-
-nbn2 = filter(BPfilt, nbn2');
 nbn2 = nbn2(lenNBN+1:2*lenNBN,:)';
-
-nbn3 = filter(BPfilt, nbn3');
 nbn3 = nbn3(lenNBN+1:2*lenNBN,:)';
 
 
