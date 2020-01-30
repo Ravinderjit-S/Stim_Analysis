@@ -23,7 +23,7 @@ import pickle
 
 
 fig_format = 'png'
-close_plots = False
+close_plots = True
 
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/')
 dataAnalyzd_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/Pickles')
@@ -33,8 +33,7 @@ refchans = ['EXG1','EXG2']
 subjects = ['S132','S227','S228','S229','S230']
 EEG_types = ['Active','Passive']
 
-EEG_types = ['Active']
-subjects = ['S132_B1B2']
+subjects = ['S132']
 
 for m in range(0,len(subjects)):
     subject = subjects[m]
@@ -168,48 +167,48 @@ for m in range(0,len(subjects)):
         
         
  
-        freqs = np.arange(1.,120.,1.)
-        T = 1./5
-        n_cycles = freqs*T
-        time_bandwidth = 2
-        vmin = -0.2
-        vmax = 0.2
+        # freqs = np.arange(1.,120.,1.)
+        # T = 1./5
+        # n_cycles = freqs*T
+        # time_bandwidth = 2
+        # vmin = -0.2
+        # vmax = 0.2
          
-        channels = np.arange(0,32)
+        # channels = np.arange(0,32)
          
-        tfr_e1 = mne.time_frequency.tfr_multitaper(epochs_1.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)#,average=False)
-        tfr_e1.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e1', vmin=vmin,vmax=vmax)
+        # tfr_e1 = mne.time_frequency.tfr_multitaper(epochs_1.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)#,average=False)
+        # tfr_e1.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e1', vmin=vmin,vmax=vmax)
         
-        tfr_e2 = mne.time_frequency.tfr_multitaper(epochs_2.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)
-        tfr_e2.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e2', vmin=vmin,vmax=vmax)
+        # tfr_e2 = mne.time_frequency.tfr_multitaper(epochs_2.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)
+        # tfr_e2.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e2', vmin=vmin,vmax=vmax)
          
-        tfr_e3 = mne.time_frequency.tfr_multitaper(epochs_3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)
-        tfr_e3.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e3', vmin=vmin,vmax=vmax)
+        # tfr_e3 = mne.time_frequency.tfr_multitaper(epochs_3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)
+        # tfr_e3.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e3', vmin=vmin,vmax=vmax)
          
-        vmin = -1
-        vmax = 1
+        # vmin = -1
+        # vmax = 1
         
-        power_e1_evkd = mne.time_frequency.tfr_multitaper(evoked_1, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
-        power_e1_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e1_evkd', vmin=vmin,vmax=vmax)
+        # power_e1_evkd = mne.time_frequency.tfr_multitaper(evoked_1, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
+        # power_e1_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e1_evkd', vmin=vmin,vmax=vmax)
         
-        power_e2_evkd = mne.time_frequency.tfr_multitaper(evoked_2, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
-        power_e2_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e2_evkd', vmin=vmin,vmax=vmax)
+        # power_e2_evkd = mne.time_frequency.tfr_multitaper(evoked_2, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
+        # power_e2_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e2_evkd', vmin=vmin,vmax=vmax)
         
-        power_e3_evkd = mne.time_frequency.tfr_multitaper(evoked_3, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
-        power_e3_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e3_evkd', vmin=vmin,vmax=vmax)
+        # power_e3_evkd = mne.time_frequency.tfr_multitaper(evoked_3, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
+        # power_e3_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e3_evkd', vmin=vmin,vmax=vmax)
         
-        #power_e3.plot_joint(timefreqs = (1.4,30) ,picks=[30,31],baseline=(-0.3,0),fmin=28,fmax=40)
+        # #power_e3.plot_joint(timefreqs = (1.4,30) ,picks=[30,31],baseline=(-0.3,0),fmin=28,fmax=40)
  
-        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_tfr.pickle'),'wb') as f:
-            pickle.dump([tfr_e1,tfr_e2,tfr_e3],f)
+        # with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_tfr.pickle'),'wb') as f:
+        #     pickle.dump([tfr_e1,tfr_e2,tfr_e3],f)
             
-        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs.pickle'),'wb') as f:
-            pickle.dump([epochs_1,epochs_2,epochs_3],f)
+        # with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs.pickle'),'wb') as f:
+        #     pickle.dump([epochs_1,epochs_2,epochs_3],f)
             
             
-        # del data_eeg, data_evnt
-        # del evoked_1,evoked_2,evoked_3
-        # del epochs_1,epochs_2,epochs_3
+        del data_eeg, data_evnt
+        del evoked_1,evoked_2,evoked_3
+        del epochs_1,epochs_2,epochs_3
         # del tfr_e1, tfr_e2, tfr_e3
             
             

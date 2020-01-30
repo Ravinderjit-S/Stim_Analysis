@@ -6,6 +6,7 @@ addpath(data_path)
 
 Subjects = [{'S211'}, {'S001'}, {'S132'}, {'S205'}, {'S206'},{'S208'},{'S207'},{'S203'},{'S204'}];
 
+
 FMs = [];
 correctList = [];
 ntrials = 20; 

@@ -7,10 +7,11 @@ addpath(p); %add path to commonly used functions
 fs = 48828;
 f1 = 2000;
 f2 = f1*4;
+% f2 = f1;
 t = 0:1/fs:1-1/fs;
 
-fm = 4;
-phi_deg = 45;
+fm = 64;
+phi_deg = 90;
 phi_rad = (phi_deg/360) * 2*pi;
 AM1 = 0.5 * (sin(2*pi*fm.*t) +1);
 AM2 = 0.5 * (sin(2*pi*fm.*t + phi_rad) +1);

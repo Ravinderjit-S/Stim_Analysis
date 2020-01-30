@@ -30,7 +30,7 @@ dataAnalyzd_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Bi
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-EEG_types = ['Active']
+EEG_types = ['Passive']
 subjects = ['S132']
 
 for m in range(0,len(subjects)):
@@ -38,7 +38,7 @@ for m in range(0,len(subjects)):
     for k in range(0,len(EEG_types)):
         EEG_type = EEG_types[k]
         print('\n' + '... ' + subject + '  ..........  ' + EEG_type +'\n')
-        fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/BindingPilot/'+subject)
+        fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/BindingPilot/B1B2'+subject)
         fig_path_blinkprojs = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/BindingPilot/BlinkProjections')
         
         
@@ -96,7 +96,7 @@ for m in range(0,len(subjects)):
         # if subject == 'S228':
         #     ylim_vals = [-4.5, 7.5]
         
-        epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2, 3, 4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.3, 0.)) 
+        epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2, 3, 4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.)) 
         evokedAll = epochsAll.average()
         
         epochs_1 = mne.Epochs(data_eeg, data_evnt, [1], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.)) 
@@ -211,10 +211,13 @@ for m in range(0,len(subjects)):
         #power_e3.plot_joint(timefreqs = (1.4,30) ,picks=[30,31],baseline=(-0.3,0),fmin=28,fmax=40)
  
         with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_tfr.pickle'),'wb') as f:
-            pickle.dump([tfr_e1,tfr_e2,tfr_e3, tfr_e4, tfr_eAlle],f)
+            pickle.dump([tfr_e1,tfr_e2,tfr_e3, tfr_e4, tfr_eAll],f)
             
-        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs.pickle'),'wb') as f:
-            pickle.dump([epochs_1,epochs_2,epochs_3,epochs_4],f)
+        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs12.pickle'),'wb') as f:
+            pickle.dump([epochs_1,epochs_2],f)
+            
+        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs34.pickle'),'wb') as f:
+            pickle.dump([epochs_3,epochs_4],f)
             
             
         # del data_eeg, data_evnt

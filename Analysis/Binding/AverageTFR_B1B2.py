@@ -58,36 +58,38 @@ def plot_chAvg_tfr(tfr_obj, picks, vmin,vmax,title):
 
 
 # data from spring 20 pilot on binding
-data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/Pickles')
-subjects = ['S132','S227','S228','S230']
+data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/B1B2/Pickles')
+subjects = ['S132']
 EEG_types = ['Active','Passive']
 
-subjects=['S229']
+subjects=['S132']
 EEG_type = EEG_types[0]
 
 
 for m in range(0,len(subjects)):
     subject = subjects[m]
     with open(os.path.join(data_loc,subject+'_'+EEG_type+'_tfr.pickle'),'rb') as f:
-        tfr_e1, tfr_e2, tfr_e3 = pickle.load(f)
+        tfr_e1, tfr_e2, tfr_e3, tfr_e4, tfr_eAll = pickle.load(f)
     if m ==0:   # initialize first tfr object 
         tfr_e1_all = tfr_e1
         tfr_e2_all = tfr_e2
         tfr_e3_all = tfr_e3
+        tfr_e4_all = tfr_e4
     else:
         tfr_e1_all += tfr_e1
         tfr_e2_all += tfr_e2
         tfr_e3_all += tfr_e3
+        tfr_e4_all += tfr_e4
     
-    
-
-
 vmin = -0.1
 vmax = 0.1
 bline = (-0.2,0)
 tfr_e1_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e1_all_' + EEG_type, vmin=vmin,vmax=vmax)
 tfr_e2_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e2_all' + EEG_type, vmin=vmin,vmax=vmax)
 tfr_e3_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e3_all_' + EEG_type, vmin=vmin,vmax=vmax)
+tfr_e4_all.plot_topo(baseline =bline,mode = 'logratio', title = 'e4_all_' + EEG_type, vmin=vmin,vmax=vmax)
+tfr_eAll.plot_topo(baseline =bline,mode = 'logratio', title = 'e_all_' + EEG_type, vmin=vmin,vmax=vmax)
+
 
 # vmin= 1e-9
 # vmax= 5e-8
@@ -108,14 +110,18 @@ channels = np.arange(0,32)
 
 for m in range(0,len(subjects)):
     subject = subjects[m]
-    with open(os.path.join(data_loc,subject+'_'+EEG_type+'_epochs.pickle'),'rb') as f:
-        epochs1, epochs2, epochs3 = pickle.load(f) 
+    with open(os.path.join(data_loc,subject+'_'+EEG_type+'_epochs12.pickle'),'rb') as f:
+        epochs1, epochs2 = pickle.load(f) 
+    with open(os.path.join(data_loc,subject+'_'+EEG_type+'_epochs34.pickle'),'rb') as f:
+        epochs3, epochs4 = pickle.load(f)    
     evoked1 = epochs1.average()
     evoked2 = epochs2.average()
     evoked3 = epochs3.average()
+    evoked4 = epochs4.average()
     tfr_e1_evkd = mne.time_frequency.tfr_multitaper(evoked1, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
     tfr_e2_evkd = mne.time_frequency.tfr_multitaper(evoked2, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
     tfr_e3_evkd = mne.time_frequency.tfr_multitaper(evoked3, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
+    tfr_e4_evkd = mne.time_frequency.tfr_multitaper(evoked4, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=4)
     
     # tfr_e1_evkd.plot_topo(baseline=(-0.3,0),mode='zlogratio',title='e1_evkd_' + EEG_type + '_'+subject,vmin=vmin,vmax=vmax)
     # tfr_e2_evkd.plot_topo(baseline=(-0.3,0),mode='zlogratio',title='e2_evkd_' + EEG_type + '_'+subject,vmin=vmin,vmax=vmax)
@@ -125,11 +131,12 @@ for m in range(0,len(subjects)):
         tfr_e1_evkd_all = tfr_e1_evkd
         tfr_e2_evkd_all = tfr_e2_evkd
         tfr_e3_evkd_all = tfr_e3_evkd
+        tfr_e4_evkd_all = tfr_e4_evkd
     else:
         tfr_e1_evkd_all += tfr_e1_evkd
         tfr_e2_evkd_all += tfr_e2_evkd
         tfr_e3_evkd_all += tfr_e3_evkd
-        
+        tfr_e4_evkd_all += tfr_e4_evkd
     #del tfr_e1_evkd, tfr_e2_evkd, tfr_e3_evkd, evoked1, evoked2,evoked3
     
         
@@ -138,7 +145,7 @@ vmax = 1
 tfr_e1_evkd_all.plot_topo(baseline=bline,mode='logratio',title='e1_evkd_All' + EEG_type,vmin=vmin,vmax=vmax)
 tfr_e2_evkd_all.plot_topo(baseline=bline,mode='logratio',title='e2_evkd_All' + EEG_type,vmin=vmin,vmax=vmax)
 tfr_e3_evkd_all.plot_topo(baseline=bline,mode='logratio',title='e3_evkd_All' + EEG_type,vmin=vmin,vmax=vmax)
-
+tfr_e4_evkd_all.plot_topo(baseline=bline,mode='logratio',title='e3_evkd_All' + EEG_type,vmin=vmin,vmax=vmax)
 
 
 
@@ -162,18 +169,18 @@ tfr_e3_evkd_all.plot_topo(baseline=bline,mode='logratio',title='e3_evkd_All' + E
 
 
 picks = [4,25,30,31,8,21]
-vmin = -10
-vmax = 10
-# subject = 'all'
-plot_chAvg_tfr(tfr_e1_evkd_all,picks,vmin,vmax,title= subject+'_e1_evkd_' +EEG_type)
+vmin = -8
+vmax = 8
 plot_chAvg_tfr(tfr_e2_evkd_all,picks,vmin,vmax,title= subject+'_e2_evkd_' +EEG_type)
-plot_chAvg_tfr(tfr_e3_evkd_all,picks,vmin,vmax,title= subject+'_e3_evkd_' +EEG_type)
+plot_chAvg_tfr(tfr_e4_evkd_all,picks,vmin,vmax,title= subject+'_e4_evkd_' +EEG_type)
+# plot_chAvg_tfr(tfr_eAll_evkd_all,picks,vmin,vmax,title= subject+'_eAll_evkd_' +EEG_type)
 
-vmin = -2
-vmax = 2
+
+vmin = -3
+vmax = 0.5
+plot_chAvg_tfr(tfr_eAll,picks,vmin,vmax,title= subject+'_eAll_induced_' +EEG_type)
 plot_chAvg_tfr(tfr_e1_all,picks,vmin,vmax,title= subject+'_e1_induced_' +EEG_type)
-plot_chAvg_tfr(tfr_e2_all,picks,vmin,vmax,title= subject+'_e2_induced_' +EEG_type)
-plot_chAvg_tfr(tfr_e3_all,picks,vmin,vmax,title= subject+'_e3_induced_' +EEG_type)
+plot_chAvg_tfr(tfr_e4_all,picks,vmin,vmax,title= subject+'_e4_induced_' +EEG_type)
 
 
 
