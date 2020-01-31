@@ -15,8 +15,8 @@ phi_test = [15, 30, 45, 60, 75, 90, 180];
 L=70; %dB SPL
 ntrials = 20;
 nconds = numel(FMs_test) * numel(phi_test);
-f1 = 1000; 
-f2 = 1000; 
+f1 = randi(1800) + 200; 
+f2 = f1*4; 
 dF1 = f1*.05;
 dF2 = f2*.05;
 
@@ -88,7 +88,9 @@ for i =1:ntrials*nconds
         tic();
         if j == 3 && i~= ntrials*nconds
             f1 = randi(1800) + 200; 
-            f2 = 4*f1; 
+            f2 = f1*4; 
+            dF1 = f1*.05;
+            dF2 = f2*.05;
             stim = FM_phi(f1,f2,fs,stim_dur,FMs(i+1),dF1,dF2,phis(i+1)); %first stim
             StimGenTime = toc();
         else

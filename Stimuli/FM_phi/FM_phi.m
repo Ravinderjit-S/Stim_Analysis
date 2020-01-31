@@ -15,7 +15,7 @@ t = 0:1/fs:tlen-1/fs;
 
 phase1 = dF1/fm * sin(2*pi*fm*t);
 phase2 = dF2/fm * sin(2*pi*fm*t);
-phase3 = dF2/fm * sin(2*pi*fm*t + phase_diff);
+phase3 = dF2/fm * sin(2*pi*fm*t + phi_rad);
 
 x1 = sin(2*pi*f1*t + phase1);
 x2 = sin(2*pi*f2*t + phase2);
