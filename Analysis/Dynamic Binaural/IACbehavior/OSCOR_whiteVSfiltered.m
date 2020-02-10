@@ -1,6 +1,6 @@
 % compare white noise oscor to filtere noise oscor
 clear
-
+Data_path = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/';
 oscor_white = load('/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/OSCOR_white/S211_whitenoise_OSCORfmThresh.mat');
 oscor_filt = load('/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/S211_OSCORfmThresh.mat');
 
@@ -24,3 +24,6 @@ xlabel('OSCOR FM (Hz)')
 ylabel('Accuracy')
 ylim([0,1.05]), xlim([2.2 8.4])
 legend('White','Filt','Chance','location','northeast')
+
+
+save([Data_path 'OSCORwhite_processed.mat'],'Accuracy_white')

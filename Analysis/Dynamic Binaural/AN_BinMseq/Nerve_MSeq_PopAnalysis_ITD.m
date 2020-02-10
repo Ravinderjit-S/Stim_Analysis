@@ -3,6 +3,7 @@ clear all
 Analyze_dates = [{'09.16.18'},{'09.20.18'},{'09.21.18'},{'10.01.18'},{'10.12.18'}];
 
 addpath('../../Neuron Analysis Functions')
+addpath('/media/ravinderjit/Data_Drive/Data/AuditoryNerve/DynBin')
 
 Screen_pixelLocs = [1986 1 1855 1001]; %makes figure the size of my second screen at Lyle ... saves the figure as a larger figure
 All_CF_RT = [];
@@ -155,10 +156,10 @@ for TheDate = 1:numel(Analyze_dates)
             
             if MSO_lines <100
                 Used = [Used 0];
-                saveas(gcf,['Not_Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
+%                 saveas(gcf,['Not_Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
             else
                 Used = [Used 1];
-                saveas(gcf,['Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
+%                 saveas(gcf,['Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
             end
                 
             
@@ -307,7 +308,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_PowerFreq','-dpng','-r0')
+% print('ITD_PowerFreq','-dpng','-r0')
 
 
 figure, hold on
@@ -326,7 +327,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_CFvsRollOff','-dpng','-r0')
+% print('ITD_CFvsRollOff','-dpng','-r0')
 
 figure, hold on
 for i =1:size(All_phasef2)
@@ -346,7 +347,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_PhaseFreq','-dpng','-r0')
+% print('ITD_PhaseFreq','-dpng','-r0')
 
 figure, hold on
 for i=1:size(All_Himpf2,1)
@@ -359,7 +360,10 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('ITD_GroupDelay','-dpng','-r0')
+% print('ITD_GroupDelay','-dpng','-r0')
+
+
+save(['/media/ravinderjit/Data_Drive/Data/AuditoryNerve/DynBin/' 'ITDnerveMseq_figData.mat'],'All_CF_interp2','All_Roll_off_Freq2','All_GroupDelay2')
 
 
 % figure,semilogx(sort(unique(All_CF_interp(Used==1))), ones(1,length(unique(All_CF_interp(Used==1)))),'x')
@@ -409,5 +413,7 @@ subplot(2,1,2), semilogx(All_CF_interp,abs(All_GroupDelay),'x'),xlabel('CF(Hz)')
 % legend(num2str(un_Atten(1)),num2str(un_Atten(2)),num2str(un_Atten(3)),num2str(un_Atten(4)),num2str(un_Atten(5)))
 % 
 % 
-% 
-% 
+
+
+
+

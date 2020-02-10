@@ -1,5 +1,5 @@
 clear all
-data_path = '../../../../Data/IACbehavior/';
+data_path = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/';
 Fig_path = '../../../../Figures/DynBin/';
 OL_path = '../../../../../Apps/Overleaf/Binaural Bash 2019/Figures/';
 addpath(data_path)
@@ -12,7 +12,7 @@ correctList = [];
 ntrials = 20; 
 respList = [];
 for i =1:numel(Subjects)
-     ThisData= load([Subjects{i} '_OSCORfmThresh.mat']);
+     ThisData= load([data_path Subjects{i} '_OSCORfmThresh.mat']);
      FMs = horzcat(FMs,ThisData.FMs');
      correctList = horzcat(correctList,ThisData.correctList');
      respList = horzcat(respList,ThisData.respList');
@@ -76,9 +76,11 @@ set(gca,'fontsize',15)
 ylim([0,1.05]), xlim([2.2 8.4])
 fig.PaperPosition = [0 0 9 6];
 legend([PerfAvg, Individ(1), Chance(1)], {['Performance ' char(177) ' SEM'], 'Individuals' ,'Chance Level'},'location','southwest')
-print([Fig_path 'OscorFMbehavior'],'-depsc','-r0')
-print([Fig_path 'OscorFMbehavior'],'-dpng','-r0')
+% print([Fig_path 'OscorFMbehavior'],'-depsc','-r0')
+% print([Fig_path 'OscorFMbehavior'],'-dpng','-r0')
 %print([OL_path 'OscorFMbehavior'],'-depsc','-r0')
+
+save([data_path 'OSCORfmThresh_processed.mat'],'FM_played','Accuracy','sem')
 
 %% Also look at rand AM vs IAC 
 

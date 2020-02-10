@@ -5,6 +5,7 @@ Analyze_dates = [{'09.16.18'},{'09.20.18'},{'09.21.18'},{'10.01.18'},{'10.12.18'
 
 
 addpath('../../Neuron Analysis Functions')
+addpath('/media/ravinderjit/Data_Drive/Data/AuditoryNerve/DynBin')
 
 Screen_pixelLocs = [1986 1 1855 1001]; %makes figure the size of my second screen at Lyle ... saves the figure as a larger figure
 All_CF_RT = [];
@@ -158,12 +159,12 @@ for TheDate = 1:numel(Analyze_dates)
             
             if MSO_lines <100
                 Used = [Used 0];
-                saveas(gcf,['Not_Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
+%                 saveas(gcf,['Not_Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
             else
                 Used = [Used 1];
-                saveas(gcf,['Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
+%                 saveas(gcf,['Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
             end
-                
+%                 
             
 %             figure, semilogx(f_H,Z_Hf),title('Z_Hf')
             
@@ -332,7 +333,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_PowerFreq','-dpng','-r0')
+% print('IAC_PowerFreq','-dpng','-r0')
 
 figure, hold on
 for i =1:size(All_Himpf2,1)
@@ -350,7 +351,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_CFvsRollOff_6dB','-dpng','-r0')
+% print('IAC_CFvsRollOff_6dB','-dpng','-r0')
 
 figure, hold on
 for i =1:size(All_phasef2)
@@ -370,7 +371,7 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_PhaseFreq','-dpng','-r0')
+% print('IAC_PhaseFreq','-dpng','-r0')
 
 figure, hold on
 for i=1:size(All_Himpf2,1)
@@ -383,8 +384,10 @@ set(gca,'fontsize',25)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print('IAC_GroupDelay','-dpng','-r0')
+% print('IAC_GroupDelay','-dpng','-r0')
    
+
+save(['/media/ravinderjit/Data_Drive/Data/AuditoryNerve/DynBin/' 'IACnerveMseq_figData.mat'],'All_CF_interp2','All_Roll_off_Freq2','All_GroupDelay2')
 
 
 
