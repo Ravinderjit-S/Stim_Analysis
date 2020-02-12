@@ -1,4 +1,4 @@
-function [stim] = FM_phi(f1,f2,fs,tlen,fm,dF1,dF2,phi_deg)
+function [stim] = FM_phi(f1,f2,fs,tlen,fm,phi_deg)
 %This fucntion will return a 3 AFC stim where the 3rd stimulus has an FM
 %with a phase difference 
 %f1 = frequency of tone 1
@@ -6,9 +6,10 @@ function [stim] = FM_phi(f1,f2,fs,tlen,fm,dF1,dF2,phi_deg)
 %fs = sampling rate
 %tlen = length of stim in seconds
 %fm = FM rate
-%df1 = deviation from f1
-%df2 = deviation from f2
 %phi_deg = phase difference between two FMs in degrees
+
+dF1 = f1 * 0.05;
+dF2 = f2 * 0.05;
 
 phi_rad = (phi_deg/360) * 2*pi;
 t = 0:1/fs:tlen-1/fs;

@@ -1,4 +1,4 @@
-%3 AFC to find highest detectable OSCOR fm
+%3AFC to determine phase difference detectable at different AM rates
 
 clear all; close all hidden; clc; %#ok<CLALL>
 path = '../CommonExperiment';
