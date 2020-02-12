@@ -9,6 +9,7 @@ load('s.mat')
 rng(s)
 
 subj = input('Please subject ID:', 's');
+file_load = input('File name for last block to load, type NONE if starting from 1st block:','s');
 %% Stim & Experimental parameters
 Mods_test = [4,8,16,32,64];
 phi_test = [15, 30, 45, 60, 75, 90, 180];
@@ -90,7 +91,7 @@ ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 blockSize_i = blockSize;
 trialgen = 1;
 
-file_load = ('Last block to load, type NONE if from 1st block','s');
+
 if ~strcmpi(file_load,'NONE')
     load(file_load);
 end
@@ -102,9 +103,9 @@ for b=1:blocks
     f1 = randi(1800) + 200; 
     f2 = 4*f1; 
     if params.modType(b) == 'A'
-        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phis(trialgen));
+        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
     else
-        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phis(trialgen));
+        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
     end
 
     for i =1:blockSize_i 
@@ -121,9 +122,9 @@ for b=1:blocks
                 f1 = randi(1800) + 200; 
                 f2 = 4*f1; 
                 if params.modType(b) == 'A'
-                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phis(trialgen)); 
+                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen)); 
                 else
-                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phis(trialgen));
+                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
                 end
                 StimGenTime = toc();
             else
