@@ -17,8 +17,7 @@ ntrials = 20;
 nconds = numel(FMs_test) * numel(phi_test);
 f1 = randi(1800) + 200; 
 f2 = f1*4; 
-dF1 = f1*.05;
-dF2 = f2*.05;
+diotic = 0; %send carriers to different ears if 1
 
 FMs = repmat(FMs_test,1,ntrials*length(phi_test));
 phis = repmat(phi_test,1,ntrials * length(FMs_test));
@@ -59,7 +58,7 @@ line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
 
-stim = FM_phi(f1,f2,fs,stim_dur,FMs(1),dF1,dF2,phis(1)); %first stim
+stim = FM_phi(f1,f2,fs,stim_dur,FMs(1),phis(1),diotic); %first stim
 
 for i =1:ntrials*nconds
     
@@ -84,14 +83,14 @@ for i =1:ntrials*nconds
     PlayOrder= randperm(3);
     stim = stim(PlayOrder);
     for j = 1:3
-        PlayStim([stim{j};stim{j}],fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
         tic();
         if j == 3 && i~= ntrials*nconds
             f1 = randi(1800) + 200; 
             f2 = f1*4; 
             dF1 = f1*.05;
             dF2 = f2*.05;
-            stim = FM_phi(f1,f2,fs,stim_dur,FMs(i+1),dF1,dF2,phis(i+1)); %first stim
+            stim = FM_phi(f1,f2,fs,stim_dur,FMs(i+1),phis(i+1),diotic); %first stim
             StimGenTime = toc();
         else
             StimGenTime = toc();

@@ -17,6 +17,7 @@ phi_test = [15, 30, 45, 60, 75, 90, 180];
 L=70; %dB SPL
 ntrials = 20;
 nconds = numel(Mods_test) * numel(phi_test);
+diotic = 0; %if 1, send carriers to different ears
 
 AMs = repmat(Mods_test,1,ntrials*length(phi_test));
 AM_phis = repmat(phi_test,1,ntrials * length(Mods_test));
@@ -103,9 +104,9 @@ for b=1:blocks
     f1 = randi(1800) + 200; 
     f2 = 4*f1; 
     if params.modType(b) == 'A'
-        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
+        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
     else
-        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
+        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
     end
 
     for i =1:blockSize_i 
@@ -116,15 +117,15 @@ for b=1:blocks
         PlayOrder= randperm(3);
         stim = stim(PlayOrder);
         for j = 1:3
-            PlayStim([stim{j};stim{j}],fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+            PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
             tic();
             if j == 3 && i~= blockSize
                 f1 = randi(1800) + 200; 
                 f2 = 4*f1; 
                 if params.modType(b) == 'A'
-                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen)); 
+                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic); 
                 else
-                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen));
+                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
                 end
                 StimGenTime = toc();
             else
