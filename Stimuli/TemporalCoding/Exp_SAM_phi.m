@@ -106,7 +106,7 @@ for i =1:ntrials*nconds
     
 end
 
-save([subj '_SAM_phi.mat'],'AMs','ntrials','respList','correctList','phis')
+save([subj '_SAM_phi.mat'],'AMs','ntrials','respList','correctList','phis','diotic')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);

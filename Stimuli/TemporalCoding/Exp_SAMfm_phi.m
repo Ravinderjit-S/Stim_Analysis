@@ -145,7 +145,7 @@ for b=1:blocks
 
     end
 
-    save([subj '_SamFm_phi_block' num2str], 'params', 'ntrials','respList','correctList','trialgen') 
+    save([subj '_SamFm_phi_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','diotic') 
     
     info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b,blocks);
     Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
@@ -162,7 +162,7 @@ for b=1:blocks
     
 end
 
-save([subj '_SamFm_phi_aBlocks.mat'],'params', 'ntrials','respList','correctList')
+save([subj '_SamFm_phi_aBlocks.mat'],'params', 'ntrials','respList','correctList','diotic')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
