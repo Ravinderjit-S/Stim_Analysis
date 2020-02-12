@@ -1,10 +1,10 @@
 % Look at some processed binaural EEG data mseq
 clear
 Subjects = [{'S001'},{'S132'},{'S203'},{'S204'},{'S205'},{'S206'},{'S207'},{'S208'}];
-data_path = '../../../../Data/EEG_DynBin/';
-Fig_path = '../../../../Figures/DynBin/';
+data_path = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mats';
+Fig_path = '/media/ravinderjit/Data_Drive/Data/Figures/DynBin';
 addpath(data_path)
-load('Mseq_4096fs_compensated.mat')
+load('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat')
 
 fs = 4096;
 Keep_H = 1; %time length of impulse response to keep
@@ -170,28 +170,34 @@ set(plotstd,'facealpha',0.5)
 % title('IAC Across Subjects')
 % legend('Response Power', 'CI>95%')
 legend('Mean w/ 95% CI','Noise Floor w/ 95% CI','location','northeast')
-set(gca,'fontsize',25)
+set(gca,'fontsize',20)
 set(gca,'XScale','log')
 yticks([0:2:10])
 xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
-print([Fig_path 'IAC_EEGResponsePower'],'-dpng','-r0')
+% print([Fig_path 'IAC_EEGResponsePower'],'-dpng','-r0')
 
 figure(), hold on
-plot(f,AcrossSubjectHf_ITD-NFmean_ITD,'b','linewidth',2), xlim([0 20]), ylim([0,7]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')
-plotstd = fill([f;flipud(f)],[zeros(length(f),1);flipud(NFstd_ITD)],'r','linestyle','none');
+plot(f,AcrossSubjectHf_ITD-NFmean_ITD,'k','linewidth',5), xlim([0 20]), ylim([0,7]), xlabel('Frequency (Hz)'), ylabel('Response Power (dB/Hz)')
+plotsem = fill([f(Index_log);flipud(f(Index_log))],[AcrossSubjectHf_ITD(Index_log)-AcrossSubjectHf_ITD_SEM(Index_log)-NFmean_ITD(Index_log);flipud(AcrossSubjectHf_ITD(Index_log)+AcrossSubjectHf_ITD_SEM(Index_log)-NFmean_ITD(Index_log))],'k','linestyle','none');
+set(plotsem,'facealpha',0.5)
+
+plotstd = fill([f(Index_log);flipud(f(Index_log))],[zeros(length(f(Index_log)),1);flipud(NFstd_ITD(Index_log))],'r','linestyle','none');
 set(plotstd,'facealpha',0.5)
 % title('ITD Across Subjects')
-legend('Response Power', 'CI>95%')
-set(gca,'fontsize',25)
+% legend('Response Power', 'CI>95%')
+set(gca,'fontsize',20)
+set(gca,'XScale','log')
 yticks([0:1:7])
 xticks([0:5:20])
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 8];
 %print('ITD_EEGResponsePower','-dpng','-r0')
+
+
 
 
 
