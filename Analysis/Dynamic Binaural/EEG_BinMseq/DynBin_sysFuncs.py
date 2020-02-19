@@ -14,7 +14,9 @@ import scipy.io as sio
 import os
 import pickle
 import numpy as np
+import scipy as sp
 from anlffr.spectral import mtspecraw
+from spectralAnalysis import periodogram
 # import mne
 
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
@@ -116,6 +118,33 @@ plt.plot(f,IAC_Hf)
 plt.plot(f,NF_Hfs.T,color= mcolors.CSS4_COLORS['grey'])
 fig.axes[0].set_xscale('log')
 plt.xlim([0,20])
+
+
+#%% Calculate TMTF via PLV
+
+
+# Mf = sp.fft(Mseq,axis=0,n=N)
+# Yf = sp.fft(IAC32.mean(axis=1),axis=0,n=N)
+# f = np.arange(0,N)*fs/N
+TW = 4 #time half bandwidth product
+ntaps = 2*TW -1 
+dpss = sp.signal.windows.dpss(Mseq.size,TW,ntaps)
+
+N = int(2**np.ceil(np.log2(Mseq.size)))
+Mf = np.zeros([Mseq.size])
+
+for k in range(0,ntaps):
+    window = dpss[k,:]
+    Mf[k,:] += sp.fft(Mseq[:,0]*window,axis=0,n=N) / ntaps
+    
+    
+
+
+plt.figure()
+plt.plot(f,abs(Mf)**2)
+
+
+
 
 
 

@@ -21,18 +21,22 @@ import pickle
 
 
 
-def plot_chAvg_tfr(tfr_obj, picks, vmin,vmax,title):
+def plot_chAvg_tfr(tfr_obj, picks, vmin,vmax,title,bline):
 # This function will average tfr data for the channels in picks. It references to baseline and does 10log10
 #tfr_obj = mne tfr object
     
 
     tfr_data = tfr_obj.data[picks,:,:]
     t = tfr_obj.times
-    b1 = int(np.argwhere(t>=-0.2)[0])
-    b2 = int(np.argwhere(t>=0)[0])
     f = tfr_obj.freqs
     AvgCh = tfr_data.mean(axis=0)
-    AvgCh = 10*np.log10(AvgCh/AvgCh[:,b1:b2].mean(axis=1).reshape(119,1))
+    
+    if bline[0] == None:
+        AvgCh = 10*np.log10(AvgCh/AvgCh.mean(axis=1).reshape(119,1))
+    else:
+        b1 = int(np.argwhere(t>=bline[0])[0])
+        b2 = int(np.argwhere(t>=bline[1])[0])
+        AvgCh = 10*np.log10(AvgCh/AvgCh[:,b1:b2].mean(axis=1).reshape(119,1))
 
     plt.figure()
     Z = AvgCh
@@ -63,7 +67,7 @@ subjects = ['S132','S227','S228','S230']
 EEG_types = ['Active','Passive']
 
 subjects=['S229']
-EEG_type = EEG_types[0]
+EEG_type = EEG_types[1]
 
 
 for m in range(0,len(subjects)):
@@ -84,7 +88,7 @@ for m in range(0,len(subjects)):
 
 vmin = -0.1
 vmax = 0.1
-bline = (-0.2,0)
+bline = (0,4)
 tfr_e1_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e1_all_' + EEG_type, vmin=vmin,vmax=vmax)
 tfr_e2_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e2_all' + EEG_type, vmin=vmin,vmax=vmax)
 tfr_e3_all.plot_topo(baseline =bline,mode= 'logratio', title = 'e3_all_' + EEG_type, vmin=vmin,vmax=vmax)
@@ -165,15 +169,16 @@ picks = [4,25,30,31,8,21]
 vmin = -10
 vmax = 10
 # subject = 'all'
-plot_chAvg_tfr(tfr_e1_evkd_all,picks,vmin,vmax,title= subject+'_e1_evkd_' +EEG_type)
-plot_chAvg_tfr(tfr_e2_evkd_all,picks,vmin,vmax,title= subject+'_e2_evkd_' +EEG_type)
-plot_chAvg_tfr(tfr_e3_evkd_all,picks,vmin,vmax,title= subject+'_e3_evkd_' +EEG_type)
+plot_chAvg_tfr(tfr_e1_evkd_all,picks,vmin,vmax,title= subject+'_e1_evkd_' +EEG_type,bline=bline)
+plot_chAvg_tfr(tfr_e2_evkd_all,picks,vmin,vmax,title= subject+'_e2_evkd_' +EEG_type,bline=bline)
+plot_chAvg_tfr(tfr_e3_evkd_all,picks,vmin,vmax,title= subject+'_e3_evkd_' +EEG_type,bline=bline)
 
-vmin = -2
-vmax = 2
-plot_chAvg_tfr(tfr_e1_all,picks,vmin,vmax,title= subject+'_e1_induced_' +EEG_type)
-plot_chAvg_tfr(tfr_e2_all,picks,vmin,vmax,title= subject+'_e2_induced_' +EEG_type)
-plot_chAvg_tfr(tfr_e3_all,picks,vmin,vmax,title= subject+'_e3_induced_' +EEG_type)
+vmin = -1
+vmax = 1
+plot_chAvg_tfr(tfr_e1_all,picks,vmin,vmax,title= subject+'_e1_induced_' +EEG_type,bline=bline)
+plot_chAvg_tfr(tfr_e2_all,picks,vmin,vmax,title= subject+'_e2_induced_' +EEG_type,bline=bline)
+plot_chAvg_tfr(tfr_e3_all,picks,vmin,vmax,title= subject+'_e3_induced_' +EEG_type,bline=bline)
+
 
 
 

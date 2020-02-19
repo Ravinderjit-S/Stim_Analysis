@@ -25,7 +25,7 @@ refchans = ['EXG1','EXG2']
 data_eeg = [];
 data_evnt = [];
     
-direct_ = '/media/ravinderjit/Data_Drive/EEGdata/EFR'
+direct_ = '/media/ravinderjit/Data_Drive/Data/EEGdata/EFR'
 
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
@@ -40,9 +40,10 @@ Trigs = data_evnt[:,2]
 Trigs[1001:] = 2
 data_evnt[:,2] = Trigs   #ran 1000 trials at mod of 41 Hz and 1000 at mod of 151 but all have the same trigger. Giving 151 mod rate trigg value of 2
 
-epoch_data = mne.Epochs(data_eeg, data_evnt, [2], tmin=-0.1, tmax=1.1,reject=dict(eeg=200e-6)) #, baseline=(-0.2, 0.)) 
+epoch_data = mne.Epochs(data_eeg, data_evnt, [2], tmin=-0.2, tmax=1.1,reject=dict(eeg=200e-6), baseline=(-0.2, 0.)) 
 evkd_data = epoch_data.average();
-evkd_data.plot(titles = 'EFR')
+evkd_data.plot(titles = 'EFR',picks=31)
+
 
 #data_raw = data_eeg.get_data()[0:31,:]
 data_raw = evkd_data.data[0:31,:]
