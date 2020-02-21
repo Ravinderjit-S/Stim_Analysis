@@ -92,11 +92,12 @@ ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 blockSize_i = blockSize;
 trialgen = 1;
 
-
+start_block=1;
 if ~strcmpi(file_load,'NONE')
     load(file_load);
+    start_block=str2num(file_load(end-4))+1;
 end
-for b=1:blocks
+for b=start_block:blocks
     if (b == blocks || b == blocks-1) && mod(length(AMs),blockSize) ~=0
         blockSize_i = mod(length(AMs) ,blockSize);
     end
@@ -147,7 +148,7 @@ for b=1:blocks
 
     save([subj '_SamFm_phi_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','diotic') 
     
-    info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b,blocks);
+    info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
     Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
     Screen('Flip',PS.window);
     fprintf(1, 'Break \n');
