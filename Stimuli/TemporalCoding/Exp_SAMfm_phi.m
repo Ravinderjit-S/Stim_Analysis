@@ -5,8 +5,6 @@ path = '../CommonExperiment';
 p = genpath(path);
 addpath(p);
 
-load('s.mat')
-rng(s)
 
 subj = input('Please subject ID:', 's');
 file_load = input('File name for last block to load, type NONE if starting from 1st block:','s');
