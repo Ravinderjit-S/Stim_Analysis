@@ -1,6 +1,6 @@
 %Analyze data from 3AFC SAM, phi difference experiment 
 clear
-data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/SAMphi/';
+data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/TemporalCoding/SAMphi/';
 subj = 'S211_di_SAM_phi';
 load([data_loc, subj, '.mat'])
 
