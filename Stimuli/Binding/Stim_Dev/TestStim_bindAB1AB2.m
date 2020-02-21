@@ -18,3 +18,4 @@ sound(stimABAB,fs)
 figure()
 spectrogram(stimABAB,fs/50,[],[],fs,'yaxis'), ylim([0 10])
 
+

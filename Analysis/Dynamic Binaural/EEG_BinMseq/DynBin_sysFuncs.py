@@ -19,6 +19,33 @@ from anlffr.spectral import mtspecraw
 from spectralAnalysis import periodogram
 # import mne
 
+
+def PLV_Coh(X,Y,TW,fs):
+    """
+    X is the Mseq
+    Y is time x trials
+    TW is half bandwidth product 
+    """
+    X = X.squeeze()
+    ntaps = 2*TW - 1
+    dpss = sp.signal.windows.dpss(Mseq.size,TW,ntaps)
+    N = int(2**np.ceil(np.log2(Mseq.size)))
+    f = np.arange(0,N)*fs/N
+    PLV_taps = np.zeros([N,ntaps])
+    Coh_taps = np.zeros([N,ntaps])
+    
+    for k in range(0,ntaps):
+        print('tap:',k+1,'/',ntaps)
+        Xf = sp.fft(X *dpss[k,:],axis=0,n=N)
+        Yf = sp.fft(Y * dpss[k,:].reshape(dpss.shape[1],1),axis=0,n=N)
+        XYf = Xf.reshape(Xf.shape[0],1) * Yf.conj()
+        PLV_taps[:,k] = abs(np.mean(XYf / abs(XYf),axis=1))
+        Coh_taps[:,k] = abs(np.mean(XYf,axis=1) / np.mean(abs(XYf),axis=1))
+        
+    PLV = PLV_taps.mean(axis=1)
+    Coh = Coh_taps.mean(axis=1)
+    return PLV, Coh, f
+
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles')
 
@@ -26,7 +53,7 @@ Mseq_mat = sio.loadmat(direct_Mseq)
 Mseq = Mseq_mat['Mseq_sig'].T
 Mseq = Mseq.astype(float)
 
-Num_noiseFloors = 50
+Num_noiseFloors = 10
 Keep_H = 1 #length of system function to keep in seconds 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
@@ -77,14 +104,12 @@ for nn in range(0,Num_noiseFloors):
     randInds = np.random.permutation(IAC32.shape[1]) #random inds for epochs
     IAC_Noise = (IAC32[:, randInds[0:int(np.round(randInds.size/2))]].sum(axis=1) - \
                  IAC32[:, randInds[int(np.round(randInds.size/2)):]].sum(axis=1)) / randInds.size
-    
     randInds = np.random.permutation(ITD32.shape[1])
     ITD_Noise = (ITD32[:, randInds[0:int(np.round(randInds.size/2))]].sum(axis=1) - \
         ITD32[:, randInds[int(np.round(randInds.size/2)):]].sum(axis=1)) / randInds.size
     
     IAC_nf = np.correlate(IAC_Noise,Mseq[:,0],mode='full')
     IAC_nfs[nn,:] = IAC_nf[Mseq.size-1:]
-    
     ITD_nf = np.correlate(ITD_Noise,Mseq[:,0],mode='full')
     ITD_nfs[nn,:] = ITD_nf[Mseq.size-1:]
     
@@ -114,37 +139,41 @@ for j in range(0,Num_noiseFloors):
     NF_Hfs[j,:] = 10*np.log10(out_NF[0])
 
 fig = plt.figure()
-plt.plot(f,IAC_Hf)
+plt.plot(f,IAC_Hf,color='k')
 plt.plot(f,NF_Hfs.T,color= mcolors.CSS4_COLORS['grey'])
-fig.axes[0].set_xscale('log')
+# fig.axes[0].set_xscale('log')
 plt.xlim([0,20])
-
+plt.title('CrossCorr')
 
 #%% Calculate TMTF via PLV
 
+TW = 7
+Fres = (1/12.75) * TW * 2 
+PLV, Coh, f = PLV_Coh(Mseq,IAC32,TW,fs)
 
-# Mf = sp.fft(Mseq,axis=0,n=N)
-# Yf = sp.fft(IAC32.mean(axis=1),axis=0,n=N)
-# f = np.arange(0,N)*fs/N
-TW = 4 #time half bandwidth product
-ntaps = 2*TW -1 
-dpss = sp.signal.windows.dpss(Mseq.size,TW,ntaps)
+#Noise FLoors
+PLVnf = np.zeros([PLV.shape[0],Num_noiseFloors])
+Cohnf = np.zeros([PLV.shape[0],Num_noiseFloors])
+for nf in range(0,Num_noiseFloors):
+    print('NF:', nf+1, '/',Num_noiseFloors)
+    order = np.random.permutation(IAC32.shape[1])
+    Y = IAC32[:,order]
+    Y[:,0:int(np.round(order.size/2))] = - Y[:,0:int(np.round(order.size/2))]
+    PLVn, Cohn, f = PLV_Coh(Mseq, Y, TW,fs)
+    PLVnf[:,nf] = PLVn
+    Cohnf[:,nf] = Cohn
 
-N = int(2**np.ceil(np.log2(Mseq.size)))
-Mf = np.zeros([Mseq.size])
-
-for k in range(0,ntaps):
-    window = dpss[k,:]
-    Mf[k,:] += sp.fft(Mseq[:,0]*window,axis=0,n=N) / ntaps
-    
-    
-
+#Plot stuff
+plt.figure()
+plt.plot(f,PLV,color='k')
+plt.plot(f,PLVnf,color= mcolors.CSS4_COLORS['grey'])
+plt.title('PLV')
 
 plt.figure()
-plt.plot(f,abs(Mf)**2)
-
-
-
+plt.plot(f,Coh,color='k')
+plt.plot(f,Cohnf,color= mcolors.CSS4_COLORS['grey'])
+plt.title('Coh')
+        
 
 
 
