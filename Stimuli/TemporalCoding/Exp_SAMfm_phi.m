@@ -146,18 +146,20 @@ for b=start_block:blocks
 
     save([subj '_SamFm_phi_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','diotic') 
     
-    info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
-    Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
-    Screen('Flip',PS.window);
-    fprintf(1, 'Break \n');
-    if buttonBox  %Subject pushes button twice to begin
-        getResponse(PS.RP);
-        getResponse(PS.RP);
-    else
-        getResponseKb; %#ok<UNRCH>
-        getResponseKb;
+    if b ~=blocks
+        info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
+        Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
+        Screen('Flip',PS.window);
+        fprintf(1, 'Break \n');
+        if buttonBox  %Subject pushes button twice to begin
+            getResponse(PS.RP);
+            getResponse(PS.RP);
+        else
+            getResponseKb; %#ok<UNRCH>
+            getResponseKb;
+        end
+        fprintf(1,'Subject continued \n')
     end
-    fprintf(1,'Subject continued \n')
     
 end
 

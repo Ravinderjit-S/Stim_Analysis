@@ -17,6 +17,7 @@ import numpy as np
 import scipy as sp
 from anlffr.spectral import mtspecraw
 from spectralAnalysis import periodogram
+from multiprocessing import Pool
 # import mne
 
 
@@ -72,9 +73,12 @@ for subj in range(0,len(Subjects)):
     ITD32 = ITD32.T[:,0,:]
     
     #%% Plot PSD, should be clear ASSR at 20 Hz
-    IAC_epochs.plot_psd(fmin=0, fmax=50, tmin = 0.0, tmax=12.75, proj=True,average=False)
-    ITD_epochs.plot_psd(fmin=0, fmax=50, tmin = 0.0, tmax=12.75, proj=True,average=False)
-    
+    fig = IAC_epochs.plot_psd(fmin=0, fmax=50, tmin = 0.0, tmax=12.75, proj=True,average=False)
+    fig.suptitle(Subject + ' IAC')
+    fig.savefig('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/A32_PSD/' + Subject +'_IAC')
+    fig = ITD_epochs.plot_psd(fmin=0, fmax=50, tmin = 0.0, tmax=12.75, proj=True,average=False)
+    fig.suptitle(Subject + ' ITD')
+    fig.savefig('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/A32_PSD/' + Subject +'_ITD')
     #%% Remove any epochs with large deflections
     Peak2Peak_IAC = IAC32.max(axis=0) - IAC32.min(axis=0)
     IAC32 = IAC32[:,Peak2Peak_IAC*1e6 < 100.]
@@ -180,7 +184,7 @@ for subj in range(0,len(Subjects)):
     
     #%% Calculate TMTF via PLV
     
-    TW = 20
+    TW = 10
     Fres = (1/12.75) * TW * 2 
     PLV_IAC, Coh_IAC, f2 = PLV_Coh(Mseq,IAC32,TW,fs)
     PLV_ITD, Coh_ITD, f2 = PLV_Coh(Mseq,ITD32,TW,fs)
@@ -221,7 +225,7 @@ for subj in range(0,len(Subjects)):
     # plt.xlim([1,20])
     # fig.axes[0].set_xscale('log')
     
-    with open(os.path.join(data_loc,'SystemFuncs', Subject+'_DynBin_SysFunc.pickle'),'wb') as f:     
+    with open(os.path.join(data_loc,'SystemFuncs', Subject+'_DynBin_SysFuncTW' + str(TW) + '.pickle'),'wb') as f:     
         pickle.dump([IAC_Ht, IAC_nfs, IAC_Hf, NF_Hfs_IAC, PLV_IAC, Coh_IAC, PLVnf_IAC, Cohnf_IAC, \
                      ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t],f)
         
