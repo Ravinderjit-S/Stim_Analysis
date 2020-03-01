@@ -1,7 +1,7 @@
 %Analyze data from 3AFC SAM, phi difference experiment 
 clear
-data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/FMphi/';
-subj = 'S211_pilot_FMphi';
+data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/TemporalCoding/FMphi/';
+subj = 'S211_di_FM_phi';
 load([data_loc, subj, '.mat'])
 
 

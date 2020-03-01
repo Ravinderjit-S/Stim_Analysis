@@ -25,14 +25,10 @@ fs = 48828;
 
 
 
-Corr_inds{1,1} = 5:16;
+Corr_inds{1,1} = 1:16;
 Corr_inds{1,2} = 1:16;
 Corr_inds{2,1} = 5:16;
-Corr_inds{2,2} = 5:16;
-Corr_inds{3,1} = 1:16;
-Corr_inds{3,2} = 5:16;
-Corr_inds{4,1} = 1:16;
-Corr_inds{4,2} = 1:16;
+Corr_inds{2,2} = 1:12;
 
 
 nconds = length(Corr_inds);

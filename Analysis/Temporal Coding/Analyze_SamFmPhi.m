@@ -1,7 +1,7 @@
 %Analyze data from 3AFC SAM, phi difference experiment 
 clear
 data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/TemporalCoding/';
-subj = 'S211_SamFm_phi_block7';
+subj = 'S211_SamFm_phi_aBlocks';
 load([data_loc, subj, '.mat'])
 
 mods = params.mod;
