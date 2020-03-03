@@ -15,7 +15,7 @@ FS_tag = 3;
 %% Stim & Experimental parameters
 
 L=70; %dB SPL
-ntrials = 3000;
+ntrials = 1000;
 nconds =1;
 jitlist = rand(1,ntrials*nconds)*0.1;
 risetime = 0.005;
@@ -23,8 +23,9 @@ TypePhones = 'earphones';
 stim_dur = 1;
 fs =48828.125;
 passive =1;
-BPfilt = designfilt('bandpassfir', 'StopbandFrequency1', 100, 'PassbandFrequency1', 200, 'PassbandFrequency2', 1500, 'StopbandFrequency2', 2000, 'StopbandAttenuation1', 60, 'PassbandRipple', 1, 'StopbandAttenuation2', 60, 'SampleRate', fs);
-OSCOR_fm = 40; %hz
+%BPfilt = designfilt('bandpassfir', 'StopbandFrequency1', 100, 'PassbandFrequency1', 200, 'PassbandFrequency2', 1500, 'StopbandFrequency2', 2000, 'StopbandAttenuation1', 60, 'PassbandRipple', 1, 'StopbandAttenuation2', 60, 'SampleRate', fs);
+BPfilt = [];
+OSCOR_fm = 44; %hz
 
 %% Startup parameters
 FsamptTDT = 3; %48828.125 Hz
@@ -45,10 +46,10 @@ invoke(PS.RP, 'SoftTrg', 6);
 pause(2.0);
 
 for i =1:ntrials*nconds
-    stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,0);
+    stim = OSCOR(stim_dur,fs,OSCOR_fm,BPfilt,1);
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     PlayStim_Binaural(stim,fs,risetime,PS,L, useTDT, [], 1, TypePhones,passive)
-    WaitSecs(stim_dur + 0.1 + jitlist(i));
+    WaitSecs(stim_dur + 0.2 + jitlist(i));
 end
     
 % % Turns EEG Saving off ('Pause on')
