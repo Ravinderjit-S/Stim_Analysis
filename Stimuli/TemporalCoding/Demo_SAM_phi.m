@@ -13,6 +13,8 @@ L=70; %dB SPL
 ntrials = 5;
 nconds = numel(AMs_test) * numel(phi_test);
 diotic = 0; %send carriers to different ears if 1
+frange = [500 6000]; % range of the carriers
+fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
 AMs = repmat(AMs_test,1,ntrials*length(phi_test));
 phis = repmat(phi_test,1,ntrials * length(AMs_test));
@@ -52,11 +54,11 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
-
+%% listen demo
 demo1 = true;
 while demo1
-    f1 = randi(1000) + 500; 
-    f2 = 4*f1; 
+    f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+    f2 = fratio*f1; 
     stim = SAM_phi(f1,f2,fs,stim_dur,AMs_test(1),phis(end-1),diotic); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
@@ -85,8 +87,8 @@ end
    
 demo2 = true;
 while demo2
-    f1 = randi(1800) + 200; 
-    f2 = 4*f1; 
+    f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+    f2 = fratio*f1; 
     stim = SAM_phi(f1,f2,fs,stim_dur,AMs_test(3),phis(end-1),diotic); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
@@ -113,6 +115,8 @@ while demo2
     end
 end
 
+%% practice run
+
 info = sprintf('Now for a full practice run!');
 info2 = sprintf('Press any button twice when ready');
 Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -128,8 +132,8 @@ else
 end
 Screen('Flip',PS.window);
 
-f1 = randi(1800) + 200; 
-f2 = 4*f1; 
+f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+f2 = fratio*f1; 
 stim = SAM_phi(f1,f2,fs,stim_dur,AMs(1),phis(1),diotic); %first stim
 for i =1:ntrials*nconds
         
@@ -141,7 +145,7 @@ for i =1:ntrials*nconds
         tic();
         if j == 3 && i~= ntrials*nconds
             f1 = randi(1800) + 200; 
-            f2 = 4*f1; 
+            f2 = fratio*f1; 
             stim = SAM_phi(f1,f2,fs,stim_dur,AMs(i+1),phis(i+1),diotic); %first stim
             StimGenTime = toc();
         else

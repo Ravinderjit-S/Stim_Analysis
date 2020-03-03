@@ -16,6 +16,8 @@ L=70; %dB SPL
 ntrials = 20;
 nconds = numel(Mods_test) * numel(phi_test);
 diotic = 0; %if 1, send carriers to different ears
+frange = [500 6000]; % range of the carriers
+fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
 AMs = repmat(Mods_test,1,ntrials*length(phi_test));
 AM_phis = repmat(phi_test,1,ntrials * length(Mods_test));
@@ -100,8 +102,8 @@ for b=start_block:blocks
         blockSize_i = mod(length(AMs) ,blockSize);
     end
     %% gen first stim of block
-    f1 = randi(1800) + 200; 
-    f2 = 4*f1; 
+    f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+    f2 = fratio*f1;  
     if params.modType(b) == 'A'
         stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
     else
@@ -119,8 +121,8 @@ for b=start_block:blocks
             PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
             tic();
             if j == 3 && i~= blockSize
-                f1 = randi(1800) + 200; 
-                f2 = 4*f1; 
+                f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+                f2 = fratio*f1; 
                 if params.modType(b) == 'A'
                     stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic); 
                 else

@@ -16,6 +16,9 @@ L=70; %dB SPL
 ntrials = 20;
 nconds = numel(AMs_test) * numel(phi_test);
 diotic = 0; %send carriers to different ears if 1
+frange = [500 6000]; % range of the carriers
+fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
+
 
 AMs = repmat(AMs_test,1,ntrials*length(phi_test));
 phis = repmat(phi_test,1,ntrials * length(AMs_test));
@@ -55,8 +58,8 @@ textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
-f1 = randi(1800) + 200; 
-f2 = 4*f1; 
+f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+f2 = fratio*f1; 
 stim = SAM_phi(f1,f2,fs,stim_dur,AMs(1),phis(1),diotic); %first stim
 
 for i =1:ntrials*nconds
@@ -85,8 +88,8 @@ for i =1:ntrials*nconds
         PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
         tic();
         if j == 3 && i~= ntrials*nconds
-            f1 = randi(1800) + 200; 
-            f2 = 4*f1; 
+            f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+            f2 = fratio*f1;
             stim = SAM_phi(f1,f2,fs,stim_dur,AMs(i+1),phis(i+1),diotic); %first stim
             StimGenTime = toc();
         else

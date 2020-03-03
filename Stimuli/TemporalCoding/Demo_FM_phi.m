@@ -5,19 +5,17 @@ path = '../CommonExperiment';
 p = genpath(path);
 addpath(p);
 
-load('s.mat')
-rng(s)
-
 subj = input('Please subject ID:', 's');
 %% Stim & Experimental parameters
-FMs_test = [4,64];
-phi_test = [15, 30, 45, 60, 75, 90, 180];
+FMs_test = [4,16,64,128];
+phi_test = [30, 75, 90, 180];
 L=70; %dB SPL
-ntrials = 20;
+ntrials = 5;
 nconds = numel(FMs_test) * numel(phi_test);
 diotic = 0; %send carriers to different ears if 1
 frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
+
 
 FMs = repmat(FMs_test,1,ntrials*length(phi_test));
 phis = repmat(phi_test,1,ntrials * length(FMs_test));
@@ -56,6 +54,83 @@ textlocH = PS.rect(3)/4;
 textlocV = PS.rect(4)/3;
 line2line = 50;
 ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
+
+%% listen demo
+demo1 = true;
+while demo1
+    f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+    f2 = fratio*f1; 
+    stim = FM_phi(f1,f2,fs,stim_dur,FMs_test(1),phis(end-1),diotic); %first stim
+    info = sprintf('Answer is 3');
+    info2 = sprintf('Press any button to play stim');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+    Screen('Flip',PS.window);
+    if buttonBox  %Subject pushes button twice
+        getResponse(PS.RP);
+    else
+        getResponseKb; %#ok<UNRCH>
+    end
+    Screen('Flip',PS.window);
+    for j = 1:3
+        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        WaitSecs(stim_dur + 0.3); %wait 0.3 seconds b/t each stim
+    end
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo1 = false;
+    end
+end
+   
+demo2 = true;
+while demo2
+    f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
+    f2 = fratio*f1; 
+    stim = FM_phi(f1,f2,fs,stim_dur,FMs_test(3),phis(end-1),diotic); %first stim
+    info = sprintf('Answer is 3');
+    info2 = sprintf('Press any button to play stim');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+    Screen('Flip',PS.window);
+    if buttonBox  %Subject pushes button once
+        getResponse(PS.RP);
+    else
+        getResponseKb; %#ok<UNRCH>
+    end
+    Screen('Flip',PS.window);
+    for j = 1:3
+        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        WaitSecs(stim_dur + 0.3); %wait 0.3 seconds b/t each stim
+    end
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo2 = false;
+    end
+end
+
+%% practice run
+info = sprintf('Now for a full practice run!');
+info2 = sprintf('Press any button twice when ready');
+Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+Screen('Flip',PS.window);
+
+if buttonBox  %Subject pushes button twice
+    getResponse(PS.RP);
+    getResponse(PS.RP);
+else
+    getResponseKb; %#ok<UNRCH>
+    getResponseKb;
+end
+Screen('Flip',PS.window);
 
 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
 f2 = fratio*f1; 
