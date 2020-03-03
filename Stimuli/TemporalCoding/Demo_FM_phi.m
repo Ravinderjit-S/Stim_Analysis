@@ -18,7 +18,8 @@ fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
 
 FMs = repmat(FMs_test,1,ntrials*length(phi_test));
-phis = repmat(phi_test,1,ntrials * length(FMs_test));
+phis = repmat(phi_test,ntrials * length(FMs_test),1);
+phis = phis(:)';
 
 rand_order = randperm(length(FMs));
 FMs = FMs(rand_order);
@@ -137,22 +138,6 @@ f2 = fratio*f1;
 stim = FM_phi(f1,f2,fs,stim_dur,FMs(1),phis(1),diotic); %first stim
 
 for i =1:ntrials*nconds
-    
-    if i == round(ntrials*nconds/2) % Break at half way point
-        info = strcat('Break! Half way Done: Press any button twice to begin...');
-        
-        Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
-        Screen('Flip',PS.window);
-        fprintf(1, 'Break \n');
-        if buttonBox  %Subject pushes button twice to begin
-            getResponse(PS.RP);
-            getResponse(PS.RP);
-        else
-            getResponseKb; %#ok<UNRCH>
-            getResponseKb;
-        end
-        fprintf(1,'Subject continued \n')
-    end
         
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     

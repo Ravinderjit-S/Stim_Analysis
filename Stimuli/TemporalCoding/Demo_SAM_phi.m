@@ -17,7 +17,8 @@ frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
 AMs = repmat(AMs_test,1,ntrials*length(phi_test));
-phis = repmat(phi_test,1,ntrials * length(AMs_test));
+phis = repmat(phi_test,ntrials * length(AMs_test),1);
+phis = phis(:)';
 
 rand_order = randperm(length(AMs));
 AMs = AMs(rand_order);
