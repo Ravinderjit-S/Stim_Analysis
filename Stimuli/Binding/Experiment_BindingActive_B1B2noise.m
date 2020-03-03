@@ -12,7 +12,7 @@ subj = input('Please subject ID:', 's');
 load('s.mat')
 rng(s)
 
-L = 70; %dB SPL
+L = 75; %dB SPL
 respList = []; %vector that will contain the subject's responses 
 correctList = [];
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs

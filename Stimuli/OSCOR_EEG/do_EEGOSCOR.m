@@ -14,7 +14,7 @@ FS_tag = 3;
 
 %% Stim & Experimental parameters
 
-L=70; %dB SPL
+L=75; %dB SPL
 ntrials = 1000;
 nconds =1;
 jitlist = rand(1,ntrials*nconds)*0.1;
