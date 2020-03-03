@@ -5,13 +5,10 @@ path = '../CommonExperiment';
 p = genpath(path);
 addpath(p);
 
-load('s.mat')
-rng(s)
-
 subj = input('Please subject ID:', 's');
 %% Stim & Experimental parameters
-AMs_test = [4,8,16,32,64,128];
-phi_test = [15, 30, 45, 60, 75, 90, 180];
+AMs_test = [4,16,64,128];
+phi_test = [30, 75, 90, 180];
 L=70; %dB SPL
 ntrials = 5;
 nconds = numel(AMs_test) * numel(phi_test);
@@ -58,6 +55,9 @@ ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
 demo1 = true;
 while demo1
+    f1 = randi(1000) + 500; 
+    f2 = 4*f1; 
+    stim = SAM_phi(f1,f2,fs,stim_dur,AMs_test(1),phis(end-1),diotic); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -69,31 +69,71 @@ while demo1
         getResponseKb; %#ok<UNRCH>
     end
     Screen('Flip',PS.window);
+    for j = 1:3
+        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        WaitSecs(stim_dur + 0.3); %wait 0.3 seconds b/t each stim
+    end
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo1 = false;
+    end
+end
+   
+demo2 = true;
+while demo2
+    f1 = randi(1800) + 200; 
+    f2 = 4*f1; 
+    stim = SAM_phi(f1,f2,fs,stim_dur,AMs_test(3),phis(end-1),diotic); %first stim
+    info = sprintf('Answer is 3');
+    info2 = sprintf('Press any button to play stim');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+    Screen('Flip',PS.window);
+    if buttonBox  %Subject pushes button once
+        getResponse(PS.RP);
+    else
+        getResponseKb; %#ok<UNRCH>
+    end
+    Screen('Flip',PS.window);
+    for j = 1:3
+        PlayStim(stim{j},fs,risetime,PS,L, useTDT, num2str(j), [], TypePhones);
+        WaitSecs(stim_dur + 0.3); %wait 0.3 seconds b/t each stim
+    end
+    
+    info = sprintf('To hear again, press 1. To continue, press 2');
+    Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+    Screen('Flip',PS.window);
+    resp = getResponse(PS.RP);
+    if resp ~= 1
+        demo2 = false;
+    end
+end
+
+info = sprintf('Now for a full practice run!');
+info2 = sprintf('Press any button twice when ready');
+Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
+Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
+Screen('Flip',PS.window);
+
+if buttonBox  %Subject pushes button twice
+    getResponse(PS.RP);
+    getResponse(PS.RP);
+else
+    getResponseKb; %#ok<UNRCH>
+    getResponseKb;
+end
+Screen('Flip',PS.window);
 
 f1 = randi(1800) + 200; 
 f2 = 4*f1; 
 stim = SAM_phi(f1,f2,fs,stim_dur,AMs(1),phis(1),diotic); %first stim
-
 for i =1:ntrials*nconds
-    
-    if i == round(ntrials*nconds/2) % Break at half way point
-        info = strcat('Break! Half way Done: Press any button twice to begin...');
-        
-        Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
-        Screen('Flip',PS.window);
-        fprintf(1, 'Break \n');
-        if buttonBox  %Subject pushes button twice to begin
-            getResponse(PS.RP);
-            getResponse(PS.RP);
-        else
-            getResponseKb; %#ok<UNRCH>
-            getResponseKb;
-        end
-        fprintf(1,'Subject continued \n')
-    end
         
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
-    
     PlayOrder= randperm(3);
     stim = stim(PlayOrder);
     for j = 1:3
@@ -120,8 +160,6 @@ for i =1:ntrials*nconds
     respList = [respList, resp]; %#ok<AGROW>
     
 end
-
-save([subj '_SAM_phi.mat'],'AMs','ntrials','respList','correctList','phis','diotic')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
