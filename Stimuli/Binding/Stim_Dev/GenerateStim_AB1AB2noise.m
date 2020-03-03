@@ -35,8 +35,20 @@ end
 
 save('StimActive_AB1AB2noise.mat','stims','CorrSet','Corr_inds','fs')
 
-
-
-
+ntrials = 10;
+CorrSet_dem = repmat(1:nconds,1,ntrials);
+CorrSet_dem =CorrSet_dem(randperm(length(CorrSet_dem)));
+for j = 1:length(Corr_inds) + length(CorrSet_dem)
+    sprintf('Demo %d/%d', j, length(CorrSet_dem) + length(Corr_inds))
+    if j <=2
+        [stimABAB, envs, ERBspace, Tones_f] = Stim_Bind_AB1AB2_noise(Corr_inds{j,1}, ... 
+            Corr_inds{j,2} , fs, f_start, f_end, Tones_num, ERB_spacing);
+    else
+        [stimABAB, envs, ERBspace, Tones_f] = Stim_Bind_AB1AB2_noise(Corr_inds{CorrSet_dem(j-2),1}, ... 
+            Corr_inds{CorrSet_dem(j-2),2} , fs, f_start, f_end, Tones_num, ERB_spacing);
+    end
+    stim_dem{j} = stimABAB;
+end
+save('StimActive_AB1AB2noise_dem.mat','stim_dem','CorrSet_dem','Corr_inds','fs')
 
 
