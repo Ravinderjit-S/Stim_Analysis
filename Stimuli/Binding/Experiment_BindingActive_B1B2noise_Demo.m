@@ -139,7 +139,7 @@ for i=1:nconds*ntrials
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
    
     
-    trig_i = CorrSet(i);
+    trig_i = CorrSet_dem(i);
     stim = [stim_dem{i+2};stim_dem{i+2}];
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', trig_i, TypePhones);
     WaitSecs(stim_dur);
@@ -157,7 +157,7 @@ for i=1:nconds*ntrials
     WaitSecs(0.5); %wait until show dot for response 
     resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correct);
     
-    fprintf(1, ['Response = %d, correct = %d, Corr_set= %d  \n'], resp,correct, CorrSet(i));
+    fprintf(1, ['Response = %d, correct = %d, Corr_set= %d  \n'], resp,correct, CorrSet_dem(i));
     respList = [respList, resp]; %#ok<AGROW>
 
     WaitSecs(0.5 + jitlist(i)); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
