@@ -14,6 +14,8 @@ speakers = {'NCF011', 'NCF012', 'NCF013', 'NCF014', 'NCF015', 'NCF017', ...
 
 [sen, fs] = audioread('/media/ravinderjit/Data_Drive/pnnc-v2/speakers/NCF011/audio/NCF011_01-01.wav');
 
+resample_sen = resample(sen,48828/4,44100/4);
+
 Tones_num = 16;
 ERB_spacing = [];
 f_start = 100;
@@ -22,6 +24,14 @@ f_end = 8000;
 
 [bm, env] = gammatoneFast(sen,Tones_f,fs);
 
+[pxx,f] = pmtm(sen,4,2^17,fs);
+[pxx2,f2] = pmtm(resample_sen,4,2^17,48828);
+
+figure,plot(f,pxx,'b',f2,pxx2,'r')
+xlabel('Freq (Hz)')
+ylabel('Power')
+legend('Original','UpSampled')
 
 
+soundsc(sum(bm(:,10:16),2),fs)
 

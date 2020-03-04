@@ -31,7 +31,7 @@ nchans = 34;
 refchans = ['EXG1','EXG2']
 
 EEG_types = ['Active']
-subjects = ['Monaural']
+subjects = ['S211_noise']
 
 for m in range(0,len(subjects)):
     subject = subjects[m]
@@ -97,7 +97,8 @@ for m in range(0,len(subjects)):
         # if subject == 'S228':
         #     ylim_vals = [-4.5, 7.5]
         
-        epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2, 3, 4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
+        # epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2, 3, 4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
+        epochsAll = mne.Epochs(data_eeg, data_evnt, [1, 2], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
         evokedAll = epochsAll.average()
         
         epochs_1 = mne.Epochs(data_eeg, data_evnt, [1], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim = 8) 
@@ -106,11 +107,11 @@ for m in range(0,len(subjects)):
         epochs_2 = mne.Epochs(data_eeg, data_evnt, [2], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
         evoked_2 = epochs_2.average()
         
-        epochs_3 = mne.Epochs(data_eeg, data_evnt, [3], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
-        evoked_3 = epochs_3.average()
+        # epochs_3 = mne.Epochs(data_eeg, data_evnt, [3], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
+        # evoked_3 = epochs_3.average()
         
-        epochs_4 = mne.Epochs(data_eeg, data_evnt, [4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
-        evoked_4 = epochs_4.average()
+        # epochs_4 = mne.Epochs(data_eeg, data_evnt, [4], tmin= ts, tmax= te, proj=True,reject=dict(eeg=200e-6), baseline=(-0.2, 0.),decim=8) 
+        # evoked_4 = epochs_4.average()
         
 
         
@@ -121,12 +122,12 @@ for m in range(0,len(subjects)):
         evoked_2.plot(picks=channels,titles=title_base +'Event 2')
         plt.savefig(os.path.join(fig_path,fig_name+'_E2evkd'),format=fig_format)
         if close_plots: plt.close()
-        evoked_3.plot(picks=channels,titles=title_base +'Event 3') 
-        plt.savefig(os.path.join(fig_path,fig_name+'_E3evkd'),format=fig_format)
-        if close_plots: plt.close()
-        evoked_4.plot(picks=channels,titles=title_base +'Event 4') 
-        plt.savefig(os.path.join(fig_path,fig_name+'_E4evkd'),format=fig_format)
-        if close_plots: plt.close()
+        # evoked_3.plot(picks=channels,titles=title_base +'Event 3') 
+        # plt.savefig(os.path.join(fig_path,fig_name+'_E3evkd'),format=fig_format)
+        # if close_plots: plt.close()
+        # evoked_4.plot(picks=channels,titles=title_base +'Event 4') 
+        # plt.savefig(os.path.join(fig_path,fig_name+'_E4evkd'),format=fig_format)
+        # if close_plots: plt.close()
         
         
         # evokedAll.plot(picks=vis_channels, titles='Visual all events')
@@ -136,9 +137,9 @@ for m in range(0,len(subjects)):
         evoked_2.plot(picks=vis_channels,titles='Vis Event 2')
         plt.savefig(os.path.join(fig_path,fig_name+'_E2evkd_vis'),format=fig_format)
         if close_plots: plt.close()
-        evoked_3.plot(picks=vis_channels,titles='Vis Event 3') 
-        plt.savefig(os.path.join(fig_path,fig_name+'_E3evkd_vis'),format=fig_format)
-        if close_plots: plt.close()
+        # evoked_3.plot(picks=vis_channels,titles='Vis Event 3') 
+        # plt.savefig(os.path.join(fig_path,fig_name+'_E3evkd_vis'),format=fig_format)
+        # if close_plots: plt.close()
         
         #plot topomaps
         times = np.arange(0.5,4.5,1)
@@ -155,9 +156,9 @@ for m in range(0,len(subjects)):
         evoked_2.plot_topomap(times,average=1.0,time_unit='s',proj=True,title=title_base +'E2')#,vmin=v_min,vmax=v_max)
         plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E2topo'),format=fig_format)
         if close_plots: plt.close()
-        evoked_3.plot_topomap(times,average=1.0,time_unit='s',proj=True,title=title_base +'E3')#,vmin=v_min,vmax=v_max)
-        plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E3topo'),format=fig_format)
-        if close_plots: plt.close()
+        # evoked_3.plot_topomap(times,average=1.0,time_unit='s',proj=True,title=title_base +'E3')#,vmin=v_min,vmax=v_max)
+        # plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E3topo'),format=fig_format)
+        # if close_plots: plt.close()
         
         times2 = np.array([0.1,0.2,0.3,1.1,1.2,1.3,2.1,2.2,2.3,3.1,3.2,3.3,4.1,4.2,4.3])
         evoked_1.plot_topomap(times2,average=0.05,time_unit='s',proj=True,title= title_base +'E1')#,vmin=v_min,vmax=v_max)
@@ -166,9 +167,9 @@ for m in range(0,len(subjects)):
         evoked_2.plot_topomap(times2,average=0.05,time_unit='s',proj=True,title=title_base +'E2')#,vmin=v_min,vmax=v_max)
         plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E2topo_2'),format=fig_format)
         if close_plots: plt.close()
-        evoked_3.plot_topomap(times2,average=0.05,time_unit='s',proj=True,title=title_base +'E3')#,vmin=v_min,vmax=v_max)
-        plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E3topo_2'),format=fig_format)
-        if close_plots: plt.close()
+        # evoked_3.plot_topomap(times2,average=0.05,time_unit='s',proj=True,title=title_base +'E3')#,vmin=v_min,vmax=v_max)
+        # plt.savefig(os.path.join(fig_path,subject+'_'+EEG_type+'_E3topo_2'),format=fig_format)
+        # if close_plots: plt.close()
 
         
         
@@ -186,8 +187,8 @@ for m in range(0,len(subjects)):
         epochsAll.load_data()
         epochs_1.load_data()
         epochs_2.load_data()
-        epochs_3.load_data()
-        epochs_4.load_data()
+        # epochs_3.load_data()
+        # epochs_4.load_data()
         
         tfr_eAll = mne.time_frequency.tfr_multitaper(epochsAll.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)#,average=False)
         tfr_eAll.plot_topo(baseline =bline,mode= 'logratio', title = 'eAll', vmin=vmin,vmax=vmax)
@@ -198,11 +199,11 @@ for m in range(0,len(subjects)):
         tfr_e2 = mne.time_frequency.tfr_multitaper(epochs_2.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
         tfr_e2.plot_topo(baseline =bline,mode= 'logratio', title = 'e2', vmin=vmin,vmax=vmax)
          
-        tfr_e3 = mne.time_frequency.tfr_multitaper(epochs_3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
-        tfr_e3.plot_topo(baseline =bline,mode= 'logratio', title = 'e3', vmin=vmin,vmax=vmax)
+        # tfr_e3 = mne.time_frequency.tfr_multitaper(epochs_3.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
+        # tfr_e3.plot_topo(baseline =bline,mode= 'logratio', title = 'e3', vmin=vmin,vmax=vmax)
         
-        tfr_e4 = mne.time_frequency.tfr_multitaper(epochs_4.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
-        tfr_e4.plot_topo(baseline =bline,mode= 'logratio', title = 'e4', vmin=vmin,vmax=vmax)
+        # tfr_e4 = mne.time_frequency.tfr_multitaper(epochs_4.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
+        # tfr_e4.plot_topo(baseline =bline,mode= 'logratio', title = 'e4', vmin=vmin,vmax=vmax)
          
         vmin = -1
         vmax = 1
@@ -219,19 +220,20 @@ for m in range(0,len(subjects)):
         #power_e3.plot_joint(timefreqs = (1.4,30) ,picks=[30,31],baseline=(-0.3,0),fmin=28,fmax=40)
  
         with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_tfr.pickle'),'wb') as f:
-            pickle.dump([tfr_e1,tfr_e2,tfr_e3, tfr_e4, tfr_eAll],f)
+            #pickle.dump([tfr_e1,tfr_e2,tfr_e3, tfr_e4, tfr_eAll],f)
+            pickle.dump([tfr_e1,tfr_e2,tfr_eAll],f)
             
         with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs12.pickle'),'wb') as f:
             pickle.dump([epochs_1,epochs_2],f)
             
-        with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs34.pickle'),'wb') as f:
-            pickle.dump([epochs_3,epochs_4],f)
+        # with open(os.path.join(dataAnalyzd_loc,subject+'_'+EEG_type+'_epochs34.pickle'),'wb') as f:
+        #     pickle.dump([epochs_3,epochs_4],f)
             
             
-        del data_eeg, data_evnt
-        del evoked_1,evoked_2,evoked_3
-        del epochs_1,epochs_2,epochs_3
-        del tfr_e1, tfr_e2, tfr_e3
+        # del data_eeg, data_evnt
+        # del evoked_1,evoked_2,evoked_3
+        # del epochs_1,epochs_2,epochs_3
+        # del tfr_e1, tfr_e2, tfr_e3
             
             
             
