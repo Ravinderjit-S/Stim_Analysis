@@ -24,7 +24,7 @@ fs =48828.125;
 passive =1;
 %BPfilt = designfilt('bandpassfir', 'StopbandFrequency1', 100, 'PassbandFrequency1', 200, 'PassbandFrequency2', 1500, 'StopbandFrequency2', 2000, 'StopbandAttenuation1', 60, 'PassbandRipple', 1, 'StopbandAttenuation2', 60, 'SampleRate', fs);
 BPfilt = [];
-OSIP_fm = 22; %hz
+OSIP_fm = 24; %hz
 tone_f = 1000;
 
 %% Startup parameters
@@ -45,18 +45,47 @@ invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
 invoke(PS.RP, 'SoftTrg', 6);
 pause(2.0);
 
+stim = OSIP(stim_dur,fs,tone_f,OSIP_fm,0);
 for i =1:ntrials*nconds
-    stim = OSIP(stim_dur,fs,tone_f,OSIP_fm,0);
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', 1, TypePhones);
     WaitSecs(stim_dur + 0.2 + jitlist(i));
 end
-    
+
 % % Turns EEG Saving off ('Pause on')
 invoke(PS.RP, 'SetTagVal', 'trgname', 254);
 invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
 invoke(PS.RP, 'SoftTrg', 6);
 
+
+cont = input('Continue (y/n): ', 's');
+
+if strcmpi(cont,'y')
+    % Turns EEG Saving on ('Pause off')
+    invoke(PS.RP, 'SetTagVal', 'trgname',253);
+    invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
+    invoke(PS.RP, 'SoftTrg', 6);
+    pause(2.0);
+    for i =1:ntrials*nconds
+        stim(1,:) = zeros(1,length(stim(1,:)));
+        fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
+        PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', 2, TypePhones);
+        WaitSecs(stim_dur + 0.2 + jitlist(i));
+    end
+    
+    % % Turns EEG Saving off ('Pause on')
+    invoke(PS.RP, 'SetTagVal', 'trgname', 254);
+    invoke(PS.RP, 'SetTagVal', 'onsetdel',100);
+    invoke(PS.RP, 'SoftTrg', 6);
+end
+
+%Clearing I/O memory buffers:
+invoke(PS.RP,'ZeroTag','datainL');
+invoke(PS.RP,'ZeroTag','datainR');
+pause(3.0);
+
+close_play_circuit(PS.f1,PS.RP);
+fprintf(1,'\n Done with data collection!\n');
 
 
 
