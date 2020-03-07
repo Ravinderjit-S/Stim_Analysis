@@ -30,8 +30,8 @@ dataAnalyzd_loc = os.path.join(data_loc,'Pickles')
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-EEG_types = ['Active']
-subjects = ['S211_noise']
+EEG_types = ['Passive']
+subjects = ['S233_tones']
 
 for m in range(0,len(subjects)):
     subject = subjects[m]
@@ -205,8 +205,8 @@ for m in range(0,len(subjects)):
         # tfr_e4 = mne.time_frequency.tfr_multitaper(epochs_4.subtract_evoked(), freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=1)
         # tfr_e4.plot_topo(baseline =bline,mode= 'logratio', title = 'e4', vmin=vmin,vmax=vmax)
          
-        vmin = -1
-        vmax = 1
+        # vmin = -1
+        # vmax = 1
         
         # power_e1_evkd = mne.time_frequency.tfr_multitaper(evoked_1, freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth, return_itc = False,picks = channels,decim=8)
         # power_e1_evkd.plot_topo(baseline =(-0.2,0),mode= 'logratio', title = 'e1_evkd', vmin=vmin,vmax=vmax)
