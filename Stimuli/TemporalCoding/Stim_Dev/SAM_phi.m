@@ -31,11 +31,11 @@ if dichotic
     sig2(1,:) = AM2 .* sin(2*pi*f1.*t);
     sig2(2,:) = AM2 .* sin(2*pi*f2.*t);
     sig3(1,:) = AM3 .* sin(2*pi*f1.*t);
-    sig3(2,:) = AM4 .* sin(2*pi*f1.*t);
+    sig3(2,:) = AM4 .* sin(2*pi*f2.*t);
 else
     sig1(2,:) = sig1;
     sig2(2,:) = sig2;
-    sig3(3,:) = sig3;
+    sig3(2,:) = sig3;
 end
 
 stim = {sig1, sig2, sig3};
