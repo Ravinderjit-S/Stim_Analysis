@@ -13,15 +13,17 @@ x1 = sin(2*pi*f1.*t);
 x2 = sin(2*pi*f2.*t);
 
 sqt = linspace(0,2*pi*fm*dur,length(t));
+AM = 0.5*(sin(2*pi*2*fm.*t)+1);
 A = square(sqt);
 A = (A+1) /2; %make A a sqaure wave b/t 0 & 1
 B = circshift(A,round(fs/(2*fm)));
 
 figure,plot(t,A,t,B,'r')
 sig = A.*x1 + B.*x2;
+sig = sig.*AM;
 figure,plot(t,sig)
 
-% soundsc(sig,fs)
+soundsc(sig,fs)
 
 %% bounce between two phases
 x1 = sin(2*pi*f1.*t+A*pi/4);

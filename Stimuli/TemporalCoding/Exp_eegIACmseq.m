@@ -23,8 +23,8 @@ TypePhones = 'earphones';
 fs =48828.125;
 passive =1;
 
-load('AMmseqStim.mat'); %loads stim and mseqAM
-stim = stimAM;
+load('IACmseqStim.mat'); %loads stim and mseqAM
+stim = stimIAC;
 stim_dur = length(stim)/fs;
 
 %% Startup parameters
