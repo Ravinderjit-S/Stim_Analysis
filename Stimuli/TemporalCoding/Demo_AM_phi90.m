@@ -7,22 +7,22 @@ addpath(p);
 
 subj = input('Please subject ID:', 's');
 %% Stim & Experimental parameters
-FMs_test = [4,16,64];
+AMs_test = [4,16,64];
 dichotic_test = [0 1]; %send carriers to different ears if 1
 phi = 90;
 
 L=70; %dB SPL
 ntrials = 5;
-nconds = numel(FMs_test) * numel(dichotic_test);
+nconds = numel(AMs_test) * numel(dichotic_test);
 frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
-FMs = repmat(FMs_test,1,ntrials*length(dichotic_test));
-dichotics = repmat(dichotic_test,ntrials * length(FMs_test),1);
+AMs = repmat(AMs_test,1,ntrials*length(dichotic_test));
+dichotics = repmat(dichotic_test,ntrials * length(AMs_test),1);
 dichotics = dichotics(:)';
 
-rand_order = randperm(length(FMs));
-FMs = FMs(rand_order);
+rand_order = randperm(length(AMs));
+AMs = AMs(rand_order);
 dichotics = dichotics(rand_order);
 
 risetime = 0.125;
@@ -61,7 +61,7 @@ demo1 = true;
 while demo1
     f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
     f2 = fratio*f1; 
-    stim = FM_phi(f1,f2,fs,stim_dur,FMs_test(1),phi,dichotic_test(1)); %first stim
+    stim = AM_phi(f1,f2,fs,stim_dur,AMs_test(1),phi,dichotic_test(1)); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -91,7 +91,7 @@ demo2 = true;
 while demo2
     f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
     f2 = fratio*f1; 
-    stim = FM_phi(f1,f2,fs,stim_dur,FMs_test(3),phi,dichotic_test(1)); %first stim
+    stim = AM_phi(f1,f2,fs,stim_dur,AMs_test(3),phi,dichotic_test(1)); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -121,7 +121,7 @@ demo3 = true;
 while demo3
     f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
     f2 = fratio*f1; 
-    stim = FM_phi(f1,f2,fs,stim_dur,FMs_test(1),phi,dichotic_test(2)); %first stim
+    stim = AM_phi(f1,f2,fs,stim_dur,AMs_test(1),phi,dichotic_test(2)); %first stim
     info = sprintf('Answer is 3');
     info2 = sprintf('Press any button to play stim');
     Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
@@ -166,10 +166,9 @@ Screen('Flip',PS.window);
 
 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
 f2 = fratio*f1; 
-stim = FM_phi(f1,f2,fs,stim_dur,FMs(1),phi,dichotics(1)); %first stim
+stim = AM_phi(f1,f2,fs,stim_dur,AMs(1),phi,dichotics(1)); %first stim
 
 for i =1:ntrials*nconds
-        
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     
     PlayOrder= randperm(3);
@@ -180,7 +179,7 @@ for i =1:ntrials*nconds
         if j == 3 && i~= ntrials*nconds
             f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
             f2 = fratio*f1; 
-            stim = FM_phi(f1,f2,fs,stim_dur,FMs(i+1),phi,dichotics(i+1)); %first stim
+            stim = FM_phi(f1,f2,fs,stim_dur,AMs(i+1),phi,dichotics(i+1)); %first stim
             StimGenTime = toc();
         else
             StimGenTime = toc();
@@ -194,7 +193,7 @@ for i =1:ntrials*nconds
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
     
-    fprintf(1, 'Response =%d, answer =%d, Correct = %d, FM = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), FMs(i), dichotics(i));
+    fprintf(1, 'Response =%d, answer =%d, Correct = %d, AM = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), AMs(i), dichotics(i));
     respList = [respList, resp]; %#ok<AGROW>
     
 end
