@@ -1,4 +1,4 @@
-function [stim] = FM_phi(f1,f2,fs,tlen,fm,phi_deg,diotic)
+function [stim] = FM_phi(f1,f2,fs,tlen,fm,phi_deg,dichotic)
 %This fucntion will return a 3 AFC stim where the 3rd stimulus has an FM
 %with a phase difference 
 %f1 = frequency of tone 1
@@ -25,7 +25,7 @@ x3 = sin(2*pi*f2*t + phase3);
 sig1 = x1 + x2;
 sig2 = x1 + x3; 
 
-if diotic
+if dichotic
     sig1(1,:) = x1;
     sig1(2,:) = x2;
     sig2(1,:) = x1;

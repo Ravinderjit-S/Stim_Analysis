@@ -15,7 +15,7 @@ phi_test = [15, 30, 45, 60, 75, 90, 180];
 L=70; %dB SPL
 ntrials = 20;
 nconds = numel(AMs_test) * numel(phi_test);
-diotic = 0; %send carriers to different ears if 1
+dichotic = 0; %send carriers to different ears if 1
 frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
@@ -28,7 +28,7 @@ rand_order = randperm(length(AMs));
 AMs = AMs(rand_order);
 phis = phis(rand_order);
 
-risetime = 0.100;
+risetime = 0.125;
 TypePhones = 'earphones';
 stim_dur = 1.0; %duration of each SAM, 3 will be played per trial
 fs =48828.125;
@@ -61,7 +61,7 @@ ExperimentWelcome(PS, buttonBox,textlocH,textlocV,line2line);
 
 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
 f2 = fratio*f1; 
-stim = SAM_phi(f1,f2,fs,stim_dur,AMs(1),phis(1),diotic); %first stim
+stim = SAM_phi(f1,f2,fs,stim_dur,AMs(1),phis(1),dichotic); %first stim
 
 for i =1:ntrials*nconds
     
@@ -91,7 +91,7 @@ for i =1:ntrials*nconds
         if j == 3 && i~= ntrials*nconds
             f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
             f2 = fratio*f1;
-            stim = SAM_phi(f1,f2,fs,stim_dur,AMs(i+1),phis(i+1),diotic); %first stim
+            stim = SAM_phi(f1,f2,fs,stim_dur,AMs(i+1),phis(i+1),dichotic); %first stim
             StimGenTime = toc();
         else
             StimGenTime = toc();

@@ -23,9 +23,8 @@ TypePhones = 'earphones';
 fs =48828.125;
 passive =1;
 
-load('IACmseqStim.mat'); %loads stim and mseqAM
-stim = stimIAC;
-stim_dur = length(stim)/fs;
+load('mseqEEG.mat'); %Ponit_len,bits,fs,mseqEEG
+stim_dur = length(mseqEEG)/fs;
 
 %% Startup parameters
 FsamptTDT = 3; %48828.125 Hz
@@ -47,6 +46,7 @@ pause(2.0);
 
 
 for i =1:ntrials*nconds
+    stim = IAC_mseq(mseqEEG);
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', 1, TypePhones);
     WaitSecs(stim_dur + 0.5 + jitlist(i));

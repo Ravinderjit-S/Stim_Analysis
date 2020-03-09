@@ -10,29 +10,29 @@ subj = input('Please subject ID:', 's');
 file_load = input('File name for last block to load, type NONE if starting from 1st block:','s');
 %% Stim & Experimental parameters
 Mods_test = [4,8,16,32,64];
-phi_test = [15, 30, 45, 60, 75, 90, 180];
+dichotic_test = [0 1];
+phi = 90;
 
 L=70; %dB SPL
 ntrials = 20;
-nconds = numel(Mods_test) * numel(phi_test);
-diotic = 0; %if 1, send carriers to different ears
+nconds = numel(Mods_test) * numel(dichotic_test);
 frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
-AMs = repmat(Mods_test,1,ntrials*length(phi_test));
-AM_phis = repmat(phi_test,1,ntrials * length(Mods_test));
-FMs = repmat(Mods_test,1,ntrials*length(phi_test));
-FM_phis = repmat(phi_test,1,ntrials * length(Mods_test));
+AMs = repmat(Mods_test,1,ntrials*length(dichotic_test));
+AM_dichotics = repmat(dichotic_test,1,ntrials * length(Mods_test));
+FMs = repmat(Mods_test,1,ntrials*length(dichotic_test));
+FM_dichotics = repmat(dichotic_test,1,ntrials * length(Mods_test));
 
 rand_order1 = randperm(length(AMs));
 AMs = AMs(rand_order1);
-AM_phis = AM_phis(rand_order1);
+AM_dichotics = AM_dichotics(rand_order1);
 rand_order2 = randperm(length(FMs));
 FMs = FMs(rand_order2);
-FM_phis = FM_phis(rand_order2);
+FM_dichotics = FM_dichotics(rand_order2);
 
 blockSize = 100;
-blocks = ceil(length(AMs)/blockSize) + ceil(length(FMs)/blocksize);
+blocks = ceil(length(AMs)/blockSize) + ceil(length(FMs)/blockSize);
 
 risetime = .125;
 TypePhones = 'earphones';
@@ -44,7 +44,7 @@ correctList = [];
 %% make parameter structure
 params.modType = [];
 params.mod = [];
-params.phi = [];
+params.dichotic = [];
 
 blockSize_p = blockSize;
 for b = 1:blocks
@@ -55,12 +55,12 @@ for b = 1:blocks
        indexes =  ((b+1)/2 - 1)*blockSize_p + 1 : (b+1)/2 *blockSize_p;
        params.modType = [params.modType, 'A'];
        params.mod = [params.mod AMs(indexes)];
-       params.phi = [params.phi AM_phis(indexes)];
+       params.dichotic = [params.dichotic AM_dichotics(indexes)];
    else
        indexes = (b/2 -1) * blockSize_p + 1: b/2* blockSize_p;
        params.modType = [params.modType, 'F'];
        params.mod = [params.mod FMs(indexes)];
-       params.phi = [params.phi FM_phis(indexes)];
+       params.dichotic = [params.dichotic FM_dichotics(indexes)];
    end
 end
 
@@ -105,9 +105,9 @@ for b=start_block:blocks
     f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
     f2 = fratio*f1;  
     if params.modType(b) == 'A'
-        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
+        stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),phi,params.dichotic(trialgen));
     else
-        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
+        stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),phi,params.dichotic(trialgen));
     end
 
     for i =1:blockSize_i 
@@ -124,9 +124,9 @@ for b=start_block:blocks
                 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
                 f2 = fratio*f1; 
                 if params.modType(b) == 'A'
-                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic); 
+                    stim = SAM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),phi,params.dichotic(trialgen));
                 else
-                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),params.phi(trialgen),diotic);
+                    stim = FM_phi(f1,f2,fs,stim_dur,params.mod(trialgen),phi,params.dichotic(trialgen));
                 end
                 StimGenTime = toc();
             else
@@ -141,12 +141,12 @@ for b=start_block:blocks
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
 
-        fprintf(1, 'Response =%d, answer =%d, Correct = %d, fm = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), AMs(i), AM_phis(i));
+        fprintf(1, 'Response =%d, answer =%d, Correct = %d, fm = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), AMs(i), AM_dichotics(i));
         respList = [respList, resp]; %#ok<AGROW>
 
     end
 
-    save([subj '_SamFm_phi_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','diotic') 
+    save([subj '_SamFm_phi90_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','phi') 
     
     if b ~=blocks
         info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
@@ -165,7 +165,7 @@ for b=start_block:blocks
     
 end
 
-save([subj '_SamFm_phi_aBlocks.mat'],'params', 'ntrials','respList','correctList','diotic')
+save([subj '_SamFm_phi90_aBlocks.mat'],'params', 'ntrials','respList','correctList','phi')
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);
