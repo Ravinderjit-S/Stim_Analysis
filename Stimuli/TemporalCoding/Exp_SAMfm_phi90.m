@@ -143,13 +143,14 @@ for b=start_block:blocks
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
 
-        fprintf(1, 'Response =%d, answer =%d, Correct = %d, fm = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), AMs(i), AM_dichotics(i));
+        fprintf(1, 'Block = %d, Response =%d, answer =%d, Correct = %d, trial = %d /100 \n',b, resp, correctList(end),resp==correctList(end), i);
         respList = [respList, resp]; %#ok<AGROW>
 
     end
-
-    save([subj '_SamFm_phi90_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','phi') 
+    block_acc = sum(respList(end-blockSize_i:end)==correctList(end-blockSize_i:end)) / blockSize_i;
+    fprintf(1, 'Block Accuracy: %d %% \n', round(block_acc));
     
+    save([subj '_SamFm_phi90_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','phi') 
     if b ~=blocks
         info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
         Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);
