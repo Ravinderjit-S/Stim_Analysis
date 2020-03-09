@@ -12,8 +12,9 @@ function [stim] = SAM_phi(f1,f2,fs,tlen,fm,phi_deg,dichotic)
 phi_rad = (phi_deg/360) * 2*pi;
 t = 0:1/fs:tlen-1/fs;
 
-AM1 = 0.5 * (sin(2*pi*fm.*t - pi/2) + 1);
-AM2 = 0.5 * (sin(2*pi*fm.*t -pi/2 + phi_rad) + 1);
+phase = 2*pi*rand(); %random starting phase
+AM1 = 0.5 * (sin(2*pi*fm.*t + phase) + 1);
+AM2 = 0.5 * (sin(2*pi*fm.*t + phase + phi_rad) + 1);
 
 sig1 = AM1 .* sin(2*pi*f1*t) + AM1 .* sin(2*pi*f2*t);
 sig2 = AM1 .* sin(2*pi*f1*t) + AM2 .* sin(2*pi*f2*t);
