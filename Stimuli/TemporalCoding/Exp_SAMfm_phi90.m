@@ -4,7 +4,7 @@ clear all; close all hidden; clc; %#ok<CLALL>
 path = '../CommonExperiment';
 p = genpath(path);
 addpath(p);
-
+addpath('Stim_Dev')
 
 subj = input('Please subject ID:', 's');
 file_load = input('File name for last block to load, type NONE if starting from 1st block:','s');
@@ -141,14 +141,14 @@ for b=start_block:blocks
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
 
-        fprintf(1, 'Block = %d, Response =%d, answer =%d, Correct = %d, trial = %d /100 \n',b, resp, correctList(end),resp==correctList(end), i);
+        fprintf(1, 'Response =%d, answer =%d, Correct = %d, trial = %d /100 \n', resp, correctList(end),resp==correctList(end), i);
         respList = [respList, resp]; %#ok<AGROW>
 
     end
-    block_acc = sum(respList(end-blockSize_i:end)==correctList(end-blockSize_i:end)) / blockSize_i;
-    fprintf(1, 'Block Accuracy: %d %% \n', round(block_acc));
+    block_acc = sum(respList(end-blockSize_i+1:end)==correctList(end-blockSize_i+1:end)) / blockSize_i;
+    fprintf(1, 'Block Accuracy: %d %% \n', round(block_acc*100));
     
-    save([subj '_SamFm_phi90_block' num2str], 'params', 'ntrials','respList','correctList','trialgen','phi') 
+    save([subj '_SamFm_phi90_block' num2str(b)], 'params', 'ntrials','respList','correctList','trialgen','phi') 
     if b ~=blocks
         info = sprintf('Break! About to start Block %d/%d: Press any button twice to begin...',b+1,blocks);
         Screen('DrawText',PS.window,info,textlocH,textlocV+line2line,PS.white);

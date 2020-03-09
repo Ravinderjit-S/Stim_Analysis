@@ -141,7 +141,7 @@ for b=start_block:blocks
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
 
-        fprintf(1, 'Block = %d, Response =%d, answer =%d, Correct = %d, trial = %d /100 \n',b, resp, correctList(end),resp==correctList(end), i);
+        fprintf(1, 'Response =%d, answer =%d, Correct = %d, trial = %d /100 \n',resp, correctList(end),resp==correctList(end), i);
         respList = [respList, resp]; %#ok<AGROW>
 
     end
