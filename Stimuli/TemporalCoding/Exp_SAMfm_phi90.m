@@ -20,9 +20,11 @@ frange = [500 6000]; % range of the carriers
 fratio = 4; % ratio of 2 carriers ... 4 = 2 octaves
 
 AMs = repmat(Mods_test,1,ntrials*length(dichotic_test));
-AM_dichotics = repmat(dichotic_test,1,ntrials * length(Mods_test));
+AM_dichotics = repmat(dichotic_test,ntrials * length(Mods_test),1);
+AM_dichotics = AM_dichotics(:);
 FMs = repmat(Mods_test,1,ntrials*length(dichotic_test));
-FM_dichotics = repmat(dichotic_test,1,ntrials * length(Mods_test));
+FM_dichotics = repmat(dichotic_test,ntrials * length(Mods_test),1);
+FM_dichotics = FM_dichotics(:);
 
 rand_order1 = randperm(length(AMs));
 AMs = AMs(rand_order1);
@@ -95,7 +97,7 @@ trialgen = 1;
 start_block=1;
 if ~strcmpi(file_load,'NONE')
     load(file_load);
-    start_block=str2num(file_load(end-4))+1;
+    start_block= str2num(file_load(end-4))+1;
 end
 for b=start_block:blocks
     if (b == blocks || b == blocks-1) && mod(length(AMs),blockSize) ~=0

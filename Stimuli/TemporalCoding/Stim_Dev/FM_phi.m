@@ -14,9 +14,10 @@ dF2 = f2 * 0.05;
 phi_rad = (phi_deg/360) * 2*pi;
 t = 0:1/fs:tlen-1/fs;
 
-phase1 = dF1/fm * sin(2*pi*fm*t);
-phase2 = dF2/fm * sin(2*pi*fm*t);
-phase3 = dF2/fm * sin(2*pi*fm*t + phi_rad);
+phase = 2*pi*rand();
+phase1 = dF1/fm * sin(2*pi*fm*t + phase);
+phase2 = dF2/fm * sin(2*pi*fm*t + phase);
+phase3 = dF2/fm * sin(2*pi*fm*t + phase + phi_rad);
 
 x1 = sin(2*pi*f1*t + phase1);
 x2 = sin(2*pi*f2*t + phase2);
