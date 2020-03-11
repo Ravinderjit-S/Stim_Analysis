@@ -31,7 +31,7 @@ x2 = sin(2*pi*f2.*t + mod_f2 * phase1);
 x3 = sin(2*pi*f1.*t + mod_f1 * phase2);
 x4 = sin(2*pi*f2.*t + mod_f2 * phase2);
 x5 = sin(2*pi*f1.*t + mod_f1 * phase3);
-x6 = sin(2*pi*f1.*t + mod_f2 * phase4);
+x6 = sin(2*pi*f2.*t + mod_f2 * phase4);
 
 sig1 = x1 + x2;
 sig2 = x3 + x4;

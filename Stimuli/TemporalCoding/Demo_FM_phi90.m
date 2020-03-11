@@ -4,6 +4,7 @@ clear all; close all hidden; clc; %#ok<CLALL>
 path = '../CommonExperiment';
 p = genpath(path);
 addpath(p);
+addpath('Stim_Dev')
 
 subj = input('Please subject ID:', 's');
 %% Stim & Experimental parameters
@@ -194,7 +195,7 @@ for i =1:ntrials*nconds
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     resp = GetResponse_Feedback(PS, feedback, feedbackDuration,buttonBox, correctList(end));
     
-    fprintf(1, 'Response =%d, answer =%d, Correct = %d, FM = %d, phi = %d \n', resp, correctList(end),resp==correctList(end), FMs(i), dichotics(i));
+    fprintf(1, 'Response =%d, answer =%d, Correct = %d, FM = %d, dichotic = %d \n', resp, correctList(end),resp==correctList(end), FMs(i), dichotics(i));
     respList = [respList, resp]; %#ok<AGROW>
     
 end
