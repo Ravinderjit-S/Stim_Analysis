@@ -22,7 +22,7 @@ risetime = 0; %taken care of inside stim
 TypePhones = 'earphones';
 fs =48828.125;
 passive =1;
-load('mseqEEG.mat'); %Ponit_len,bits,fs,mseqEEG
+load('mseqEEG_500.mat'); %Ponit_len,bits,fs,mseqEEG
 stim_dur = length(mseqEEG)/fs;
 
 %% Startup parameters
@@ -48,7 +48,7 @@ for i =1:ntrials*nconds
     stim = AM_mseq(mseqEEG,Point_len);
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
     PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', 1, TypePhones);
-    WaitSecs(stim_dur + 0.5 + jitlist(i));
+    WaitSecs(stim_dur + round(stim_dur*0.25*10)/10 + jitlist(i));
 end
 
 % % Turns EEG Saving off ('Pause on')
