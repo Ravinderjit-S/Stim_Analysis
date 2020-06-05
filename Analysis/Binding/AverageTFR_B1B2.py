@@ -66,11 +66,11 @@ def plot_chAvg_tfr(tfr_obj, picks, vmin,vmax,title,bline):
 # data from spring 20 pilot on binding
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/B1B2/Pickles')
 subjects = ['S132','S211','Monaural']
-subjects = ['S211_noise']
+subjects = ['S233_tones']
 EEG_types = ['Active','Passive']
 
 # subjects=['SHK']
-EEG_type = EEG_types[0]
+EEG_type = EEG_types[1]
 
 
 for m in range(0,len(subjects)):

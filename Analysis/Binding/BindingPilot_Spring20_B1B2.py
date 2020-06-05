@@ -23,7 +23,7 @@ import pickle
 
 
 fig_format = 'png'
-close_plots = True
+close_plots = False
 
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/Binding/BindingPilot_Spring20/B1B2')
 dataAnalyzd_loc = os.path.join(data_loc,'Pickles')

@@ -9,7 +9,7 @@ function [t, A_fr] = FiringRate(spikes, method, binsize, stim_time,plotit)
 %stim_time = in millliseconds
 %plotit
 
-method == 'bin'; %implement other methods yo
+% method == 'bin'; %implement other methods yo
     
 Trials = max(spikes(:,1));
 binsize = binsize /1000; %convert to seconds
@@ -26,7 +26,7 @@ A_fr = (spk_counts_Total/Trials)/binsize;
 t = tbins - binsize/2; %this is the time vector; interpretation: the value for time x represents number of spikes in range [x, x+binsize];
 
 if plotit
-    figure, plot(t,A_fr), xlabel('Time (sec)'), ylabel('Firing Rate (spikes-1)')
+    figure, plot(t,A_fr,'linewidth',2), xlabel('Time (sec)'), ylabel('Firing Rate (Hz)')
 end
 
 
