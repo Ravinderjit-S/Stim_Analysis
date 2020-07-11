@@ -182,7 +182,7 @@ for TheDate = 1:numel(Analyze_dates)
                 TW =20;
                 noise_spks = Jumble_spikes(plv_spks,length(plv_stim)/plv_fs);
                 [plv, f] = PLV_nerve(plv_spks,plv_stim,plv_fs,TW);
-                [plv_noise, f] = PLV_nerve(noise_spks,plv_stim,plv_fs,TW);
+                [plv_noise, f] = PLV_nerve(noise_spks,plv_stim,fs,TW);
                 figure('visible','off','Position',Screen_pixelLocs), hold on
                 semilogx(f,plv), xlim([1,700])
                 semilogx(f,plv_noise,'r')
