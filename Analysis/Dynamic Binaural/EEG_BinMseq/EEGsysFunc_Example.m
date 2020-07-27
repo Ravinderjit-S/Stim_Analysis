@@ -1,23 +1,23 @@
 % make example EEG figures
 clear
-load('S207_DynBinMseqAnalyzed.mat')
-load('Mseq_4096fs_compensated.mat')
+load('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mats/S207_DynBinMseqAnalyzed.mat')
+load('/media/ravinderjit/Data_Drive/Stim_Analysis/Stimuli/Binaural_t/Stim Development/Mseq_4096fs_compensated.mat')
 fs = 4096; %eeg fs
 Keep_H = 1;
 
 t = (0:length(Mseq_sig)-1)/fs;
 Num_noiseFloors = numel(NoiseFloors_IAC);
 
-
+grey = [126,126,126]/255;
 
 figure, subplot(3,1,2), hold on
 pp = 5; %electrode 31
 [pIAC, f] = pmtm(Rev_IAC(pp,1:round(Keep_H*fs)),2.5,[],fs);
-semilogx(f,pow2db(pIAC),'k','linewidth',3),title(['IAC H(f)' num2str(Aud_channels(pp))]), xlim([0 20]), ylim([-85 -55]), xlabel('Frequency (Hz)'), ylabel('Power (dB/Hz)'), title('H(f)')
+semilogx(f,pow2db(pIAC),'k','linewidth',3),title(['IAC H(f)' num2str(Aud_channels(pp))]), xlim([0 25]), ylim([-115 -55]), xlabel('Frequency (Hz)'), ylabel('Power (dB/Hz)'), title('H(f)')
 for kk=1:Num_noiseFloors
     dummy = NoiseFloors_IAC{kk};
     [pdumb,f] = pmtm(dummy(pp,1:round(Keep_H*fs)),2.5,[],fs);
-    semilogx(f,pow2db(pdumb),'Color',[1 0 0])
+    semilogx(f,pow2db(pdumb),'Color',grey)
 end
 set(gca, 'XScale', 'log');
 set(gca,'fontsize',25)
@@ -28,7 +28,7 @@ subplot(3,1,1), hold on
 plot(t,Rev_IAC(pp,:),'k','linewidth',3),title(['IAC H(t):' num2str(Aud_channels(pp))]), xlim([0 Keep_H]), ylabel('V / IAC'), title('H(t)'), xlabel('Time (sec)')
 for kk = 1:Num_noiseFloors
     dummy = NoiseFloors_IAC{kk};
-    plot(t,dummy(pp,:),'Color',[1 0 0])
+    plot(t,dummy(pp,:),'Color', grey)
 end
 hold off
 set(gca,'fontsize',25)
@@ -41,15 +41,15 @@ hold on
 PhaseFit = polyfit(f_phase(2:8),phase(2:8),1);
 GD_line = PhaseFit(1)*f_phase(2:8)+PhaseFit(2);
 % plot(f_phase(2:8),GD_line)
-GD = abs(PhaseFit(1)) ./ (2*pi)
+GD = abs(PhaseFit(1)) ./ (2*pi);
 hold off
 set(gca,'fontsize',25)
 
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 11 18];
-print('IAC_EEGHex','-dpng','-r0')
-
+print('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/IAC_EEGHex','-dpng','-r0')
+print('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/IAC_EEGHex','-depsc','-r0')
 
 % figure()
 % if isprime(numel(Aud_channels))

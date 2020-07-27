@@ -24,6 +24,7 @@ def Zscore(X,noise):
 
 #TW = 20 for files without TW label
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles/SystemFuncs')
+fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin')
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
 
@@ -32,8 +33,15 @@ All_CohITD = np.zeros([65536,len(Subjects)])
 All_IAChf = np.zeros([41,len(Subjects)])
 All_ITDhf = np.zeros([41,len(Subjects)])
 
+All_PlvIAC = np.zeros([65536,len(Subjects)])
+All_PlvITD = np.zeros([65536,len(Subjects)])
+
+
 All_CohIAC_nfs = np.zeros([65536,100])
 All_CohITD_nfs = np.zeros([65536,100])
+All_PlvIAC_nfs = np.zeros([65536,100])
+All_PlvITD_nfs = np.zeros([65536,100])
+
 All_IAChf_nfs = np.zeros([41,100])
 All_ITDhf_nfs = np.zeros([41,100])
 
@@ -102,8 +110,14 @@ for sub in range(0,len(Subjects)):
     All_IAChf[:,sub] = IAC_Hf
     All_ITDhf[:,sub] = ITD_Hf
     
+    All_PlvIAC[:, sub] = PLV_IAC
+    All_PlvITD[:, sub] = PLV_ITD
+    
+    
     All_CohIAC_nfs += Cohnf_IAC / len(Subjects)
     All_CohITD_nfs += Cohnf_ITD / len(Subjects)
+    All_PlvIAC_nfs += PLVnf_IAC / len(Subjects)
+    All_PlvITD_nfs += PLVnf_ITD / len(Subjects)
     All_IAChf_nfs += NF_Hfs_IAC.T / len(Subjects)
     All_ITDhf_nfs += NF_Hfs_ITD.T / len(Subjects)
     
@@ -114,51 +128,105 @@ for sub in range(0,len(Subjects)):
 ZIAC_coh, ZIAC_coh_sem = Zscore(All_CohIAC,All_CohIAC_nfs)
 ZITD_coh, ZITD_coh_sem = Zscore(All_CohITD,All_CohITD_nfs)
 
+ZIAC_plv, ZIAC_plv_sem = Zscore(All_PlvIAC,All_PlvIAC_nfs)
+ZITD_plv, ZITD_plv_sem = Zscore(All_PlvITD,All_PlvITD_nfs)
+
 ZIAC_Hf, ZIAC_Hf_sem = Zscore(10*np.log10(All_IAChf),10*np.log10(All_IAChf_nfs))
 ZITD_Hf, ZITD_Hf_sem = Zscore(10*np.log10(All_ITDhf),10*np.log10(All_ITDhf_nfs))
 
-plt.figure()
-plt.plot(f2,ZIAC_coh)
-plt.plot(f2,ZIAC_coh + 1.96*ZIAC_coh_sem,color='r')
-plt.plot(f2,ZIAC_coh - 1.96*ZIAC_coh_sem,color='r')
-plt.xlim([1,20])
-plt.ylim([0,30])
-plt.xscale('log')
-plt.ylabel('Coherence (Zscore re: NoisFloor)')
-plt.title('IAC')
 
-plt.figure()
-plt.plot(f2,ZITD_coh)
-plt.plot(f2,ZITD_coh + 1.96*ZITD_coh_sem,color='r')
-plt.plot(f2,ZITD_coh - 1.96*ZITD_coh_sem,color='r')
-plt.xlim([1,20])
-plt.ylim([0,30])
-plt.xscale('log')
-plt.ylabel('Coherence (Zscore re: NoisFloor)')
-plt.title('ITD')
+fig, ax = plt.subplots()
+resp = ax.plot(f2,ZIAC_plv,color='black',linewidth=2, label='Response')
+conf = ax.fill_between(f2,ZIAC_plv + 1.96*ZIAC_plv_sem,ZIAC_plv - 1.96*ZIAC_plv_sem,
+                        color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,25])
+ax.set_ylim([0,25])
+ax.set_xscale('log')
+ax.set_ylabel('IAC PLV (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
+ax.set_xlabel('Frequency (Hz)',fontsize=12,fontweight='bold')
+ax.legend()
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+fig.savefig(os.path.join(fig_path,'IAC_plv.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'IAC_plv.png'),format='png')
 
-plt.figure()
-plt.plot(f1,ZIAC_Hf)
-plt.plot(f1,ZIAC_Hf + 1.96*ZIAC_Hf_sem,color='r')
-plt.plot(f1,ZIAC_Hf - 1.96*ZIAC_Hf_sem,color='r')
-plt.xlim([1,20])
-plt.xscale('log')
-plt.ylabel('Power dB (Zscore re: NoiseFloor)')
-plt.title('IAC')
 
-plt.figure()
-plt.plot(f1,ZITD_Hf)
-plt.plot(f1,ZITD_Hf + 1.96*ZITD_Hf_sem,color='r')
-plt.plot(f1,ZITD_Hf - 1.96*ZITD_Hf_sem,color='r')
-plt.xlim([1,20])
-plt.xscale('log')
-plt.ylabel('Power dB (Zscore re: NoiseFloor)')
-plt.title('ITD')
+fig, ax = plt.subplots()
+resp = ax.plot(f2,ZITD_plv,color='black',linewidth=2)
+conf = ax.fill_between(f2,ZITD_plv + 1.96*ZITD_plv_sem, ZITD_plv - 1.96*ZITD_plv_sem,
+         color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,25])
+ax.set_ylim([0,25])
+ax.set_xscale('log')
+ax.set_ylabel('ITD PLV (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+fig.savefig(os.path.join(fig_path,'ITD_plv.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'ITD_plv.png'),format='png')
 
-plt.figure()
-plt.plot(f2,ZITD_coh)
-plt.plot(f2,ZIAC_coh,color='r')
-plt.xlim([1,20])
+
+fig, ax = plt.subplots()
+resp = ax.plot(f2,ZIAC_coh, color='black', linewidth=2, label='Response')
+conf = ax.fill_between(f2,ZIAC_coh + 1.96*ZIAC_coh_sem, ZIAC_coh - 1.96*ZIAC_coh_sem,
+                 color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,25])
+ax.set_ylim([0,25])
+ax.set_xscale('log')
+ax.set_ylabel('IAC Coh (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
+ax.set_xlabel('Frequency (Hz)',fontsize=12,fontweight='bold')
+ax.legend()
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+fig.savefig(os.path.join(fig_path,'IAC_coh.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'IAC_coh.png'),format='png')
+
+fig, ax = plt.subplots()
+resp = ax.plot(f2,ZITD_coh, color = 'black', linewidth =2, label='Response')
+conf = ax.fill_between(f2,ZITD_coh + 1.96*ZITD_coh_sem, ZITD_coh - 1.96*ZITD_coh_sem,
+                        color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,25])
+ax.set_ylim([0,25])
+ax.set_xscale('log')
+ax.set_ylabel('ITD Coh (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+fig.savefig(os.path.join(fig_path,'ITD_coh.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'ITD_coh.png'),format='png')
+
+
+# plt.figure()
+# plt.plot(f1,ZIAC_Hf)
+# plt.plot(f1,ZIAC_Hf + 1.96*ZIAC_Hf_sem,color='r')
+# plt.plot(f1,ZIAC_Hf - 1.96*ZIAC_Hf_sem,color='r')
+# plt.xlim([1,20])
+# plt.xscale('log')
+# plt.ylabel('Power dB (Zscore re: NoiseFloor)')
+# plt.title('IAC')
+
+# plt.figure()
+# plt.plot(f1,ZITD_Hf)
+# plt.plot(f1,ZITD_Hf + 1.96*ZITD_Hf_sem,color='r')
+# plt.plot(f1,ZITD_Hf - 1.96*ZITD_Hf_sem,color='r')
+# plt.xlim([1,20])
+# plt.xscale('log')
+# plt.ylabel('Power dB (Zscore re: NoiseFloor)')
+# plt.title('ITD')
+
+# plt.figure()
+# plt.plot(f2,ZITD_coh)
+# plt.plot(f2,ZIAC_coh,color='r')
+# plt.xlim([1,20])
+
+
+
 
 
 
