@@ -1,0 +1,59 @@
+{
+    "instructions": [
+        "Welcome to the actual experiment! "
+    ],
+    "feedback": true,
+    "holdfeedback": false,
+    "feedbackdur": 600,
+    "serveraudio": true,
+    "randomize": false,
+    "isi": 600,
+    "volume": [
+        {
+            "plugin": "html-button-response",
+            "prompt": "Welcome! This task involves listening to sounds and providing responses. As a first step, we need to set an appropriate volume level for our task. To begin, make sure you are in a quiet room and wearing your headphones or earphones. Please do not use desktop speakers or laptop speakers. Also, wireless/bluetooth headphones/earphones can sometimes cause problems with our task. So please make sure you are wearing wired headphones/earphones.<p> Please bring down your computer volume to 10-20% of maximum. Then, click <strong>Continue</strong> to proceed.</p>",
+            "choices": [
+                "Continue"
+            ]
+        },
+        {
+            "plugin": "html-button-response",
+            "prompt": "When you are ready, hit the <strong>Play</strong> button to play a sample sound.<p> While that sound is playing, adjust your computer volume up to a comfortable (but not too loud) level.</p>",
+            "choices": [
+                "Play"
+            ]
+        },
+        {
+            "plugin": "hari-audio-button-response",
+            "prompt": "Now adjust your computer volume up to a comfortable (but not too loud) level.",
+            "stimulus": "volumeSetStim.wav",
+            "choices": [
+                "I have adjusted the volume, let's continue"
+            ]
+        },
+        {
+            "plugin": "html-button-response",
+            "prompt": "Thanks for adjusting your computer volume. We will use this volume setting for the remainder of the task. Please do not adjust the volume anymore throughout the task, as that could lead to sounds being too loud or too soft.<p>If this sounds OK, click <strong>Continue</strong> to begin the task.</p>",
+            "choices": [
+                "Continue"
+            ]
+        }
+    ],
+    "trials": [
+        {
+            "plugin": "hari-audio-button-response",
+            "prompt": "Select the <strong>word</strong> prompted by the voice",
+            "choices": [
+                "yo",
+                "no",
+                "ok"
+            ],
+            "answer": 3,
+            "stimulus": "mrttrial1.wav",
+            "cond": 1,
+            "annot": {
+                "SNR": "5"
+            }
+        }
+    ]
+}
