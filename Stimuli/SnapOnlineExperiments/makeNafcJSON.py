@@ -6,19 +6,32 @@ Created on Mon Jul 27 11:48:44 2020
 """
 
 import json
+import dropbox
+
+with open('dbAPIkey.json') as f:
+    APIkey = json.load(f)
+
+dbxAPIkey = APIkey['dbxAPIkey'] #importing API key from json file. Doing this to keep key hidden from public repo
+dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
+fname = 'test.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
 feedbackdur = 600 #duration of feedback in ms
-serveraudio = True
+serveraudio = False
 #estimatedduration: 
 randomize = False #randomize trial order
 isi = 600 # interstimulus interval in ms
 
 
+# Path to folder in dropbox
+folder_path = '/OnlineStimWavs'
+
+files = dbx.files_list_folder('/OnlineStimWavs')
+flink = dbx.sharing_create_shared_link(path)
 
 
 data = {}
@@ -77,7 +90,15 @@ data['trials'].append({
     })
     
 
-with open('test.JSON', 'w') as outfile:
+with open(fname, 'w') as outfile:
     json.dump(data,outfile, indent = 4)
+    
+    
+def dlURL(url):
+    ## convert db url to one that can be used to direct download
+    dl_url = url[0:url.find('?')]
+    dl_url = url[0:url.find('dropbox')] + 'dl.' + url[url.find('dropbox'):url.find('?')]
+    return dl_url
+    
 
 
