@@ -8,6 +8,31 @@ Created on Mon Jul 27 11:48:44 2020
 import json
 import dropbox
 
+
+def dlURL(url):
+    ## convert db url to one that can be used to direct download
+    dl_url = url[0:url.find('?')]
+    dl_url = url[0:url.find('dropbox')] + 'dl.' + url[url.find('dropbox'):url.find('?')]
+    return dl_url
+
+def getFiles(folder_path):
+    '''
+    naming convention of files should have trial_#.wav at end
+    '''
+    
+    files = dbx.files_list_folder(folder_path)
+    fentries = files.entries
+    trial_num = []
+    wavFiles = []
+    for x in range(len(fentries)):
+        fname = fentries[x].name
+        if fname[len(fname)-4:len(fname)].lower() == '.wav':
+            trial_num.append(int(fname[fname.find('trial_')+6:fname.find('.wav')]))
+            wavFiles.append(fname)
+    sortIndex = sorted(range(len(trial_num)), key = lambda k: trial_num[k])
+    wavFiles = [wavFiles[i] for i in sortIndex]
+    return wavFiles
+
 with open('dbAPIkey.json') as f:
     APIkey = json.load(f)
 
@@ -16,7 +41,7 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-fname = 'test.json'
+json_fname = 'test.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
@@ -28,10 +53,10 @@ isi = 600 # interstimulus interval in ms
 
 
 # Path to folder in dropbox
-folder_path = '/OnlineStimWavs'
+folder_path = '/OnlineStimWavs/AMphi_wav'
+wavFiles = getFiles(folder_path)
 
-files = dbx.files_list_folder('/OnlineStimWavs')
-flink = dbx.sharing_create_shared_link(path)
+#flink = dbx.sharing_create_shared_link()
 
 
 data = {}
@@ -90,15 +115,15 @@ data['trials'].append({
     })
     
 
-with open(fname, 'w') as outfile:
+with open(json_fname, 'w') as outfile:
     json.dump(data,outfile, indent = 4)
     
     
-def dlURL(url):
-    ## convert db url to one that can be used to direct download
-    dl_url = url[0:url.find('?')]
-    dl_url = url[0:url.find('dropbox')] + 'dl.' + url[url.find('dropbox'):url.find('?')]
-    return dl_url
+
+        
+            
+            
+            
     
 
 
