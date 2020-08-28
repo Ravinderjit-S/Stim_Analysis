@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 27 11:48:44 2020
-
-@author: StuffDeveloping
+Author: Ravinderjit Singh
 """
 
 import json
