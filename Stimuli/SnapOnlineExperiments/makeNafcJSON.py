@@ -6,18 +6,60 @@ Created on Mon Jul 27 11:48:44 2020
 """
 
 import json
+import dropbox
+from scipy.io import loadmat 
+
+
+def dlURL(url):
+    ## convert db url to one that can be used to direct download
+    dl_url = url[0:url.find('?')]
+    dl_url = url[0:url.find('dropbox')] + 'dl.dropboxusercontent' + url[url.find('.com'):url.find('?')]
+    return dl_url
+
+def getFiles(folder_path):
+    '''
+    naming convention of files should have trial_#.wav at end
+    '''
+    files = dbx.files_list_folder(folder_path)
+    fentries = files.entries
+    trial_num = []
+    wavFiles = []
+    for x in range(len(fentries)):
+        fname = fentries[x].name
+        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='volstim.wav':
+            trial_num.append(int(fname[fname.find('trial_')+6:fname.find('.wav')]))
+            wavFiles.append(fname)
+    sortIndex = sorted(range(len(trial_num)), key = lambda k: trial_num[k])
+    wavFiles = [wavFiles[i] for i in sortIndex]
+    return wavFiles
+
+with open('dbAPIkey.json') as f:
+    APIkey = json.load(f)
+
+dbxAPIkey = APIkey['dbxAPIkey'] #importing API key from json file. Doing this to keep key hidden from public repo
+dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
+json_fname = 'AMphi_AM4.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
 feedbackdur = 600 #duration of feedback in ms
-serveraudio = True
+serveraudio = False
 #estimatedduration: 
 randomize = False #randomize trial order
 isi = 600 # interstimulus interval in ms
 
+
+folder_path = '/OnlineStimWavs/AMphi' # Path to folder in dropbox
+trial_plugin = 'hari-audio-button-response'
+trial_prompt = 'Select the stimuli with an <strong>AM phase shift </strong> (the different one)'
+trial_choices = ['1', '2', '3']
+stim_info_file = loadmat('StimData.mat')
+correct_answers = stim_info_file['correct'].squeeze()
+trial_cond = 4
+phi_annotation = stim_info_file['phis'].squeeze()
 
 
 
@@ -29,6 +71,10 @@ data['feedbackdur'] = feedbackdur
 data['serveraudio'] = serveraudio
 data['randomize'] = randomize
 data['isi'] = isi
+
+flink = dbx.sharing_create_shared_link(folder_path+'/volstim.wav')
+dd_link = dlURL(flink.url) 
+
 data['volume'] = []
 data['volume'].append({
     'plugin': "html-button-response",
@@ -52,7 +98,7 @@ data['volume'].append({
 data['volume'].append({
     'plugin': 'hari-audio-button-response',
     'prompt': 'Now adjust your computer volume up to a comfortable (but not too loud) level.',
-    'stimulus': 'volumeSetStim.wav',
+    'stimulus': dd_link,
     'choices': ["I have adjusted the volume, let's continue"]
     })
 data['volume'].append({
@@ -65,19 +111,33 @@ data['volume'].append({
     "choices": ["Continue"], 
     })
 
+
+wavFiles = getFiles(folder_path)
+
 data['trials'] = []
-data['trials'].append({
-    'plugin':"hari-audio-button-response",
-    'prompt': "Select the <strong>word</strong> prompted by the voice",
-    'choices': ['yo','no','ok'],
-    'answer': 3,
-    'stimulus': 'mrttrial1.wav',
-    'cond': 1,
-    'annot': {'SNR': '5'}
-    })
+for i in range(len(wavFiles)):
+    flink = dbx.sharing_create_shared_link(folder_path+'/'+wavFiles[i])
+    dd_link = dlURL(flink.url) 
+    data['trials'].append({
+        'plugin': trial_plugin,
+        'prompt': trial_prompt,
+        'choices': trial_choices,
+        'answer': int(correct_answers[i]),
+        'stimulus': dd_link,
+        'cond': trial_cond,
+        'annot': {'phi': int(phi_annotation[i])}
+        })
     
 
-with open('test.JSON', 'w') as outfile:
+with open(json_fname, 'w') as outfile:
     json.dump(data,outfile, indent = 4)
+    
+    
+
+        
+            
+            
+            
+    
 
 
