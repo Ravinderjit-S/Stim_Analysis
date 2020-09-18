@@ -50,7 +50,7 @@ feedbackdur = 600 #duration of feedback in ms
 serveraudio = False
 #estimatedduration: 
 randomize = False #randomize trial order
-isi = 750 # interstimulus interval in ms
+isi = 0 # interstimulus interval in ms
 
 
 folder_path = '/OnlineStimWavs/AMphi/AMphi_' + str(trial_cond) # Path to folder in dropbox
@@ -122,7 +122,7 @@ for i in range(len(wavFiles)):
         'plugin': trial_plugin,
         'prompt': trial_prompt,
         'choices': trial_choices,
-        'answer': int(correct_answers[i]),
+        'answer': int(correct_answers[i])-1,
         'stimulus': dd_link,
         'cond': trial_cond,
         'annot': {'phi': int(phi_annotation[i])}

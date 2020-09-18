@@ -11,38 +11,53 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 
+StimData = '../../Stimuli/SnapOnlineExperiments/DEMO_StimData_4.mat'
 
-stim_info = loadmat('StimData.mat')
+stim_info = loadmat(StimData)
 correct = stim_info['correct'].squeeze()
 stim_phis = stim_info['phis'].squeeze()
 
-Results_fname = 'Test_Rav_results.json'
+Results_fname = 'Demo_AMphi_AM4_Rav_results.json'
 with open(Results_fname) as f:
     results = json.load(f)
     
     
-subj = results[8]
-trialnum = np.array([])
-phi = np.array([])
-resps = np.array([])
-rt = np.array([])
-for trial in subj:
-    if not 'annot' in trial:
-        continue
-    tiralnum = np.append(trialnum,trial['trialnum'])
-    annot = trial['annot']
-    phi = np.append(phi,int(annot[annot.find(':')+1:annot.find('}')]))
-    resps = np.append(resps,int(trial['button_pressed']))
-    rt = np.append(rt,trial['rt'])
+subjects = []
+trialnum = np.zeros((len(correct),len(results)))
+phi = np.zeros((len(correct),len(results)))
+resps = np.zeros((len(correct),len(results)))
+rt = np.zeros((len(correct),len(results)))
+for k in range(0,len(results)):
+    
+    subjects.append(results[k][0]['subject'])
+    subj = results[k]
+    cur_t = 0
+    for trial in subj:
+        if not 'annot' in trial:
+            continue
+        if len(trial['annot']) == 0:
+            continue
+    
+        trialnum[cur_t,k] = trial['trialnum']
+        annot = trial['annot']
+        phi[cur_t,k] = int(annot[annot.find(':')+1:annot.find('}')])
+        resps[cur_t,k] = int(trial['button_pressed'])
+        rt[cur_t,k] = trial['rt']
+        cur_t +=1 
+        
+
 
 resps = resps+1
 
 phi_conds = np.unique(phi)
-accuracy_conds = np.array([])
-for cond in phi_conds:
-    mask = phi==cond
-    accuracy = np.sum(resps[mask]==correct[mask]) / np.sum(mask)
-    accuracy_conds = np.append(accuracy_conds, accuracy)
+phi = phi[:,0]
+accuracy_conds = np.zeros((len(phi_conds), len(subjects)))
+for ll in range(len(phi_conds)):
+    mask = phi==phi_conds[ll]
+    for m in range(0,len(subjects)):
+        accuracy = np.sum(resps[mask,m] == correct[mask]) / len(correct[mask])
+        accuracy_conds[ll,m] = accuracy
+        
     
 fig, ax = plt.subplots()
 ax.plot(range(len(phi_conds)),accuracy_conds)
