@@ -4,6 +4,10 @@ path = '../../CommonExperiment';
 p = genpath(path);
 addpath(p);
 
+path = '../Stim_Dev';
+p = genpath(path);
+addpath(p)
+
 folder_loc = '/media/ravinderjit/Data_Drive/Data/Stimuli_WavMat/AMphi/';
 folder_loc = '/home/ravinderjit/Documents/OnlineStim_WavFiles/AMphi/';
 
@@ -15,7 +19,7 @@ ref = 1;
 fs = 48828;
 risetime = .125;
 
-fm = 64;
+fm = 4;
 phis = [30, 60, 90, 180];
 ntrials = 20; 
 phis = repmat(phis, 1, ntrials);
@@ -42,6 +46,7 @@ for i = 1:length(phis)
     audiowrite(fname, stimulus_all',fs);
 end
 save([folder_loc 'StimData_' num2str(fm) '.mat'],'correct','fm','phis');
+save(['StimData_' num2str(fm) '.mat'],'correct','fm','phis');
 
 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
 f2 = fratio*f1; 
@@ -56,7 +61,7 @@ end
 stimulus_all = horzcat(stim{1}, ISI, stim{2}, ISI, stim{3}, ISI, stim{4});
 stimulus_all = scaleSound(stimulus_all);
 
-for i = 1:5
+for i = 1:3
     stimulus_all = horzcat(stimulus_all, ISI, stimulus_all);
 end
 

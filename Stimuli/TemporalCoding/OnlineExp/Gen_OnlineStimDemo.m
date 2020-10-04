@@ -21,7 +21,7 @@ risetime = .125;
 
 fm = 4;
 phis = [30, 60, 90, 180];
-ntrials = 5; S
+ntrials = 5;
 phis = repmat(phis, 1, ntrials);
 phis = phis(randperm(length(phis)));
 ISI = zeros(2,fs* (stim_dur /2)); 
@@ -51,7 +51,7 @@ for k = 1:length(demo_phi)
     audiowrite(fname, stimulus_all',fs);
 end
 save([folder_loc 'DEMOprac_StimData_' num2str(fm) '.mat'],'correct_k','fm','phis');
-
+save(['DEMOprac_StimData_' num2str(fm) '.mat'],'correct_k','fm','phis');
 
 for i = 1:length(phis)
     f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
@@ -60,7 +60,7 @@ for i = 1:length(phis)
     order = [1 randperm(3)+1];
     stim = stim(order);
     correct(i) = find(order ==4);
-    for j = 1:3
+    for j = 1:4
         stimulus = stim{j};
         energy = mean(rms(stimulus'));
         stimulus(1,:) = rampsound(stimulus(1,:),fs,risetime) / energy;
@@ -73,11 +73,12 @@ for i = 1:length(phis)
     audiowrite(fname, stimulus_all',fs);
 end
 save([folder_loc 'DEMO_StimData_' num2str(fm) '.mat'],'correct','fm','phis');
+save(['DEMO_StimData_' num2str(fm) '.mat'],'correct','fm','phis');
 
 f1 = randi(frange(2)/fratio - frange(1)) + frange(1); 
 f2 = fratio*f1; 
 stim = SAM_phi(f1,f2,fs,stim_dur,fm,180,dichotic,ref);
-for j = 1:3
+for j = 1:4
     stimulus = stim{j};
     energy = mean(rms(stimulus'));
     stimulus(1,:) = rampsound(stimulus(1,:),fs,risetime) / energy;
@@ -87,7 +88,7 @@ end
 stimulus_all = horzcat(stim{1}, ISI, stim{2}, ISI, stim{3}, ISI, stim{4});
 stimulus_all = scaleSound(stimulus_all);
 
-for i = 1:5
+for i = 1:3
     stimulus_all = horzcat(stimulus_all, ISI, stimulus_all);
 end
 fname = [folder_loc 'DEMO_volstim.wav'];

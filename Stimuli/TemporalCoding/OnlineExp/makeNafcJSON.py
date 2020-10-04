@@ -32,7 +32,7 @@ def getFiles(folder_path):
     wavFiles = [wavFiles[i] for i in sortIndex]
     return wavFiles
 
-with open('dbAPIkey.json') as f:
+with open('../../SnapOnlineExperiments/dbAPIkey.json') as f:
     APIkey = json.load(f)
 
 dbxAPIkey = APIkey['dbxAPIkey'] #importing API key from json file. Doing this to keep key hidden from public repo
@@ -40,24 +40,25 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-trial_cond = 64
+AM =4
+trial_cond = 1
 
-json_fname = 'AMphi_AM' + str(trial_cond) + '.json'
+json_fname = 'AMphi_AM' + str(AM) + '.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
-feedbackdur = 600 #duration of feedback in ms
+feedbackdur = 750 #duration of feedback in ms
 serveraudio = False
 #estimatedduration: 
 randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path = '/OnlineStimWavs/AMphi/AMphi_' + str(trial_cond) # Path to folder in dropbox
+folder_path = '/OnlineStimWavs/AMphi/AMphi_' + str(AM) # Path to folder in dropbox
 trial_plugin = 'hari-audio-button-response'
-trial_prompt = 'Select the stimuli with an <strong>AM phase shift </strong> (the different one)'
-trial_choices = ['1', '2', '3']
-stim_info_file = loadmat('StimData_' + str(trial_cond) + '.mat')
+trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
+trial_choices = ['A', 'B', 'C']
+stim_info_file = loadmat('StimData_' + str(AM) + '.mat')
 correct_answers = stim_info_file['correct'].squeeze()
 phi_annotation = stim_info_file['phis'].squeeze()
 

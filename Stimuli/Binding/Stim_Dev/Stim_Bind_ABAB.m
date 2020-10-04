@@ -4,7 +4,7 @@ function [stim, All_envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_s
 
     T_a = 1.0; %Time of a part of the stimulus
     
-    bw = [4 24]; %bandwidth of envelope
+    bw = [4 24]; %bandwidth of envelope 4-24
     lpf = 40; %low pass filter
 
     [Tones_f, ERBspace] = Get_Tones(Tones_num, ERB_spacing, f_start, f_end); %returns tone frequencies 

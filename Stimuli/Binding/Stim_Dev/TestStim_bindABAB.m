@@ -10,7 +10,7 @@ tic()
 [stimABAB, envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing);
 toc()
 tic()
-Corr_inds = [1:2:16];
+Corr_inds = [];
 [stimAAAA, envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing);
 toc()
 
