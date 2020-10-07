@@ -40,10 +40,10 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-AM =4
+phi = 90
 trial_cond = 1
 
-json_fname = 'AMphi_AM' + str(AM) + '.json'
+json_fname = 'PhiAM_phi' + str(phi) + '.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
@@ -54,13 +54,13 @@ randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path = '/OnlineStimWavs/AMphi/AMphi_' + str(AM) # Path to folder in dropbox
+folder_path = '/OnlineStimWavs/PhiAM/Phi_' + str(phi) # Path to folder in dropbox
 trial_plugin = 'hari-audio-button-response'
 trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-stim_info_file = loadmat('StimData_' + str(AM) + '.mat')
+stim_info_file = loadmat('StimData_' + str(phi) + '.mat')
 correct_answers = stim_info_file['correct'].squeeze()
-phi_annotation = stim_info_file['phis'].squeeze()
+AMs_annotation = stim_info_file['fms'].squeeze()
 
 
 
@@ -126,7 +126,7 @@ for i in range(len(wavFiles)):
         'answer': int(correct_answers[i])-1,
         'stimulus': dd_link,
         'cond': trial_cond,
-        'annot': {'phi': int(phi_annotation[i])}
+        'annot': {'phi': int(AMs_annotation[i])}
         })
     
 
