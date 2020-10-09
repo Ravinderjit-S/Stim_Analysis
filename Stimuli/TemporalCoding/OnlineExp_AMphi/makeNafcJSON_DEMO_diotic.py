@@ -35,7 +35,7 @@ def getFiles(folder_path):
     wavFiles = []
     for x in range(len(fentries)):
         fname = fentries[x].name
-        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='DEMO_volstim.wav':
+        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='DEMO_diotic_volstim.wav':
             trial_num.append(int(fname[fname.find('trial_')+6:fname.find('.wav')]))
             wavFiles.append(fname)
     sortIndex = sorted(range(len(trial_num)), key = lambda k: trial_num[k])
@@ -50,10 +50,10 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-trial_cond = 128
+trial_cond = 64
 test_cond = 1 #use this for testing accuracy in flow of experiment
 
-json_fname = 'Demo_AMphi_AM' + str(trial_cond) + '.json'
+json_fname = 'Demo_AMphi_AM_diotic' + str(trial_cond) + '.json'
 instructions = ["Welcome to the Demo! "]
 feedback = True
 holdfeedback = False
@@ -64,13 +64,13 @@ randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path_demo = '/OnlineStimWavs/AMphi/DEMO_AMphi_' + str(trial_cond) # Path to folder in dropbox
-folder_path_prac = '/OnlineStimWavs/AMphi/DEMOprac_AMphi_' + str(trial_cond) 
+folder_path_demo = '/OnlineStimWavs/AMphi_diotic/DEMO_AMphi_diotic_' + str(trial_cond) # Path to folder in dropbox
+folder_path_prac = '/OnlineStimWavs/AMphi_diotic/DEMOprac_AMphi_diotic_' + str(trial_cond) 
 trial_plugin = 'hari-audio-button-response'
 trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-demo_info_file = loadmat('DEMO_StimData_' + str(trial_cond) + '.mat') #update this in folder 
-demo_prac_file = loadmat('DEMOprac_StimData_' + str(trial_cond) + '.mat')
+demo_info_file = loadmat('DEMO_StimData_diotic' + str(trial_cond) + '.mat') #update this in folder 
+demo_prac_file = loadmat('DEMOprac_StimData_diotic' + str(trial_cond) + '.mat')
 demo_correct_answers = demo_info_file['correct'].squeeze()
 prac_correct_answers = demo_prac_file['correct_k'].squeeze()
 phi_annotation = demo_info_file['phis'].squeeze()
@@ -86,7 +86,7 @@ data['serveraudio'] = serveraudio
 data['randomize'] = randomize
 data['isi'] = isi
 
-flink = dbx.sharing_create_shared_link(folder_path_demo+'/DEMO_volstim.wav')
+flink = dbx.sharing_create_shared_link(folder_path_demo+'/DEMO_diotic_volstim.wav')
 dd_link = dlURL(flink.url) 
 
 data['volume'] = []

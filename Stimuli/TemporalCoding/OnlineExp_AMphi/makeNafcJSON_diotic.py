@@ -25,7 +25,7 @@ def getFiles(folder_path):
     wavFiles = []
     for x in range(len(fentries)):
         fname = fentries[x].name
-        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='volstim.wav':
+        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='diotic_volstim.wav':
             trial_num.append(int(fname[fname.find('trial_')+6:fname.find('.wav')]))
             wavFiles.append(fname)
     sortIndex = sorted(range(len(trial_num)), key = lambda k: trial_num[k])
@@ -40,10 +40,10 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-AM =128
+AM =4
 trial_cond = 1
 
-json_fname = 'AMphi_AM' + str(AM) + '.json'
+json_fname = 'AMphi_AM_diotic' + str(AM) + '.json'
 instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
@@ -54,11 +54,11 @@ randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path = '/OnlineStimWavs/AMphi/AMphi_' + str(AM) # Path to folder in dropbox
+folder_path = '/OnlineStimWavs/AMphi_diotic/AMphi_diotic_' + str(AM) # Path to folder in dropbox
 trial_plugin = 'hari-audio-button-response'
 trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-stim_info_file = loadmat('StimData_' + str(AM) + '.mat')
+stim_info_file = loadmat('StimData_diotic' + str(AM) + '.mat')
 correct_answers = stim_info_file['correct'].squeeze()
 phi_annotation = stim_info_file['phis'].squeeze()
 
@@ -73,7 +73,7 @@ data['serveraudio'] = serveraudio
 data['randomize'] = randomize
 data['isi'] = isi
 
-flink = dbx.sharing_create_shared_link(folder_path+'/volstim.wav')
+flink = dbx.sharing_create_shared_link(folder_path+'/diotic_volstim.wav')
 dd_link = dlURL(flink.url) 
 
 data['volume'] = []

@@ -17,14 +17,18 @@ StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_8.mat'
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_16.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_32.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_64.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_128.mat')
 
 Results_fname = ['Task_AMphi_AM4_Rav_results.json']
 Results_fname.append('Task_AMphi_AM8_Rav_results.json')
 Results_fname.append('Task_AMphi_AM16_Rav_results.json')
 Results_fname.append('Task_AMphi_AM32_Rav_results.json')
 Results_fname.append('Task_AMphi_AM64_Rav_results.json')
+Results_fname.append('Task_AMphi_AM128_Rav_results.json')
 
-AM = [4,8,16,32,64]
+AM = [4,8,16,32,64,128]
+
+AM_avgs = np.zeros((4,len(AM)))
 
 for j in range(0,len(StimData)):
     StimData_j = StimData[j]
@@ -91,3 +95,28 @@ for j in range(0,len(StimData)):
     plt.ylabel('Accuracy')
     plt.xlabel('Phase Difference')
     plt.title(str(AM[j]))
+    
+    AM_avgs[:,j] = accuracy_conds.mean(axis=1)
+    
+fig, ax = plt.subplots()
+ax.plot(range(len(phi_conds)),AM_avgs)
+plt.xticks(range(len(phi_conds)),labels = phi_conds)
+plt.ylabel('Accuracy')
+plt.xlabel('Phase Difference')
+plt.legend(AM)
+
+t_diff = np.zeros(AM_avgs.shape)
+for m in range (len(AM)):
+    t_diff[:,m] = (1/AM[m]) * phi_conds.T/360
+
+
+fig, ax = plt.subplots()
+ax.plot(t_diff,AM_avgs,marker='x',linewidth=0)
+plt.ylabel('Accuracy')
+plt.xlabel('Time Difference')
+plt.legend(AM)
+
+
+
+
+    
