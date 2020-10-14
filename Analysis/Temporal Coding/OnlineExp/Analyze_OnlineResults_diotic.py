@@ -12,21 +12,21 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
 
-StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_4.mat']
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_8.mat')
+StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic4.mat']
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic8.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_16.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_32.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_64.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_128.mat')
 
-Results_fname = ['Task_AMphi_AM4_Rav_results.json']
-Results_fname.append('Task_AMphi_AM8_Rav_results.json')
+Results_fname = ['AMphi_AM_diotic_4_Rav_results.json']
+Results_fname.append('Task_AMphi_diotic_8_Rav_results.json')
 Results_fname.append('Task_AMphi_AM16_Rav_results.json')
 Results_fname.append('Task_AMphi_AM32_Rav_results.json')
 Results_fname.append('Task_AMphi_AM64_Rav_results.json')
 Results_fname.append('Task_AMphi_AM128_Rav_results.json')
 
-AM = [4,8,16,32,64,128]
+AM = [4,8]
 
 AM_avgs = np.zeros((4,len(AM)))
 
