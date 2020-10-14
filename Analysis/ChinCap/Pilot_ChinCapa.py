@@ -17,13 +17,14 @@ import os
 
 #data_loc = r'H:\ChinCap\090720\'
 data_loc = r'H:\ChinCap\082020\\'
-data_loc = '/home/ravinderjit/Documents/ChinCapData/091820/'
+data_loc = '/home/ravinderjit/Documents/ChinCapData/092320/'
+stim_type = 'click_' #'click_'  tone_4k_
 pathThing = '/'
 nchans = 34
 refchans = ['A1', 'A2']
 refchans = ['EXG1']
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_80' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type +'80' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 #data_eeg.notch_filter(60)
 scalings = dict(eeg=20e-6,stim=1)
@@ -42,49 +43,49 @@ channels.remove(0)
 evoked_80.plot(picks=channels, titles ='80')
 
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_70' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type+ '70' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_70 = epochs.average()
 evoked_70.plot(picks=channels, titles = '70')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_60' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type + '60' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_60 = epochs.average()
 evoked_60.plot(picks=channels, titles = '60')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_50' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type + '50' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_50 = epochs.average()
 evoked_50.plot(picks=channels, titles = '50')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_40' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type +'40' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_40 = epochs.average()
 evoked_40.plot(picks=channels, titles = '40')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_30' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type +'30' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_30 = epochs.average()
 evoked_30.plot(picks=channels, titles = '30')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_20' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type +'20' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_20 = epochs.average()
 evoked_20.plot(picks=channels, titles = '20')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_10' + pathThing,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type +'10' + pathThing,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_10 = epochs.average()
 evoked_10.plot(picks=channels, titles = '10')
 
-data_eeg,data_evnt = EEGconcatenateFolder(data_loc + 'click_0' + pathThing ,nchans,refchans,exclude)
+data_eeg,data_evnt = EEGconcatenateFolder(data_loc + stim_type + '0' + pathThing ,nchans,refchans,exclude)
 data_eeg.filter(300,3000)
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
 evoked_0 = epochs.average()
