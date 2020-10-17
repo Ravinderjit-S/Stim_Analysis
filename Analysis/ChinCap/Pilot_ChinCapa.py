@@ -12,13 +12,13 @@ from EEGpp import EEGconcatenateFolder
 import mne
 from anlffr import spectral
 import os
-
+from scipy import linalg
 
 
 #data_loc = r'H:\ChinCap\090720\'
 data_loc = r'H:\ChinCap\082020\\'
 data_loc = '/home/ravinderjit/Documents/ChinCapData/092320/'
-stim_type = 'click_' #'click_'  tone_4k_
+stim_type = 'tone_4k_' #'click_'  tone_4k_
 pathThing = '/'
 nchans = 34
 refchans = ['A1', 'A2']
@@ -29,7 +29,7 @@ data_eeg.filter(300,3000)
 #data_eeg.notch_filter(60)
 scalings = dict(eeg=20e-6,stim=1)
 #data_eeg.plot(events = data_evnt, scalings=scalings,show_options=True)
-#data_eeg.plot_psd(picks =[32,33])
+data_eeg.plot_psd(picks =[31,32,33])
 
 
 epochs = mne.Epochs(data_eeg,data_evnt,[255],tmin=-0.005,tmax=0.01)
@@ -93,7 +93,7 @@ evoked_0.plot(picks=channels, titles = '0')
 
 
 #get data out of structure
-fs = evoked_0.info['sfreq']
+fs = evoked_80.info['sfreq']
 t = np.arange(-0.005,0.01 + 1/fs, 1/fs)
 
 click_0 = evoked_0.data * 1e6
@@ -160,6 +160,31 @@ plt.title('Overall P2p')
 plt.xlabel('Channel')
 plt.ylabel('P2P')
 
+
+# x = epochs.get_data()
+# x = x[:,0:32,:]
+# params = dict()
+# params['Fs'] = epochs.info['sfreq']
+
+x_ave = click_60
+x_ave = np.delete(x_ave,[1,23,24,25,26,27,32,33],axis=0)
+C_td = np.cov(x_ave)
+vals, vecs = linalg.eigh(C_td, eigvals_only=False)
+y_pc = np.dot(vecs[:, -1].T, x_ave) / (vecs[:, -1].sum())
+
+plt.figure()
+#plt.plot(vecs)
+plt.plot(vecs[:,-1] / (vecs[:,-1].sum()),color='k',linewidth=1)
+
+
+plt.figure()
+plt.plot(t,y_pc,linewidth=3)
+plt.plot(t,x_ave[6,:],color='r')
+plt.plot(t,x_ave.mean(axis=0),color='k')
+plt.legend(['pca', 'ch.8','avg_chs'])
+
+
+#y_cpc, y_pc = spectral.mtcpca_timeDomain(x, params)
 
 
 
