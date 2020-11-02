@@ -74,7 +74,7 @@ end
 % figure,plot(f{3},WindowSizes,A_FitInt{3})
 % figure,plot(f{4},WindowSizes,A_FitInt{4})
 
-
+S211_SNR = MedianSNR(:,end);
 AcrossSubjectsSNR = mean(MedianSNR,2);
 AcrossSubjectsSEM = std(MedianSNR,[],2) ./ sqrt(numel(Subjects)); 
 
@@ -147,7 +147,7 @@ fig.PaperPosition = [0 0 9 6];
 % print('ExRespTracks','-dpng','-r0')
 
 
-% save([Data_path 'IACsquareTone_Processed.mat'],'WindowSizes','AcrossSubjectsSNR','AcrossSubjectsSEM')
+%save([Data_path 'IACsquareTone_Processed.mat'],'WindowSizes','AcrossSubjectsSNR','AcrossSubjectsSEM','S211_SNR')
 % 
 
 

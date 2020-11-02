@@ -6,6 +6,7 @@ Created on Sun Jul 12 00:10:26 2020
 @author: ravinderjit
 """
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import os
@@ -13,7 +14,7 @@ import pickle
 import numpy as np
 import scipy as sp
 
-
+matplotlib.rcParams['font.family'] ='Arial'
 
 def Zscore(X,noise):
     #X and noise is shape frequency x instances
@@ -50,22 +51,28 @@ ax.xaxis.set_ticks_position('bottom')
 fig.savefig(os.path.join(fig_path,'S207_IAC_plv.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'S207_IAC_plv.png'),format='png')
 
+
   
-fig, ax = plt.subplots()
-ax.plot(f2, Coh_IAC, color = 'black' )
+fig, ax = plt.subplots(figsize=(2.25,2.15))
+font_size = 8.5
+ax.plot(f2, Coh_IAC, color = 'black',linewidth=2 )
 ax.plot(f2, Cohnf_IAC, color = mcolors.CSS4_COLORS['grey'])
 ax.set_xlim([1,25])
 #ax.set_ylim([0,25])
 ax.set_xscale('log')
-ax.set_ylabel('IAC Coh ', fontsize=12,fontweight='bold')
-ax.set_xlabel('Frequency (Hz)',fontsize=12,fontweight='bold')
+ax.set_ylabel('Coherence', fontsize=font_size)
+ax.set_xlabel('Frequency (Hz)',fontsize=font_size)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.yaxis.set_ticks_position('left')
 ax.xaxis.set_ticks_position('bottom')
+plt.xticks([1,10,20],['1','10','20'],fontsize=font_size)
+plt.yticks([.050,.15],['.05', '.15'],fontsize=font_size)
+plt.title('H(f)', fontweight='bold',fontsize=font_size)
+plt.tight_layout()
 fig.savefig(os.path.join(fig_path,'S207_IAC_coh.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'S207_IAC_coh.png'),format='png')
-
+fig.savefig(os.path.join(fig_path,'S207_IAC_coh.svg'),format='svg')
 
   
     
