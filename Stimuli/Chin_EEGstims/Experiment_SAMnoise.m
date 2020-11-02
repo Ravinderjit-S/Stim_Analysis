@@ -23,11 +23,6 @@ invoke(RP2,'Halt');
 invoke(RP2,'ClearCOF');
 invoke(RP2,'LoadCOF',circuit_RP2);
 
-
-% invoke(RP1, 'SetTagVal', 'StmOn', 1000);
-% invoke(RP1, 'SetTagVal', 'StmOff', 500);
-%invoke(RP1, 'SetTagVal', 'RiseFall', 10);
-
 invoke(RP1,'Run');
 invoke(RP2,'Run');
 
