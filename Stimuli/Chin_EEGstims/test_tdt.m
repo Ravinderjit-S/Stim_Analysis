@@ -29,9 +29,9 @@ invoke(RP2,'Run');
 
 %mixer selector
 invoke(RP1,'SetTagVal','Select_L',0);
-invoke(RP1,'SetTagVal','Connect_L',0);
+invoke(RP1,'SetTagVal','Connect_L',2);
 invoke(RP2,'SetTagVal','Select_R',5);
-invoke(RP2,'SetTagVal','Connect_R',3);
+invoke(RP2,'SetTagVal','Connect_R',1);
 
 invoke(PA1,'SetAtten',0);
 invoke(PA2,'SetAtten',120);
