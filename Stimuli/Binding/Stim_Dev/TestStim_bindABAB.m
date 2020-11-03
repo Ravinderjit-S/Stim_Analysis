@@ -1,9 +1,9 @@
 fs = 48828;
 %Corr_inds = [12:16];
-Corr_inds = [1:8];
+Corr_inds = [2,3];
 f_start = 100;
 f_end = 8000; 
-Tones_num = 16;
+Tones_num = 4;
 ERB_spacing = []; %if specified, takes precedence over Tones_num
 
 tic()
