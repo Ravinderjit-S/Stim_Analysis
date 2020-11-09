@@ -19,9 +19,9 @@ def periodogram(x,fs,nfft):
     spec = abs(Xf)/N
     
     if np.mod(N,2) == 0:
-        half_index = N/2;
+        half_index = int(N/2);
     else:
-        half_index = (N-1)/2; 
+        half_index = int((N-1)/2); 
     
     f = f[:half_index]
     spec = spec[:half_index]
