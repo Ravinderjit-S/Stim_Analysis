@@ -1,8 +1,8 @@
 fs = 48828;
-f_start = 400;
-f_end = 6000; 
+f_start = 500;
+f_end = 8000; 
 Tones_num = 3;
-ERB_spacing = 2; %if specified, takes precedence over Tones_num
+ERB_spacing = 4; %if specified, takes precedence over Tones_num
 
 [Tones_f, ERBspace] = Get_Tones(Tones_num, ERB_spacing, f_start, f_end); 
 

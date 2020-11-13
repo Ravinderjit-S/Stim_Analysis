@@ -1,12 +1,12 @@
-function [stimA, stimB1, stimA2, envs_A, envs_B1, envs_A2, ERBspace, Tones_f] = Stim_Bind_ABB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing)
+function [stimA, stimB1, stimA2, envs_A, envs_B1, envs_A2, ERBspace, Tones_f] = Stim_Bind_ABA(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing,bw,lpf)
 % IF ERB_spacing is given, that will be used instead of Tones_num
 % This version of the binding stimulus will return the A and B parts
 % seperatley for a 3AFC experiment
 
     T_a = 1.0; %Time of a part of the stimulus
     
-    bw = [4 24]; %bandwidth of envelope
-    lpf = 40; %low pass filter
+    %bw = [4 24]; %bandwidth of envelope
+    %lpf = 40; %low pass filter
 
     [Tones_f, ERBspace] = Get_Tones(Tones_num, ERB_spacing, f_start, f_end); %returns tone frequencies 
     T = 0:1/fs:T_a-1/fs;
