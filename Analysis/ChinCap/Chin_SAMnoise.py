@@ -16,13 +16,13 @@ from anlffr import spectral
 import scipy.io as sio
 
 
-folder = 'Q394_111620'
+folder = 'Q394_111320'
 data_loc = '/media/ravinderjit/Storage2/ChinCap/SAM_noise/' + folder + '/SAM_'
 pathThing = '/'
 nchans = 37
 refchans = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19',
             'A20','A21','A22','A23','A29','A30','A31','A32']
-refchans = ['A4']
+#refchans = ['A4']
 #exclude = ['A1','A25','A26','A27','A28','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 #exclude = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 exclude = ['EXG6','EXG7','EXG8']
@@ -38,15 +38,18 @@ bad_chs =[23,24,25,26,27,29]
 All_chs = np.arange(32)
 channels = np.delete(All_chs,bad_chs)
 
-epochs_AM5 = mne.Epochs(data_AM5,evnts_AM5,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0))
+bad_chs = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG4','EXG5']
+data_AM5.drop_channels(bad_chs)
+epochs_AM5 = mne.Epochs(data_AM5,evnts_AM5,[255],tmin=-0.5,tmax=1.3,baseline=(-0.3,0))
 evoked_AM5 = epochs_AM5.average()
 evoked_AM5.plot(titles = 'AM 4',picks=channels)
 
 data_AM40,evnts_AM40 = EEGconcatenateFolder(data_loc + '40' + pathThing ,nchans,refchans,exclude)
 data_AM40.filter(1,100)
-epochs_AM40 = mne.Epochs(data_AM40,evnts_AM40,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0))
+data_AM40.drop_channels(bad_chs)
+epochs_AM40 = mne.Epochs(data_AM40,evnts_AM40,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6))
 evoked_AM40 = epochs_AM40.average()
-evoked_AM40.plot(titles = 'AM 40',picks=channels)
+evoked_AM40.plot(titles = 'AM 40')
 
 # data_AM223,evnts_AM223 = EEGconcatenateFolder(data_loc + '223' + pathThing ,nchans,refchans,exclude)
 # data_AM223.filter(1,300)
@@ -103,7 +106,7 @@ chs = evoked_AM5.info['ch_names']
 chs = np.arange(1,24)
 chs = np.append(chs,np.arange(29,33))
 
-# sio.savemat(str('SAMnoise_' +folder+ '.mat'), {'x4':x4,'x40':x40,'x223':x223,'fs':fs,'chs':chs})
+sio.savemat(str('SAMnoise_' +folder+ '.mat'), {'x4':x4,'fs':fs})#'x40':x40,'x223':x223,'fs':fs,'chs':chs})
 
 fs = data_AM5.info['sfreq']
 nfft = 2**np.ceil(np.log(x4.size)/np.log(2))

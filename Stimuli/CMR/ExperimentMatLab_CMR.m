@@ -7,9 +7,9 @@ addpath(genpath(path));
 fs = 44100;
 tlen = 1;
 t = 0:1/fs:tlen-1/fs;
-upper_f = 4000;
-target_f = 2000;
-lower_f = 1000;
+upper_f = 6000;
+target_f = 4000;
+lower_f = 2000;
 noise_half_bw = 300; %half the bandwidth of noise. noise is centered on lower and upper f
 center_freqs = [lower_f target_f upper_f];
 n_modf = 10;
