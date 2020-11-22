@@ -12,7 +12,7 @@ target_f = 4000;
 lower_f = 2000;
 noise_half_bw = 200; %half the bandwidth of noise. noise is centered on lower and upper f
 center_freqs = [lower_f target_f upper_f];
-n_mod_cuts = [125 132];
+n_mod_cuts = [2 10];
 target_modf = 4;
 coh = 1;
 bp_mod_fo = 1/2 * 5 *fs;
@@ -28,7 +28,7 @@ Correct_2up = [0 0];
 TrackSNRs = Start_SNR;
 changes =0;
 
-n_mods = load(['RandMod_' num2str(n_mod_cuts(2)) '.mat']);
+n_mods = load(['RandMod_Hrect_' num2str(n_mod_cuts(2)) '.mat']);
 n_mods_iter = 1;
 while Reversals < Reversals_stop
     if coh == 1
@@ -77,6 +77,6 @@ while Reversals < Reversals_stop
         Reversals = Reversals + 1;
     end
 end
-save(['CMR_SigAM_' num2str(n_mod_cuts(2)) 'coh_' num2str(coh) '.mat'],'TrackSNRs','target_modf','center_freqs','noise_half_bw','coh','n_mod_cuts');
+save(['CMR_SigAM_Hrect_' num2str(n_mod_cuts(2)) 'coh_' num2str(coh) '.mat'],'TrackSNRs','target_modf','center_freqs','noise_half_bw','coh','n_mod_cuts');
     
 
