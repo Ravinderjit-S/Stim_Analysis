@@ -170,7 +170,7 @@ x_ave = click_60
 x_ave = np.delete(x_ave,[1,23,24,25,26,27,32,33],axis=0)
 C_td = np.cov(x_ave)
 vals, vecs = linalg.eigh(C_td, eigvals_only=False)
-y_pc = np.dot(vecs[:, -1].T, x_ave) / (vecs[:, -1].sum())
+y_pc = np.dot(vecs[:, -1], x_ave) / (vecs[:, -1].sum())
 
 plt.figure()
 #plt.plot(vecs)
@@ -178,10 +178,10 @@ plt.plot(vecs[:,-1] / (vecs[:,-1].sum()),color='k',linewidth=1)
 
 
 plt.figure()
-plt.plot(t,y_pc,linewidth=3)
-plt.plot(t,x_ave[6,:],color='r')
+#plt.plot(t,x_ave[6,:],color='r')
 plt.plot(t,x_ave.mean(axis=0),color='k')
-plt.legend(['pca', 'ch.8','avg_chs'])
+plt.plot(t,y_pc,color='r')
+plt.legend(['avg_chs','pca'])
 
 
 #y_cpc, y_pc = spectral.mtcpca_timeDomain(x, params)
