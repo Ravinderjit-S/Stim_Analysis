@@ -45,33 +45,43 @@ Roll_off_6dB_index = find(pow2db(H_f) <= max(pow2db(H_f)) - 6,1,'first');
 
 t=(0:length(H_imp)-1)./fs*1000; %time in ms
 
-figure, subplot(3,1,1), hold on, plot(t, H_imp,'k', 'linewidth',3), title('H(t)'), xlabel('Time (ms)'), ylabel('Firing Rate / IAC')
+figure, subplot(3,1,3), hold on, plot(t, H_imp,'k', 'linewidth',2), title('H(t)'), xlabel('Time (ms)'), ylabel('Firing Rate / IAC')
 for m =1:numel(H_NF)
     H_NF{m} = H_NF{m}(Mseq_samps+1:Mseq_samps+round(Time_Impulse*fs));
     plot(t,H_NF{m},'Color',grey)
 end
 xlim([0 20])
+xticks([0,10,20])
+yticks([0, 3e4, 6e4])
 hold off
-set(gca,'fontsize',25)
+%set(gca,'fontsize',25)
+set(gca, 'FontName','Arial')
 
 
-subplot(3,1,2), hold on, semilogx(f,pow2db(H_f),'k','linewidth',3), title('H(f)'), xlabel('Frequency (Hz)'), xlim([0 600]), ylabel('Power (dB/Hz)'), ylim([10,60])
+subplot(3,1,1), hold on, semilogx(f,pow2db(H_f),'k','linewidth',2), title('H(f)'), xlabel('Frequency (Hz)'), xlim([0 600]), ylabel('Power (dB/Hz)'), ylim([10,60])
 %semilogx(f(Roll_off_6dB_index),pow2db(H_f(Roll_off_6dB_index)),'bx','MarkerSize',20,'linewidth',3);
 for m=1:numel(H_NF)
     [p_NF,f] = pmtm(H_NF{m},2.5,[],fs);
     semilogx(f,pow2db(p_NF),'Color',grey)
 end
+xticks([1, 10, 100, 500])
+yticks([20, 40, 60])
 hold off, set(gca, 'XScale','log')
-set(gca,'fontsize',25)
+%set(gca,'fontsize',25)
+set(gca, 'FontName','Arial')
 
-subplot(3,1,3),plot(f_phase,phase,'k','linewidth',3), title('Phase(f)'), ylabel('Radians'), xlim([0 300]), xlabel('Frequency (Hz)')
-set(gca,'fontsize',25)
+subplot(3,1,2),plot(f_phase,phase,'k','linewidth',2), title('Phase(f)'), ylabel('Radians'), xlim([0 300]), xlabel('Frequency (Hz)')
+xticks([0 100,200,300])
+%set(gca,'fontsize',25)
+set(gca, 'FontName','Arial')
+box off
 
 fig = gcf;
 fig.PaperUnits = 'inches';
-fig.PaperPosition = [0 0 11 16];
+fig.PaperPosition = [0 0 2 6];
 print('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/IAC_nerveHex','-dpng','-r0')
 print('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/IAC_nerveHex','-depsc','-r0')
+print('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/IAC_nerveHex','-dsvg','-r0')
 
 
 % t2 = 0:1/fs:Mseq_samps/fs-1/fs;

@@ -11,24 +11,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
+import pickle
 
 StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic4.mat']
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic8.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_16.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_32.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_64.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic16.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic32.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic64.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_128.mat')
 
 Results_fname = ['AMphi_AM_diotic_4_Rav_results.json']
 Results_fname.append('Task_AMphi_diotic_8_Rav_results.json')
-Results_fname.append('Task_AMphi_AM16_Rav_results.json')
-Results_fname.append('Task_AMphi_AM32_Rav_results.json')
-Results_fname.append('Task_AMphi_AM64_Rav_results.json')
-Results_fname.append('Task_AMphi_AM128_Rav_results.json')
+Results_fname.append('Task_AMphi_diotic_16_Rav_results.json')
+Results_fname.append('Task_AMphi_diotic_32_Rav_results.json')
+Results_fname.append('Task_AMphi_diotic_64_Rav_results.json')
+Results_fname.append('Task_AMphi_diotic_128_Rav_results.json')
 
-AM = [4,8]
+AM = [4,8,16,32,64]
 
 AM_avgs = np.zeros((4,len(AM)))
+AM_sems = np.zeros((4,len(AM)))
+AM_rav = np.zeros((4,len(AM)))
 
 for j in range(0,len(AM)):
     StimData_j = StimData[j]
@@ -84,7 +87,7 @@ for j in range(0,len(AM)):
     plt.ylabel('Accuracy')
     plt.xlabel('Phase Difference')
     plt.title(str(AM[j]))
-    #plt.legend(subjects)
+    plt.legend(subjects)
     
     sem = accuracy_conds.std(axis=1) / np.sqrt(accuracy_conds.shape[1])
     
@@ -97,12 +100,21 @@ for j in range(0,len(AM)):
     plt.title(str(AM[j]))
     
     AM_avgs[:,j] = accuracy_conds.mean(axis=1)
+    AM_sems[:,j] = sem
+    AM_rav[:,j] = accuracy_conds[:,0]
     
+    
+cmap = plt.get_cmap('hot')
+cmap_colors = cmap(np.linspace(0,0.8,len(AM)))   
 fig, ax = plt.subplots()
-ax.plot(range(len(phi_conds)),AM_avgs)
+#ax.plot(range(len(phi_conds)),AM_avgs)
+for n in range(0,len(AM)):
+    ax.errorbar(range(len(phi_conds)),AM_avgs[:,n],yerr = AM_sems[:,n],color=cmap_colors[n,:],linewidth=2)
 plt.xticks(range(len(phi_conds)),labels = phi_conds)
+plt.ylim((0.2,1))
 plt.ylabel('Accuracy')
 plt.xlabel('Phase Difference')
+plt.title('Dichotic')
 plt.legend(AM)
 
 t_diff = np.zeros(AM_avgs.shape)
@@ -114,9 +126,21 @@ fig, ax = plt.subplots()
 ax.plot(t_diff,AM_avgs,marker='x',linewidth=0)
 plt.ylabel('Accuracy')
 plt.xlabel('Time Difference')
+plt.title('Dichotic')
+plt.ylim((0.2,1))
 plt.legend(AM)
 
+#plot Rav
+fig,ax = plt.subplots()
+for n in range(0,len(AM)):
+    ax.plot(range(len(phi_conds)),AM_rav[:,n],color=cmap_colors[n,:])
+plt.xticks(range(len(phi_conds)),labels = phi_conds)
+plt.ylabel('Accuracy')
+plt.xlabel('Phase Difference')
+plt.title('Rav Dichotic')
+plt.legend(AM)
+
+with open('AMphi_dichotic.pickle','wb') as f:
+    pickle.dump([AM_avgs,AM_sems],f)
 
 
-
-    

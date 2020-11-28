@@ -1,17 +1,18 @@
-function [stimA, stimB1, stimA2, envs_A, envs_B1, envs_A2, ERBspace, Tones_f] = Stim_Bind_ABB(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing)
+function [stim_Ref, stimA, stimB1, stimA2, envs_A, envs_B1, envs_A2, ERBspace, Tones_f] = Stim_Bind_ABA(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing,bw,bp_fo,lpf)
 % IF ERB_spacing is given, that will be used instead of Tones_num
 % This version of the binding stimulus will return the A and B parts
 % seperatley for a 3AFC experiment
 
     T_a = 1.0; %Time of a part of the stimulus
     
-    bw = [4 24]; %bandwidth of envelope
-    lpf = 40; %low pass filter
+    %bw = [4 24]; %bandwidth of envelope
+    %lpf = 40; %low pass filter
 
     [Tones_f, ERBspace] = Get_Tones(Tones_num, ERB_spacing, f_start, f_end); %returns tone frequencies 
     T = 0:1/fs:T_a-1/fs;
 
-    [corr_env1, ~] = create_envelope(bw,lpf,T_a,fs); 
+    hRectify = 0;
+    [corr_env1, ~] = create_envelope(bw,bp_fo,lpf,T_a,fs,hRectify); 
     
     % initialize stim variables
     envs_A  = nan(length(Tones_f),length(T));
@@ -20,20 +21,23 @@ function [stimA, stimB1, stimA2, envs_A, envs_B1, envs_A2, ERBspace, Tones_f] = 
     stimA  = zeros(1,length(T));
     stimB1 = zeros(1,length(T));
     stimA2 = zeros(1,length(T));
+    stim_Ref = zeros(1,length(T));
     
     
     for k = 1:length(Tones_f)
         f = Tones_f(k);
-        sig_tone = sin(2*pi*f*T);
-        env_A = create_envelope(bw,lpf,T_a,fs);
-        env_A2 = create_envelope(bw,lpf,T_a,fs);
+        sig_tone = sin(2*pi*f*T+rand()*2*pi);
+        env_A = create_envelope(bw,bp_fo,lpf,T_a,fs,hRectify);
+        env_A2 = create_envelope(bw,bp_fo,lpf,T_a,fs,hRectify);
+        env_Ref = create_envelope(bw,bp_fo,lpf,T_a,fs,hRectify);
         
         if any(k==Corr_inds)
             env_B1 = corr_env1;
         else
-            env_B1 = create_envelope(bw,lpf,T_a,fs);
+            env_B1 = create_envelope(bw,bp_fo,lpf,T_a,fs,hRectify);
         end
 
+        stim_Ref = stim_Ref + sig_tone .* env_Ref;
         stimA  = stimA  + sig_tone .* env_A;
         stimB1 = stimB1 + sig_tone .* env_B1;
         stimA2 = stimA2 + sig_tone .* env_A2;

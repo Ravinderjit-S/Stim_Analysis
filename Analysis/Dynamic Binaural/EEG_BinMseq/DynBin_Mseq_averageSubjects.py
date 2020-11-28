@@ -6,13 +6,14 @@ Created on Tue Feb 25 15:57:32 2020
 @author: ravinderjit
 """
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import os
 import pickle
 import numpy as np
-import scipy as sp
 
+matplotlib.rcParams['font.family'] = 'Arial'
 
 def Zscore(X,noise):
     #X and noise is shape frequency x instances
@@ -169,37 +170,48 @@ fig.savefig(os.path.join(fig_path,'ITD_plv.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'ITD_plv.png'),format='png')
 
 
-fig, ax = plt.subplots()
+font_size = 10
+fig, ax = plt.subplots(figsize=(3.3,3.3))
 resp = ax.plot(f2,ZIAC_coh, color='black', linewidth=2, label='Response')
 conf = ax.fill_between(f2,ZIAC_coh + 1.96*ZIAC_coh_sem, ZIAC_coh - 1.96*ZIAC_coh_sem,
                  color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
 ax.set_xlim([1,25])
 ax.set_ylim([0,25])
 ax.set_xscale('log')
-ax.set_ylabel('IAC Coh (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
-ax.set_xlabel('Frequency (Hz)',fontsize=12,fontweight='bold')
-ax.legend()
+ax.set_ylabel('Coherence (Zscore re: NoisFloor)', fontsize=font_size)
+ax.set_xlabel('Frequency (Hz)',fontsize=font_size)
+#ax.legend()
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.yaxis.set_ticks_position('left')
 ax.xaxis.set_ticks_position('bottom')
+plt.xticks([1,10,20],['1','10','20'],fontsize=font_size)
+plt.title('IAC')
+plt.tight_layout()
 fig.savefig(os.path.join(fig_path,'IAC_coh.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'IAC_coh.png'),format='png')
+fig.savefig(os.path.join(fig_path,'IAC_coh.svg'),format='svg')
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(3.3,3.3))
 resp = ax.plot(f2,ZITD_coh, color = 'black', linewidth =2, label='Response')
 conf = ax.fill_between(f2,ZITD_coh + 1.96*ZITD_coh_sem, ZITD_coh - 1.96*ZITD_coh_sem,
                         color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
 ax.set_xlim([1,25])
 ax.set_ylim([0,25])
 ax.set_xscale('log')
-ax.set_ylabel('ITD Coh (Zscore re: NoisFloor)', fontsize=12,fontweight='bold')
+ax.legend(frameon=False)
+ax.set_ylabel('Coherence (Zscore re: NoisFloor)', fontsize=font_size)
+ax.set_xlabel('Frequency (Hz)',fontsize=font_size)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.yaxis.set_ticks_position('left')
 ax.xaxis.set_ticks_position('bottom')
+plt.xticks([1,10,20],['1','10','20'],fontsize=font_size)
+plt.title('ITD',fontsize=font_size)
+plt.tight_layout()
 fig.savefig(os.path.join(fig_path,'ITD_coh.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'ITD_coh.png'),format='png')
+fig.savefig(os.path.join(fig_path,'ITD_coh.svg'),format='svg')
 
 
 # plt.figure()
@@ -224,6 +236,17 @@ fig.savefig(os.path.join(fig_path,'ITD_coh.png'),format='png')
 # plt.plot(f2,ZITD_coh)
 # plt.plot(f2,ZIAC_coh,color='r')
 # plt.xlim([1,20])
+
+f_1 = np.where(f2>=1)[0][0]
+f_15 = np.where(f2>=15)[0][0]
+f_index = np.arange(f_1,f_15)
+
+IAC_fmax = f2[ZIAC_coh[f_index].argmax() +f_1]
+ITD_fmax = f2[ZITD_coh[f_index].argmax() + f_1]
+
+
+
+
 
 
 

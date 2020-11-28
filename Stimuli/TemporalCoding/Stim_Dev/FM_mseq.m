@@ -8,7 +8,7 @@ UpperF = fs/Point_len;
 t = 0:1/fs:length(mseqFM)/fs -1/fs;
 
 f1 = range_carrier(1) + (range_carrier(2) -range_carrier(1))*rand();
-f2 = 1.05*f1;
+f2 = 1.10*f1;
 
 x1 = sin(2*pi*f1.*t);
 x1(mseqFM ==-1) = 0;
