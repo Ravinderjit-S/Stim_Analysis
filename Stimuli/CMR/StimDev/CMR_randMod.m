@@ -1,4 +1,4 @@
-function [Sig] = CMR_randMod(noise_bands,target_f,SNRdB,n_mod_cuts,target_modf,fs,tlen,coh,bp_mod_fo)
+function [Sig] = CMR_randMod(noise_bands,target_f,SNRdB,n_mod_cuts,target_mod,fs,tlen,coh,bp_mod_fo)
 
 t = 0:1/fs:tlen-1/fs;
 
@@ -45,7 +45,6 @@ noise_full = sum(noise_bp,1);
 
 
 target = sin(2*pi*target_f.*t);
-target_mod = 0.5 + 0.5*sin(2*pi*target_modf.*t);
 target = target_mod .*target;
 
 desired_SNR = 10^(SNRdB/20);

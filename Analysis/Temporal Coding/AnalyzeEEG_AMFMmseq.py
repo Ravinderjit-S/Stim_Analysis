@@ -55,13 +55,15 @@ data_eeg = [];
 data_evnt = [];
   
 
-Mseq_loc = '/media/ravinderjit/Storage2/EEGdata/mseqEEG_40_4096.mat'
+#Mseq_loc = '/media/ravinderjit/Storage2/EEGdata/mseqEEG_40_4096.mat'
+Mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_40_4096.mat'
 
 Mseq_dat = sio.loadmat(Mseq_loc)
 mseq = Mseq_dat['mseqEEG_4096']
 mseq = mseq.astype(float)
 
-data_loc = '/media/ravinderjit/Storage2/EEGdata/'
+#data_loc = '/media/ravinderjit/Storage2/EEGdata/'
+data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMFMmseq/'
 subject = 'S211'
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
@@ -91,10 +93,11 @@ evkd_data_AM.plot(picks = [31], titles = 'AMmseq')
 
 epoch_data_FM = mne.Epochs(data_eeg, data_evnt, [2], tmin=-0.3, tmax=13,reject=None, baseline=(-0.2, 0.)) 
 evkd_data_FM = epoch_data_FM.average();
-evkd_data_FM.plot(picks = [31], titles = 'AMmseq')
+evkd_data_FM.plot(picks = [31], titles = 'FMmseq')
+
+del data_eeg, data_evnt, evkd_data_AM, evkd_data_FM
 
 #%% Plot PSD
-data_eeg.plot_psd(fmin=0,fmax=1100,tmin=0.0,tmax=1.0,proj=True,average=False)
 
 #%% Extract part of response when stim is on
 t = epoch_data_AM.times
@@ -165,6 +168,8 @@ plt.plot(f,Coh_AM,color='k',linewidth=2)
 plt.figure()
 plt.plot(f,Cohnf_FM,color='grey')
 plt.plot(f,Coh_FM,color='k',linewidth=2)
+
+
 
 
 

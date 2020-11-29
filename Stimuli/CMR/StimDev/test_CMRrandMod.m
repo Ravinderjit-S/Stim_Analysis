@@ -11,11 +11,11 @@ ERBspacing = 1.5;
 target_f = 4000;
 noise_bands = CMRbands(target_f, ERB_halfwidth, ERBspacing);
 
-SNRdb = 0;
+SNRdb = -10;
 mod_band = [2 10];
 target_modf = 40;
 
-coh = 1;
+coh = 0;
 bp_mod_fo = 1/2 * 5 *fs; %filter order for slowest modulation instance ... keep same sharpness for all modulation filters so setting here
 
 tic()
