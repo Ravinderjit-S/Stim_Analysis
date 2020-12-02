@@ -54,6 +54,30 @@ def mts(x,TBW,fs,nfft):
     mtPSD = 2*mtspec**2
     return f, mtPSD
     
+def PLV_Coh(X,Y,TW,fs):
+    """
+    X is the Mseq
+    Y is time x trials
+    TW is half bandwidth product 
+    """
+    X = X.squeeze()
+    ntaps = 2*TW - 1
+    dpss = sp.signal.windows.dpss(X.size,TW,ntaps)
+    N = int(2**np.ceil(np.log2(X.size)))
+    f = np.arange(0,N)*fs/N
+    PLV_taps = np.zeros([N,ntaps])
+    Coh_taps = np.zeros([N,ntaps])
     
+    for k in range(0,ntaps):
+        print('tap:',k+1,'/',ntaps)
+        Xf = sp.fft(X *dpss[k,:],axis=0,n=N)
+        Yf = sp.fft(Y * dpss[k,:].reshape(dpss.shape[1],1),axis=0,n=N)
+        XYf = Xf.reshape(Xf.shape[0],1) * Yf.conj()
+        PLV_taps[:,k] = abs(np.mean(XYf / abs(XYf),axis=1))
+        Coh_taps[:,k] = abs(np.mean(XYf,axis=1) / np.mean(abs(XYf),axis=1))
+        
+    PLV = PLV_taps.mean(axis=1)
+    Coh = Coh_taps.mean(axis=1)
+    return PLV, Coh, f
 
 

@@ -16,10 +16,10 @@ ERBspacing = 1.5;
 target_f = 4000;
 noise_bands = CMRbands(target_f, ERB_halfwidth, ERBspacing);
 
-SNRdb = -6;
+SNRdb = 12;
 mod_band = [2 10];
 
-target_modf = [4, 40, 223];
+target_modf = [6, 40, 223];
 target_mod_band = [2 10];
 
 coh = [0 1];
@@ -43,7 +43,7 @@ target_mods(end+1,:) = noise_mod;
 
 for k = 1:length(coh)
     This_coh = coh(k);
-    for i =1:length(target_modf)+1
+    for i =1:length(target_modf)
         Sig = zeros(trials,length(t));  
         for j = 1:trials
             fprintf('BigBlock %d/%d Stim block %d/%d  Stim %d/%d \n',k,length(coh),i,length(target_modf)+1,j,trials)
