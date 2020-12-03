@@ -9,7 +9,6 @@ import dropbox
 from scipy.io import loadmat 
 
 
-
 def dlURL(url):
     ## convert db url to one that can be used to direct download
     dl_url = url[0:url.find('?')]
@@ -42,12 +41,13 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
 Mod = [2,10]
-Block = 1
+Block = 2
 #trial_cond = 1
 
-json_fname = 'CMR3AFC_' + str(Mod[0]) + '_' + str(Mod[1]) + '_Demo.json'
+json_fname = 'CMR3AFC_' + str(Mod[0]) + '_' + str(Mod[1]) + '_Block' + str(Block) + '.json'
 
-instructions = ["Welcome to the Demo!"]
+instructions = ['Welcome to the actual experiment! <br> You will hear 3 itervals of sound (A,B,C). Your goal is to select the interval with a steady beep<br> '
+                'In some cases the beep will be faint. Try your best! ']
 feedback = True
 holdfeedback = False
 feedbackdur = 500 #duration of feedback in ms
@@ -57,17 +57,15 @@ randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path = '/OnlineStimWavs/CMR/Demo/Mod_' + str(Mod[0]) +'_'+str(Mod[1]) +'/' +'Block'+str(1) # Path to folder in dropbox
+folder_path = '/OnlineStimWavs/CMR/Mod_' + str(Mod[0]) +'_'+str(Mod[1]) +'/' +'Block'+str(Block) # Path to folder in dropbox
 trial_plugin = 'hari-audio-button-response'
-trial_prompt = 'Select the interval <strong> that contains a tone. </strong> <br> Stimuli Order: Stim A, Stim B, Stim C'
+trial_prompt = 'Select the interval <strong> that contains a steady beep. </strong> <br> Stimuli Order: Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-stim_info_file = loadmat('StimData/Demo/Mod_' + str(Mod[0]) + '_'+str(Mod[1]) + '/' +'Block'+str(Block) + '/Stim_Data.mat')
+stim_info_file = loadmat('StimData/Mod_' + str(Mod[0]) + '_'+str(Mod[1]) + '/' +'Block'+str(Block) + '/Stim_Data.mat')
 correct_answers = stim_info_file['correct'].squeeze()
 SNRdB_exp = stim_info_file['SNRdB_exp'].squeeze()
 SNRdB = SNRdB_exp[:,0]
-sort_ind = SNRdB.argsort()[-1::-1]
-SNRdB = SNRdB[sort_ind]
-coh = SNRdB_exp[:,1][sort_ind]
+coh = SNRdB_exp[:,1]
 
 
 
@@ -123,44 +121,6 @@ data['volume'].append({
 wavFiles = getFiles(folder_path)
 
 data['trials'] = []
-data['trials'].append({
-        'plugin': 'html-button-response',
-        'prompt': 'INSTRUCTIONS: You will hear 3 intervals of noise (A,B,C). '
-        'Your goal is to pick the interval that contains a tone in the noise. <br> '
-        'In this practice, it will start easy and get harder. Try your best!',
-        'choices': ['Continue']
-    })
-
-for i in sort_ind:
-    flink = dbx.sharing_create_shared_link(folder_path+'/'+wavFiles[i])
-    dd_link = dlURL(flink.url) 
-    data['trials'].append({
-        'plugin': trial_plugin,
-        'prompt': trial_prompt,
-        'choices': trial_choices,
-        'answer': int(correct_answers[i]),
-        'stimulus': dd_link,
-        'cond': 1,
-        'annot': {'SNR': int(SNRdB[i])}
-        })
-   
-data['trials'].append({
-        'plugin': 'html-button-response',
-        'prompt': 'INSTRUCTIONS: You will hear 3 intervals of noise (A,B,C). '
-        'Your goal is to pick the interval that contains a tone in the noise. <br> '
-        'In this practice, easy and hard trails will be given randomly just like the actual task. Try your best!',
-        'choices': ['Continue']
-    })
-
-folder_path = '/OnlineStimWavs/CMR/Demo/Mod_' + str(Mod[0]) +'_'+str(Mod[1]) +'/' +'Block'+str(2) # Path to folder in dropbox
-stim_info_file = loadmat('StimData/Demo/Mod_' + str(Mod[0]) + '_'+str(Mod[1]) + '/' +'Block'+str(2) + '/Stim_Data.mat')
-correct_answers = stim_info_file['correct'].squeeze()
-SNRdB_exp = stim_info_file['SNRdB_exp'].squeeze()
-SNRdB = SNRdB_exp[:,0]
-coh = SNRdB_exp[:,1]
-    
-wavFiles = getFiles(folder_path)
-
 for i in range(len(wavFiles)):
     flink = dbx.sharing_create_shared_link(folder_path+'/'+wavFiles[i])
     dd_link = dlURL(flink.url) 
@@ -173,6 +133,7 @@ for i in range(len(wavFiles)):
         'cond': int(coh[i]+1),
         'annot': {'SNR': int(SNRdB[i])}
         })
+    
 
 with open(json_fname, 'w') as outfile:
     json.dump(data,outfile, indent = 4)
