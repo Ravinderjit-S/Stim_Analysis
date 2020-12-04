@@ -16,10 +16,10 @@ ERBspacing = 1.5;
 target_f = 4000;
 noise_bands = CMRbands(target_f, ERB_halfwidth, ERBspacing);
 
-SNRdb = 12;
+SNRdb = 24;
 mod_band = [2 10];
 
-target_modf = [6, 40, 223];
+target_modf = [4, 40, 223];
 target_mod_band = [2 10];
 
 coh = [0 1];
@@ -31,22 +31,22 @@ for i =1:length(target_modf)
     target_mods(i,:) = 0.5+0.5*sin(2*pi*target_modf(i).*t);
 end
 
-bp_filt_mod = fir1(bp_mod_fo, [target_mod_band(1) target_mod_band(2)]*2/fs,'bandpass');
-
-noise_mod = randn(1,1.5*length(t) + bp_mod_fo + 1);
-noise_mod = filter(bp_filt_mod,1,noise_mod);
-noise_mod = noise_mod(bp_mod_fo+1:bp_mod_fo+length(t));
-noise_mod = noise_mod - min(noise_mod);
-noise_mod = noise_mod / max(noise_mod);
-
-target_mods(end+1,:) = noise_mod;
+% bp_filt_mod = fir1(bp_mod_fo, [target_mod_band(1) target_mod_band(2)]*2/fs,'bandpass');
+% 
+% noise_mod = randn(1,1.5*length(t) + bp_mod_fo + 1);
+% noise_mod = filter(bp_filt_mod,1,noise_mod);
+% noise_mod = noise_mod(bp_mod_fo+1:bp_mod_fo+length(t));
+% noise_mod = noise_mod - min(noise_mod);
+% noise_mod = noise_mod / max(noise_mod);
+% 
+% target_mods(end+1,:) = noise_mod;
 
 for k = 1:length(coh)
     This_coh = coh(k);
     for i =1:length(target_modf)
         Sig = zeros(trials,length(t));  
         for j = 1:trials
-            fprintf('BigBlock %d/%d Stim block %d/%d  Stim %d/%d \n',k,length(coh),i,length(target_modf)+1,j,trials)
+            fprintf('BigBlock %d/%d Stim block %d/%d  Stim %d/%d \n',k,length(coh),i,length(target_modf),j,trials)
             Sig(j,:) = CMR_randMod(noise_bands,target_f,SNRdb,mod_band,target_mods(i,:),fs,tlen,coh(k),bp_mod_fo);
         end
         if i == length(target_modf)+1

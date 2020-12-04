@@ -26,6 +26,7 @@ Blocks = 2;
 silence = zeros(2,round(fs)*0.5);
 
 folder_loc = '/home/ravinderjit/Documents/OnlineStim_WavFiles/CMR/';
+folder_loc = '/media/ravinderjit/Data_Drive/Data/Stimuli_WavMat/CMR/';
 
 for j = 1:Blocks
     for k = 1:length(mod_bands)
