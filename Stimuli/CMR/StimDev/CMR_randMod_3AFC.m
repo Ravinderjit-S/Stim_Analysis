@@ -11,6 +11,10 @@ bp_filt_mod = fir1(bp_mod_fo, [n_mod_cuts(1) n_mod_cuts(2)]*2/fs,'bandpass');
 bp_fo = round(1/(min(min(noise_bands(1)))) * 20 *fs);
 noise_bp = zeros(3,length(t));
 
+
+
+%% Frozen modulation
+
 if coh ==1
     noise_mod = randn(1,1.5*length(t) + bp_mod_fo + 1);
     noise_mod = filter(bp_filt_mod,1,noise_mod);
@@ -30,6 +34,10 @@ else
         noise_mod(i,:) = noise_mod_i / max(noise_mod_i);
     end
 end
+
+
+
+%% Make stim
 
 for j=1:3
     for i =1:length(noise_bands)
