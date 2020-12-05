@@ -27,13 +27,13 @@ data_evnt = [];
   
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
-subject = 'S211_plus20dB'
+subject = 'S211_plus12dB_tpsd'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=300)
+data_eeg.filter(l_freq=1,h_freq=100)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0, h_freq=10)
@@ -57,10 +57,12 @@ data_eeg.plot(events=blinks,show_options=True)
 #8 = 2-10 coh 1
 # labels = ['4 coh 0', '40 coh 0', '223 coh 0', '4 coh 1','40 coh 1','223 coh 1',
 #           '2-10 coh 0','2-10 coh 1']
-labels = ['6 coh 0', '40 coh 0', '6 coh 1','40 coh 1']
+#labels = ['6 coh 0', '6 coh 1', '40 coh 0','40 coh 1']
+labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
+
 
 tmin = -0.5
-tmax = 2.3
+tmax = 4.5
 reject = dict(eeg=100e-6)
 baseline = (-0.2,0)
 
@@ -128,7 +130,7 @@ for j in np.arange(4):
 
 t = epochs_1.times
 t1 = np.where(t>=0)[0][0]
-t2 = np.where(t>=2.0)[0][0]
+t2 = np.where(t>=4.0)[0][0]
 t = t[t1:t2]
 
 target_mods = np.zeros((2,int(fs*2)))
@@ -147,10 +149,10 @@ dat_epochs_3 = epochs_3.get_data()
 dat_epochs_4 = epochs_4.get_data()
 
 
-dat_epochs_1 = dat_epochs_1[:,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_2 = dat_epochs_2[:,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_3 = dat_epochs_3[:,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_4 = dat_epochs_4[:,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_1 = dat_epochs_1[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_3 = dat_epochs_3[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
 
 
 
