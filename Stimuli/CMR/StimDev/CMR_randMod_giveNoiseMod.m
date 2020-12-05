@@ -10,6 +10,7 @@ end
 bp_fo = round(1/(min(min(noise_bands(1)))) * 20 *fs);
 noise_bp = zeros(3,length(t));
 
+
 for j=1:3
     for i =1:length(noise_bands)
         noise = randn(length(t)*1.5+bp_fo,1);
