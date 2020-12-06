@@ -52,7 +52,44 @@ data_AM40.set_channel_types({'EXG4':'eeg','EXG3':'eeg','EXG5':'eeg'})
 data_AM40.drop_channels(bad_chs)
 epochs_AM40 = mne.Epochs(data_AM40,evnts_AM40,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6))
 evoked_AM40 = epochs_AM40.average()
-evoked_AM40.plot(titles = 'AM 40',picks=['A17','A18','A19'])
+evoked_AM40.plot(titles = 'AM 40',picks=['A6'],xlim=[-0.1,2.2])
+
+t = epochs_AM40.times
+t1 = np.where(t>=0)[0][0]
+t2 = np.where(t>=2.0)[0][0]
+t = t[t1:t2]
+epoch40_dat = epochs_AM40.get_data()
+epoch40_dat = epoch40_dat[:,0:27,t1:t2].transpose(1,0,2)
+
+params = dict()
+params['Fs'] = epochs_AM40.info['sfreq']
+params['tapers'] = [2,2*2-1]
+params['fpass'] = [1,100]
+params['itc'] = 0
+
+plvtap_1, f = spectral.mtplv(epoch40_dat,params)
+np.max(plvtap_1[:,75:85],axis=1)
+fig, ax = plt.subplots(figsize=(5,3.3))
+fontsize=10
+ax.plot(f,plvtap_1.T)
+plt.ylabel('PLV',fontsize=fontsize)
+plt.xlabel('Frequency (Hz)',fontsize=fontsize)
+plt.xticks([0,20,40,60,80,100],fontsize=fontsize)
+plt.yticks([0.1,0.2,0.3],fontsize=fontsize)
+
+evoked_dat40 = evoked_AM40.data[5,:]
+fig,ax = plt.subplots(figsize=(5,3.3))
+fontsize=10
+ax.plot(epochs_AM40.times,evoked_dat40*1e6,linewidth=2,color='k')
+plt.xlim([-0.1,2.1])
+plt.xticks([0,0.5,1.0,1.5,2.0],fontsize=fontsize)
+plt.yticks([-3,-2,-1,0,1],fontsize=fontsize)
+plt.ylabel('\u03BCV',fontsize=fontsize)
+plt.xlabel('Time (sec)',fontsize=fontsize)
+
+
+
+
 
 # data_AM223,evnts_AM223 = EEGconcatenateFolder(data_loc + '223' + pathThing ,nchans,refchans,exclude)
 # data_AM223.filter(1,300)
