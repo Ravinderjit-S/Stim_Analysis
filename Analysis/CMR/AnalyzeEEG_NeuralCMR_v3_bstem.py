@@ -27,13 +27,13 @@ data_evnt = [];
   
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
-subject = 'S211_plus12dB_tpsd'
+subject = 'S211_plus12dB_tpsd_223'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=100)
+data_eeg.filter(l_freq=1,h_freq=300)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0, h_freq=10)
@@ -58,37 +58,33 @@ data_eeg.plot(events=blinks,show_options=True)
 # labels = ['4 coh 0', '40 coh 0', '223 coh 0', '4 coh 1','40 coh 1','223 coh 1',
 #           '2-10 coh 0','2-10 coh 1']
 #labels = ['6 coh 0', '6 coh 1', '40 coh 0','40 coh 1']
-labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
+#labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
+labels = ['223 coh0','223coh1']
 
 
 tmin = -0.5
 tmax = 4.5
-reject = dict(eeg=100e-6)
+reject = dict(eeg=200e-6)
 baseline = (-0.2,0)
 
-epochs_1 = mne.Epochs(data_eeg,data_evnt,[1],tmin=tmin,tmax=tmax,
+epochs_1 = mne.Epochs(data_eeg,data_evnt,[5],tmin=tmin,tmax=tmax,
                               baseline=baseline,reject=reject)
-epochs_2 = mne.Epochs(data_eeg,data_evnt,[2],tmin=tmin,tmax=tmax,
+epochs_2 = mne.Epochs(data_eeg,data_evnt,[6],tmin=tmin,tmax=tmax,
                               baseline=baseline,reject=reject)
-epochs_3 = mne.Epochs(data_eeg,data_evnt,[3],tmin=tmin,tmax=tmax,
-                              baseline=baseline,reject=reject)
-epochs_4 = mne.Epochs(data_eeg,data_evnt,[4],tmin=tmin,tmax=tmax,
-                              baseline=baseline,reject=reject)
+
 
 
 
 evkd_1 = epochs_1.average()
 evkd_2 = epochs_2.average()
-evkd_3 = epochs_3.average()
-evkd_4 = epochs_4.average()
+
 
 
 picks = [4,30,31,7,22,8,21]
 picks = 30
 evkd_1.plot(picks=picks,titles=labels[0])
 evkd_2.plot(picks=picks,titles=labels[1])
-evkd_3.plot(picks=picks,titles=labels[2])
-evkd_4.plot(picks=picks,titles=labels[3])
+
 
 
 #%% spectral analysievkd_1.plot(picks=picks,titles='4 coh 0')
@@ -96,30 +92,25 @@ fs = evkd_1.info['sfreq']
 
 data_1 = evkd_1.data
 data_2 = evkd_2.data
-data_3 = evkd_3.data
-data_4 = evkd_4.data
 
 
-nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
+# nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
 
-pxx = np.zeros((int(nfft/2),34,9))
-f,p1 = sa.periodogram(data_1.T, fs, nfft)
-pxx[:,:,0] = p1.squeeze()
-f,p1 = sa.periodogram(data_2.T, fs, nfft)
-pxx[:,:,1] = p1.squeeze()
-f,p1 = sa.periodogram(data_3.T, fs, nfft)
-pxx[:,:,2] = p1.squeeze()
-f,p1 = sa.periodogram(data_4.T, fs, nfft)
-pxx[:,:,3] = p1.squeeze()
+# pxx = np.zeros((int(nfft/2),34,9))
+# f,p1 = sa.periodogram(data_1.T, fs, nfft)
+# pxx[:,:,0] = p1.squeeze()
+# f,p1 = sa.periodogram(data_2.T, fs, nfft)
+# pxx[:,:,1] = p1.squeeze()
+
 
 
 
     
-for j in np.arange(4):
-    plt.figure()
-    plt.plot(f,10*np.log10(pxx[:,:,j]))
-    plt.title(labels[j])
-    plt.legend(np.arange(32))
+# for j in np.arange(4):
+#     plt.figure()
+#     plt.plot(f,10*np.log10(pxx[:,:,j]))
+#     plt.title(labels[j])
+#     plt.legend(np.arange(32))
 #     plt.plot(f,10*np.log10(pxx[j,:]))
 #     plt.title(labels[j])
 
@@ -145,14 +136,12 @@ t = t[t1:t2]
 
 dat_epochs_1 = epochs_1.get_data()
 dat_epochs_2 = epochs_2.get_data()
-dat_epochs_3 = epochs_3.get_data()
-dat_epochs_4 = epochs_4.get_data()
+
 
 
 dat_epochs_1 = dat_epochs_1[0:200,0:32,t1:t2].transpose(1,0,2)
 dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_3 = dat_epochs_3[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
+
 
 
 
@@ -165,35 +154,26 @@ params['itc'] = 0
 
 plvtap_1, f = mtplv(dat_epochs_1,params)
 plvtap_2, f = mtplv(dat_epochs_2,params)
-plvtap_3, f = mtplv(dat_epochs_3,params)
-plvtap_4, f = mtplv(dat_epochs_4,params)
 
 
-np.max(plvtap_4[:,150:167],axis=1)
+
+np.max(plvtap_2[:,870:900],axis=1)
 
 fig, ax = plt.subplots(figsize=(5.5,5))
-fontsize=15
-ax.plot(f,plvtap_4[30,:],label='Coh',linewidth=2)
-ax.plot(f,plvtap_3[30,:],label='Incoh',linewidth=2)
+fontsize = 15
+ax.plot(f,plvtap_2[31,:],label='Coh',linewidth=2)
+ax.plot(f,plvtap_1[31,:],label='Incoh',linewidth=2,)
+#plt.title('223 Hz',fontsize=fontsize)
 ax.legend(fontsize=fontsize)
 plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
-#plt.ylabel('PLV',fontsize=fontsize,fontweight='bold')
-plt.xlim((35,45))
-plt.xticks([35,40,45],fontsize=fontsize)
+#plt.ylabel('PLV',fontsize=fontsize)
+plt.xlim((218,228))
+plt.xticks([218,223,228],fontsize=fontsize)
 plt.yticks([0,0.04,0.08],fontsize=fontsize)
 
 plt.figure()
 plt.plot(f,plvtap_2.T)
 plt.title(labels[1])
-
-plt.figure()
-plt.plot(f,plvtap_3.T)
-plt.title(labels[2])
-
-plt.figure()
-plt.plot(f,plvtap_4.T)
-plt.title(labels[3])
-
 
 
 

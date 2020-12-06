@@ -21,6 +21,7 @@ mod_band = [2 10];
 
 %target_modf = [4, 40, 223];
 target_modf = [4,40];
+target_modf = 223
 target_mod_band = [2 10];
 
 coh = [0 1];
