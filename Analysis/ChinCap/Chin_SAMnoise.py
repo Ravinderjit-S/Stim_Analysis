@@ -20,39 +20,42 @@ folder = 'Q394_111620'
 data_loc = '/media/ravinderjit/Storage2/ChinCap/SAM_noise/' + folder + '/SAM_'
 pathThing = '/'
 nchans = 37
-refchans = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19',
-            'A20','A21','A22','A23','A29','A30','A31','A32']
-#refchans = ['A1']
-#exclude = ['A1','A25','A26','A27','A28','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
-#exclude = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
+# refchans = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19',
+#             'A20','A21','A22','A23','A29','A30','A31','A32']
+refchans = ['EXG1','EXG2']
 exclude = ['EXG6','EXG7','EXG8']
 data_AM5,evnts_AM5 = EEGconcatenateFolder(data_loc + '4' + pathThing ,nchans,refchans,exclude)
 data_AM5.filter(2,40)
 data_AM5.set_channel_types({'EXG4':'eeg','EXG3':'eeg','EXG5':'eeg'})
 #data_eeg.notch_filter(60)
+
+
+#bad_chs = [0,5,8,9,16,24,25,26,27]
+bad_chs =[23,24,25,26,27]
+All_chs = np.arange(32)
+channels = np.delete(All_chs,bad_chs)
+bad_chs = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG3','EXG4','EXG5']
+data_AM5.drop_channels(bad_chs)
+data_AM5.set_eeg_reference(ref_channels='average')
+
 scalings = dict(eeg=20e-6,stim=1)
 data_AM5.plot(events = evnts_AM5, scalings=scalings,show_options=True)
 
-#bad_chs = [0,5,8,9,16,24,25,26,27]
-bad_chs =[23,24,25,26,27,29]
-All_chs = np.arange(32)
-channels = np.delete(All_chs,bad_chs)
-
-bad_chs = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG3','EXG4','EXG5']
-data_AM5.drop_channels(bad_chs)
 epochs_AM5 = mne.Epochs(data_AM5,evnts_AM5,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6))
 evoked_AM5 = epochs_AM5.average()
 evoked_AM5.plot(titles = 'AM 4')
 
-picks = ['A31']
 data_AM40,evnts_AM40 = EEGconcatenateFolder(data_loc + '40' + pathThing ,nchans,refchans,exclude)
 data_AM40.filter(2,100)
-data_AM40.plot(events=evnts_AM40,scalings=scalings,show_options=True)
 data_AM40.set_channel_types({'EXG4':'eeg','EXG3':'eeg','EXG5':'eeg'})
 data_AM40.drop_channels(bad_chs)
-epochs_AM40 = mne.Epochs(data_AM40,evnts_AM40,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6))
+data_AM40.set_eeg_reference(ref_channels='average')
+data_AM40.plot(events=evnts_AM40,scalings=scalings,show_options=True)
+
+Aud_picks = ['A30', 'A6', 'A29', 'A7', 'A4', 'A17', 'A32', 'A10', 'A3']
+epochs_AM40 = mne.Epochs(data_AM40,evnts_AM40,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6),picks=Aud_picks)
 evoked_AM40 = epochs_AM40.average()
-evoked_AM40.plot(titles = 'AM 40',picks=['A6'],xlim=[-0.1,2.2])
+evoked_AM40.plot(titles = 'AM 40',picks=Aud_picks,xlim=[-0.1,2.2])
 
 t = epochs_AM40.times
 t1 = np.where(t>=0)[0][0]
@@ -68,7 +71,12 @@ params['fpass'] = [1,100]
 params['itc'] = 0
 
 plvtap_1, f = spectral.mtplv(epoch40_dat,params)
-np.max(plvtap_1[:,75:85],axis=1)
+Aud_inds = np.flip(np.argsort(np.max(plvtap_1[:,75:85],axis=1)))
+
+Aud_chans = []
+for ind in Aud_inds[0:9]:
+    Aud_chans.append(epochs_AM40.ch_names[ind])
+
 fig, ax = plt.subplots(figsize=(5,3.3))
 fontsize=10
 ax.plot(f,plvtap_1.T)
@@ -76,6 +84,15 @@ plt.ylabel('PLV',fontsize=fontsize)
 plt.xlabel('Frequency (Hz)',fontsize=fontsize)
 plt.xticks([0,20,40,60,80,100],fontsize=fontsize)
 plt.yticks([0.1,0.2,0.3],fontsize=fontsize)
+
+fig, ax = plt.subplots(figsize=(5,3.3))
+fontsize=10
+ax.plot(f,plvtap_1[Aud_inds[0:9],:].T)
+plt.ylabel('PLV',fontsize=fontsize)
+plt.xlabel('Frequency (Hz)',fontsize=fontsize)
+plt.xticks([0,20,40,60,80,100],fontsize=fontsize)
+plt.yticks([0.1,0.2,0.3],fontsize=fontsize)
+
 
 evoked_dat40 = evoked_AM40.data[5,:]
 fig,ax = plt.subplots(figsize=(5,3.3))
