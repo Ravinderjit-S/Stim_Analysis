@@ -9,13 +9,3 @@ stim = noise.*AM;
 
 end
 
-
-
-
-
-
-
-
-
-
-
