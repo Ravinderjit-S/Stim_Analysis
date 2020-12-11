@@ -1,20 +1,23 @@
 clear all; close all hidden; clc;
+addpath(genpath('CMR'))
+
+
 
 [RP1, RP2, RX8, PA1,PA2,PA3,PA4,tdt_info] = tdt_init(99);
 
 %% stim params
 fs =48828.125;
-tlen = 0.2;
-AMf = [20, 30, 40, 55, 70, 90, 110, 170, 250, 400, 600, 800, 1000, 3000];
-t = 0:1/fs:tlen-1/fs;
-ISI = 0.10;
-jit = 0.050;
-trials = 300;
-risetime = .005;
+mod40_coh0 = load('CMRrandmod_tpsd_40_coh_0.mat');
+mod40_coh1 = load('CMRrandmod_tpsd_40_coh_1.mat');
+mod223_coh0 = load('CMRrandmod_tpsd_223_coh_0.mat');
+mod223_coh1 = load('CMRrandmod_tpsd_223_coh_1.mat');
 
-for s = 1:length(AMf)
-    stim_AMf{s} = SAM_noise(AMf(s),tlen,fs);
-end
+stim_dur = size(mod40_coh1.Sig,2)/fs; %4 sec
+ISI = 1.15;
+jit = 0.100;
+trials = size(mod40_coh1.Sig,1); %300
+risetime = .050;
+
     
 
 %% tdt setup
@@ -52,17 +55,23 @@ invoke(PA4,'SetAtten',25);
 %% Play Stimuli
 
 for i=1:trials
-    order = randperm(length(stim_AMf));
+    stims{1} = mod40_coh0.Sig(i,:);
+    stims{2} = mod40_coh1.Sig(i,:);
+    stims{3} = mod223_coh0.Sig(i,:);
+    stims{4} = mod223_coh1.Sig(i,:);
+    
+    order = randperm(length(stims));
     for j =1:length(order)
-        stim = stim_AMf{order(j)}; 
+        stim = stims{order(j)}; 
         stim = rampsound(stim,fs,risetime);
         stim = scaleSound(stim);
         invoke(RP1, 'SetTagVal', 'nsamps', length(stim));
         invoke(RP1,'WriteTagVEX','datainR',0,'F32',stim);
+        pause(0.1);
         invoke(RX8, 'SetTagVal', 'TrigVal', order(j));
         invoke(RP1,'SoftTrg',1);
         fprintf(1,'Trig %d \n',order(j))
-        pause(tlen + ISI);
+        pause(stim_dur + ISI);
         if j == length(order)
             pause(jit*rand)
         end
