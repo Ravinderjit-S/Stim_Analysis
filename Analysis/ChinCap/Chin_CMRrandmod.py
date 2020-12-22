@@ -32,7 +32,7 @@ data_eeg.set_channel_types({'EXG3':'eeg'})
 
 bad_chs = ['A1','A25','A26','A27','A28']#,'EXG1','EXG2','A20']
 data_eeg.drop_channels(bad_chs)
-#data_eeg.set_eeg_reference(ref_channels='average')
+data_eeg.set_eeg_reference(ref_channels='average')
 
 scalings = dict(eeg=20e-6,stim=1)
 data_eeg.plot(events = evnts_eeg, scalings=scalings,show_options=True)
