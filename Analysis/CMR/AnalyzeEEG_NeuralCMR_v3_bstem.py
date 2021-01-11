@@ -147,7 +147,7 @@ dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
 
 params = dict()
 params['Fs'] = fs
-params['tapers'] = [1,2*1-1]
+params['tapers'] = [2,2*2-1]
 params['fpass'] = [1,300]
 params['itc'] = 0
 
@@ -161,8 +161,8 @@ np.max(plvtap_2[:,870:900],axis=1)
 
 fig, ax = plt.subplots(figsize=(5.5,5))
 fontsize = 15
-ax.plot(f,plvtap_2[31,:],label='Coh',linewidth=2)
-ax.plot(f,plvtap_1[31,:],label='Incoh',linewidth=2,)
+ax.plot(f,plvtap_2[31,:],label='CORR',linewidth=2)
+ax.plot(f,plvtap_1[31,:],label='ACORR',linewidth=2)
 #plt.title('223 Hz',fontsize=fontsize)
 ax.legend(fontsize=fontsize)
 plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')

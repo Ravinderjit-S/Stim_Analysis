@@ -33,7 +33,7 @@ data_eeg.set_channel_types({'EXG3':'eeg'})
 
 bad_chs = ['A1','A25','A26','A27','A28','EXG3']#,'EXG1','EXG2','A20']
 data_eeg.drop_channels(bad_chs)
-data_eeg.set_eeg_reference(ref_channels='average')
+#data_eeg.set_eeg_reference(ref_channels='average')
 
 scalings = dict(eeg=20e-6,stim=1)
 data_eeg.plot(events = evnts_eeg, scalings=scalings,show_options=True)
@@ -61,7 +61,7 @@ epoch_dat = []
 for m in range(4):
     epoch_dat_m = epochs_all[m].get_data(picks=All_picks)
     epoch_dat_m = epoch_dat_m[:,:,t1:t2].transpose(1,0,2)
-    epoch_dat.append(epoch_dat_m)
+    epoch_dat.append(epoch_dat_m[:,0:100,:])
 
 # AMf = AMf[2:] #first 2 triggers mest up
 # epoch_dat = epoch_dat[2:]
@@ -69,7 +69,7 @@ for m in range(4):
 
 params = dict()
 params['Fs'] = epochs_all[0].info['sfreq']
-params['tapers'] = [1,2*1-1]
+params['tapers'] = [2,2*2-1] #2*TW-1
 params['fpass'] = [1,4000]
 params['itc'] = 0
 
@@ -90,6 +90,35 @@ for m in np.arange(len(AMf)):
     #plt.xlim((0,AMf[m]*3))
     All_plvs.append(plvtap)
     
+channel_ind =1
+fig, ax = plt.subplots(figsize=(5.5,5))
+fontsize=15
+ax.plot(f,All_plvs[1][channel_ind,:],label='CORR',linewidth=2)
+ax.plot(f,All_plvs[0][channel_ind,:],label='ACORR',linewidth=2)
+ax.legend(fontsize=fontsize)
+plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
+#plt.ylabel('PLV',fontsize=fontsize,fontweight='bold')
+plt.xlim((35,45))
+#plt.ylim((0.6,1))
+plt.xticks([35,40,45],fontsize=fontsize)
+plt.yticks([0,0.3,0.6],fontsize=fontsize)
+
+channel_ind =1
+fig, ax = plt.subplots(figsize=(5.5,5))
+fontsize=15
+ax.plot(f,All_plvs[3][channel_ind,:],label='CORR',linewidth=2)
+ax.plot(f,All_plvs[2][channel_ind,:],label='ACORR',linewidth=2)
+ax.legend(fontsize=fontsize)
+plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
+#plt.ylabel('PLV',fontsize=fontsize,fontweight='bold')
+plt.xlim((218,228))
+#plt.ylim((0.6,1))
+plt.xticks([218,223,228],fontsize=fontsize)
+plt.yticks([0,0.5,1.0],fontsize=fontsize)
+
+
+
+
 plt.figure()
 plt.plot(f,All_plvs[0].T,color='r')
 plt.plot(f,All_plvs[1].T,color='b')

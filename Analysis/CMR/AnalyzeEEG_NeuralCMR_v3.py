@@ -158,7 +158,7 @@ dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
 
 params = dict()
 params['Fs'] = fs
-params['tapers'] = [1,2*1-1]
+params['tapers'] = [2,2*2-1]
 params['fpass'] = [1,300]
 params['itc'] = 0
 
@@ -173,8 +173,8 @@ np.max(plvtap_4[:,150:167],axis=1)
 
 fig, ax = plt.subplots(figsize=(5.5,5))
 fontsize=15
-ax.plot(f,plvtap_4[30,:],label='Coh',linewidth=2)
-ax.plot(f,plvtap_3[30,:],label='Incoh',linewidth=2)
+ax.plot(f,plvtap_4[30,:],label='CORR',linewidth=2)
+ax.plot(f,plvtap_3[30,:],label='ACORR',linewidth=2)
 ax.legend(fontsize=fontsize)
 plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
 #plt.ylabel('PLV',fontsize=fontsize,fontweight='bold')
