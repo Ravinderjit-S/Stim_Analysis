@@ -6,7 +6,7 @@ fs = 48828;
 
 [mseqEEG,Point_len] = EEGmseq(bits,upperF,fs);
 
-%save('mseqEEG.mat','mseqEEG','bits','fs','Point_len')
+save(['mseqEEG_' num2str(upperF) '.mat'],'mseqEEG','bits','fs','Point_len')
 
 
 % upperF = 500;
