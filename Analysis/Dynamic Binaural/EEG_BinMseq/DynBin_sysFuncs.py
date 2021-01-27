@@ -34,18 +34,20 @@ def PLV_Coh(X,Y,TW,fs):
     f = np.arange(0,N)*fs/N
     PLV_taps = np.zeros([N,ntaps])
     Coh_taps = np.zeros([N,ntaps])
-    
+    Phase_taps = np.zeros([N,ntaps])
     for k in range(0,ntaps):
         print('tap:',k+1,'/',ntaps)
         Xf = sp.fft(X *dpss[k,:],axis=0,n=N)
         Yf = sp.fft(Y * dpss[k,:].reshape(dpss.shape[1],1),axis=0,n=N)
-        XYf = Xf.reshape(Xf.shape[0],1) * Yf.conj()
+        XYf = Xf.reshape(Xf.shape[0],1).conj() * Yf
+        Phase_taps[:,k] = np.unwrap(np.angle(np.mean(XYf / abs(XYf),axis=1)))
         PLV_taps[:,k] = abs(np.mean(XYf / abs(XYf),axis=1))
         Coh_taps[:,k] = abs(np.mean(XYf,axis=1) / np.mean(abs(XYf),axis=1))
         
     PLV = PLV_taps.mean(axis=1)
     Coh = Coh_taps.mean(axis=1)
-    return PLV, Coh, f
+    Phase = Phase_taps.mean(axis=1)
+    return PLV, Coh, f, Phase
 
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles')
@@ -186,8 +188,8 @@ for subj in range(0,len(Subjects)):
     
     TW = 10
     Fres = (1/12.75) * TW * 2 
-    PLV_IAC, Coh_IAC, f2 = PLV_Coh(Mseq,IAC32,TW,fs)
-    PLV_ITD, Coh_ITD, f2 = PLV_Coh(Mseq,ITD32,TW,fs)
+    PLV_IAC, Coh_IAC, f2, phase_IAC = PLV_Coh(Mseq,IAC32,TW,fs)
+    PLV_ITD, Coh_ITD, f2, phase_ITD = PLV_Coh(Mseq,ITD32,TW,fs)
     
     #Noise FLoors
     PLVnf_IAC = np.zeros([PLV_IAC.shape[0],Num_noiseFloors])
@@ -204,8 +206,8 @@ for subj in range(0,len(Subjects)):
         Y_IAC[:,0:int(np.round(order_IAC.size/2))] = -Y_IAC[:,0:int(np.round(order_IAC.size/2))]
         Y_ITD[:,0:int(np.round(order_ITD.size/2))] = -Y_ITD[:,0:int(np.round(order_ITD.size/2))]
         
-        PLVn_IAC, Cohn_IAC, f = PLV_Coh(Mseq, Y_IAC, TW,fs)
-        PLVn_ITD, Cohn_ITD, f = PLV_Coh(Mseq, Y_ITD, TW,fs)
+        PLVn_IAC, Cohn_IAC, f, phase = PLV_Coh(Mseq, Y_IAC, TW,fs)
+        PLVn_ITD, Cohn_ITD, f, phase = PLV_Coh(Mseq, Y_ITD, TW,fs)
         PLVnf_IAC[:,nf] = PLVn_IAC
         Cohnf_IAC[:,nf] = Cohn_IAC
         PLVnf_ITD[:,nf] = PLVn_ITD
@@ -227,7 +229,7 @@ for subj in range(0,len(Subjects)):
     
     with open(os.path.join(data_loc,'SystemFuncs', Subject+'_DynBin_SysFuncTW' + str(TW) + '.pickle'),'wb') as f:     
         pickle.dump([IAC_Ht, IAC_nfs, IAC_Hf, NF_Hfs_IAC, PLV_IAC, Coh_IAC, PLVnf_IAC, Cohnf_IAC, \
-                     ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t],f)
+                     ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t, phase_IAC,phase_ITD],f)
         
         
     

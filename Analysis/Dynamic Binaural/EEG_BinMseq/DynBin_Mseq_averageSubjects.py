@@ -37,6 +37,9 @@ All_ITDhf = np.zeros([41,len(Subjects)])
 All_PlvIAC = np.zeros([65536,len(Subjects)])
 All_PlvITD = np.zeros([65536,len(Subjects)])
 
+All_phaseIAC = np.zeros([65536,len(Subjects)])
+All_phaseITD = np.zeros([65536,len(Subjects)])
+
 
 All_CohIAC_nfs = np.zeros([65536,100])
 All_CohITD_nfs = np.zeros([65536,100])
@@ -57,9 +60,9 @@ All_ITDhf_nfs = np.zeros([41,100])
 for sub in range(0,len(Subjects)):
     Subject = Subjects[sub]
 
-    with open(os.path.join(data_loc, Subject+'_DynBin_SysFunc.pickle'),'rb') as f:     
+    with open(os.path.join(data_loc, Subject+'_DynBin_SysFuncTW10.pickle'),'rb') as f:     
         IAC_Ht, IAC_nfs, IAC_Hf, NF_Hfs_IAC, PLV_IAC, Coh_IAC, PLVnf_IAC, Cohnf_IAC, \
-        ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t = pickle.load(f)
+        ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t, phase_IAC, phase_ITD = pickle.load(f)
         
     ax_row = int(np.floor(sub/3))
     ax_col = int(np.mod(sub,3))
@@ -114,6 +117,9 @@ for sub in range(0,len(Subjects)):
     All_PlvIAC[:, sub] = PLV_IAC
     All_PlvITD[:, sub] = PLV_ITD
     
+    All_phaseIAC[:,sub] = phase_IAC
+    All_phaseITD[:,sub] = phase_ITD
+    
     
     All_CohIAC_nfs += Cohnf_IAC / len(Subjects)
     All_CohITD_nfs += Cohnf_ITD / len(Subjects)
@@ -121,8 +127,14 @@ for sub in range(0,len(Subjects)):
     All_PlvITD_nfs += PLVnf_ITD / len(Subjects)
     All_IAChf_nfs += NF_Hfs_IAC.T / len(Subjects)
     All_ITDhf_nfs += NF_Hfs_ITD.T / len(Subjects)
+
     
     
+#%% Plot Responses
+
+plt.figure()
+plt.plot(f2,All_PlvIAC)
+
 #%%  Average across subjects
 # z = (x-u) / sigma
 
@@ -243,6 +255,21 @@ f_index = np.arange(f_1,f_15)
 
 IAC_fmax = f2[ZIAC_coh[f_index].argmax() +f_1]
 ITD_fmax = f2[ZITD_coh[f_index].argmax() + f_1]
+
+#%% Phase Response
+fig, ax = plt.subplots()
+ax.plot(f2,All_phaseIAC)
+plt.title('Phase IAC')
+plt.xlim([0,20])
+plt.ylim([-4,4])
+
+fig, ax = plt.subplots()
+ax.plot(f2,All_phaseITD.mean(axis=1))
+plt.title('Phase ITD')
+plt.xlim([0,20])
+plt.ylim([-4,4])
+
+
 
 
 
