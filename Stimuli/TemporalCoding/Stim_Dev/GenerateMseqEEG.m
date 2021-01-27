@@ -1,12 +1,13 @@
 % generate stim for temporal coding experiments
 clear
-bits = 10;
-upperF = 80;
+bits = 11;
+upperF = 150;
 fs = 48828;
+reps= 1;
 
-[mseqEEG,Point_len] = EEGmseq(bits,upperF,fs);
+[mseqEEG,Point_len] = EEGmseq(bits,upperF,fs,reps);
 
-save(['mseqEEG_' num2str(upperF) '.mat'],'mseqEEG','bits','fs','Point_len')
+save(['mseqEEG_' num2str(upperF) '_reps' num2str(reps) '.mat'],'mseqEEG','bits','fs','Point_len')
 
 
 % upperF = 500;

@@ -18,6 +18,8 @@ from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
 
+from anlffr.spectral import mtspecraw
+
 
 
 def PLV_Coh(X,Y,TW,fs):
@@ -93,11 +95,11 @@ epoch_data_AM = mne.Epochs(data_eeg, data_evnt, [1], tmin=-0.3, tmax=13,reject=N
 evkd_data_AM= epoch_data_AM.average();
 # evkd_data_AM.plot(picks = [31], titles = 'AMmseq')
 
-epoch_data_FM = mne.Epochs(data_eeg, data_evnt, [2], tmin=-0.3, tmax=13,reject=None, baseline=(-0.2, 0.)) 
-evkd_data_FM = epoch_data_FM.average();
+# epoch_data_FM = mne.Epochs(data_eeg, data_evnt, [2], tmin=-0.3, tmax=13,reject=None, baseline=(-0.2, 0.)) 
+# evkd_data_FM = epoch_data_FM.average();
 # evkd_data_FM.plot(picks = [31], titles = 'FMmseq')
 
-del data_eeg, data_evnt, evkd_data_AM, evkd_data_FM
+del data_eeg, data_evnt, evkd_data_AM #, evkd_data_FM
 
 #%% Plot PSD
 
@@ -110,23 +112,38 @@ AMdata = AMdata.T[:,0,:]
 AMdata = AMdata[t1:t2,:]
 t = t[t1:t2]
 
-FMdata = epoch_data_FM.get_data(picks=[31])
-FMdata = FMdata.T[:,0,:]
-FMdata = FMdata[t1:t2,:]
+# FMdata = epoch_data_FM.get_data(picks=[31])
+# FMdata = FMdata.T[:,0,:]
+# FMdata = FMdata[t1:t2,:]
 
 #%% Remove epochs with large deflections
 Peak2Peak = AMdata.max(axis=0) - AMdata.min(axis=0)
 AMdata = AMdata[:,Peak2Peak*1e6 < 100.]
+
+fs = epoch_data_AM.info['sfreq']
  
-Peak2Peak = FMdata.max(axis=0) - FMdata.min(axis=0)
-FMdata = FMdata[:,Peak2Peak*1e6<100.]
+# Peak2Peak = FMdata.max(axis=0) - FMdata.min(axis=0)
+# FMdata = FMdata[:,Peak2Peak*1e6<100.]
+AMcont = np.array([])
+MseqCont = np.array([])
+for k in range(AMdata.shape[1]):
+    AMcont = np.append(AMcont,AMdata[:,k])
+    MseqCont = np.append(MseqCont,mseq)
+
+AMcont = sp.signal.decimate(AMcont,10,zero_phase=True)
+MseqCont = sp.signal.decimate(MseqCont,10,zero_phase=True)
+AM_Ht = np.correlate(AMcont,MseqCont,mode='full')
+tt = np.arange(0,AM_Ht.size/fs,1/fs)
+plt.figure()
+plt.plot(AM_Ht[MseqCont.size-1:])
+
 
 TW = 12
 Fres = (1/t[-1]) * TW * 2
-fs = epoch_data_AM.info['sfreq']
+
 
 PLV_AM, Coh_AM, f, Phase_AM = PLV_Coh(mseq,AMdata,TW,fs)
-PLV_FM, Coh_FM, f, Phase_FM = PLV_Coh(mseq,FMdata,TW,fs)
+# PLV_FM, Coh_FM, f, Phase_FM = PLV_Coh(mseq,FMdata,TW,fs)
 
 
 f2 = np.where(f>=3)[0][0]
@@ -148,9 +165,9 @@ fig = plt.figure()
 plt.plot(f,Coh_AM,color='k')
 plt.title('Coh AM')
 
-fig = plt.figure()
-plt.plot(f,Coh_FM,color='k')
-plt.title('Coh FM')
+# fig = plt.figure()
+# plt.plot(f,Coh_FM,color='k')
+# plt.title('Coh FM')
 
 plt.figure()
 plt.plot(f,PLV_AM)
@@ -167,9 +184,9 @@ plt.ylim([-18,5])
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Radians')
 
-plt.figure()
-plt.plot(f, Phase_FM)
-plt.title('Phase FM')
+# plt.figure()
+# plt.plot(f, Phase_FM)
+# plt.title('Phase FM')
 
 
 
@@ -183,7 +200,7 @@ PLVnf_AM = np.zeros([Coh_AM.shape[0],Num_noiseFloors])
 for nf in range(0,Num_noiseFloors):
     print('NF:',nf+1,'/',Num_noiseFloors)
     order_AM = np.random.permutation(AMdata.shape[1]-1)
-    order_FM = np.random.permutation(FMdata.shape[1]-1)
+    # order_FM = np.random.permutation(FMdata.shape[1]-1)
     Y_AM = AMdata[:,order_AM]
     # Y_FM = FMdata[:,order_AM]
     Y_AM[:,0:int(np.round(order_AM.size/2))] = -Y_AM[:,0:int(np.round(order_AM.size/2))]
