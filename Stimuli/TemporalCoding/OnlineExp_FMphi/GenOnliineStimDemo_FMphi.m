@@ -19,14 +19,14 @@ if diotic
 end
 
 stim_dur = 1.5;
-frange = [500 6000];
+frange = [500 3000];
 fratio = 4;
 
 ref = 1;
 fs = 44100;
 risetime = .125;
 
-fm = 8;
+fm = 64;
 phis = [30, 60, 90, 180];
 ntrials = 5;
 phis = repmat(phis, 1, ntrials);

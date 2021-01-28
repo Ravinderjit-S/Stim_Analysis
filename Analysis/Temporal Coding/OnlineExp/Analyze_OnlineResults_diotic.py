@@ -18,7 +18,7 @@ StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic16.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic32.mat')
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic64.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_128.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_diotic128.mat')
 
 Results_fname = ['AMphi_AM_diotic_4_Rav_results.json']
 Results_fname.append('Task_AMphi_diotic_8_Rav_results.json')
@@ -27,7 +27,7 @@ Results_fname.append('Task_AMphi_diotic_32_Rav_results.json')
 Results_fname.append('Task_AMphi_diotic_64_Rav_results.json')
 Results_fname.append('Task_AMphi_diotic_128_Rav_results.json')
 
-AM = [4,8,16,32,64]
+AM = [4,8,16,32,64,128]
 
 AM_avgs = np.zeros((4,len(AM)))
 AM_sems = np.zeros((4,len(AM)))

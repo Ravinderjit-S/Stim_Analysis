@@ -40,7 +40,7 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-AM =4
+AM =128
 trial_cond = 1
 
 json_fname = 'AMphi_AM_diotic' + str(AM) + '.json'

@@ -26,7 +26,7 @@ ref = 1;
 fs = 44100;
 risetime = .125;
 
-fm = 64;
+fm = 128;
 phis = [30, 60, 90, 180];
 ntrials = 5;
 phis = repmat(phis, 1, ntrials);
