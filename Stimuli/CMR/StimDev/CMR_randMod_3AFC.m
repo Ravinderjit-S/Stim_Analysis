@@ -13,7 +13,7 @@ noise_bp = zeros(3,length(t));
 
 
 
-%% Frozen modulation
+%% Frozen modulation in a single 3AFC trial
 
 if coh ==1
     noise_mod = randn(1,1.5*length(t) + bp_mod_fo + 1);

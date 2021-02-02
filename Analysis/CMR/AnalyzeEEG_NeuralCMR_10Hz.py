@@ -121,6 +121,27 @@ fig, ax = plt.subplots()
 ax.plot(f,plvtap_2.T)
 plt.title(labels[1])
 
+fig, ax = plt.subplots()
+ax.plot(f,plvtap_3.T)
+plt.title(labels[2])
+
+fig, ax = plt.subplots()
+ax.plot(f,plvtap_4.T)
+plt.title(labels[3])
+
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_1.T,color='r')
+ax.plot(f,plvtap_2.T,color='b')
+
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_1[:,:].T,color='r',label=labels[0])
+ax.plot(f,plvtap_2[:,:].T,color='b',label=labels[1])
+
+
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_3.T,color='r',label=labels[2])
+ax.plot(f,plvtap_4.T,color='b',label=labels[3])
+
 
 
 
