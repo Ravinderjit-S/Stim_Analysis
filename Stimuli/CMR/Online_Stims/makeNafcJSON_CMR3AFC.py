@@ -40,7 +40,7 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-Mod = [2,10]
+Mod = [16,24]
 Block = 2
 #trial_cond = 1
 

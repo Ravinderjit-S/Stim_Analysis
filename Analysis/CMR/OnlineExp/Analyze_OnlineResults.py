@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.special import erf
 from scipy.stats import norm
+import os
 # from scipy.io import loadmat 
 # import matplotlib.colors as mcolors
 # import pickle
@@ -27,9 +28,11 @@ def GaussCDF(x,sigma,mu):
 
 Results_fname = []
 Results_fname.append('CMR3AFC_2_10_frozen_Rav_results.json')
+Results_fname.append('CMR3AFC_16_24f_Rav_results.json')
 Results_fname.append('CMR3AFC_36_44_frozen_Rav_results.json')
 Results_fname.append('CMR3AFC_131_139f_Rav_results.json')
 
+fig_path = '/home/ravinderjit/Documents/Figures/CMR/'
 
 ASNR =[]
 ACoh =[]
@@ -37,11 +40,12 @@ Aresps = []
 Acorr = []
 Asubjects = []
 
+
 for R_fname in Results_fname:
     with open(R_fname) as f:
         results = json.load(f)
     
-    if R_fname == 'CMR3AFC_2_10_frozen_Rav_results.json':
+    if (R_fname == 'CMR3AFC_2_10_frozen_Rav_results.json') or (R_fname == 'CMR3AFC_16_24f_Rav_results.json'):
         trials = 105
     else:
         trials = 98
@@ -80,10 +84,10 @@ for R_fname in Results_fname:
         
         
 
-Mod_labels = ['2-10 Hz', '36-44 Hz', '131-139 Hz']
-CMR = np.zeros(3)
-for task in range(3):
-    if task ==0:
+Mod_labels = ['2-10 Hz', '16-24 Hz' ,'36-44 Hz', '131-139 Hz']
+CMR = np.zeros(4)
+for task in range(4):
+    if task ==0 or task ==1:
         SNRs_1 = [4,-2,-8,-14,-20,-26,-32,-38]
     else:
         SNRs_1 = [6,0,-6,-12,-18,-24,-30]
@@ -96,7 +100,7 @@ for task in range(3):
     corr_t = Acorr[task]
     subjects_t = Asubjects[task]
     
-    if task == 1: #remove demo subject
+    if task == 2: #remove demo subject
         SNR_t = SNR_t[:,1:]
         Coh_t = Coh_t[:,1:]
         resp_t = resp_t[:,1:]
@@ -133,13 +137,13 @@ for task in range(3):
     plt.legend()
     plt.title(Mod_labels[task])
 
-    fig, ax = plt.subplots(figsize=(4,3))
-    fontsize = 8
+    fig, ax = plt.subplots(figsize=(6,5)) #figsize is in inches
+    fontsize = 14
     ax.errorbar(SNRs_1, SNRs_1_acc.mean(axis=1),SNRs_1_acc.std(axis=1) / np.sqrt(SNRs_1_acc.shape[1]) ,label='Coh',linewidth=2)
     ax.errorbar(SNRs_2, SNRs_2_acc.mean(axis=1),SNRs_2_acc.std(axis=1) /np.sqrt(SNRs_2_acc.shape[1]) ,label='Incoh',linewidth=2)
     # plt.plot(x1,psycho1)
     # plt.plot(x2,psycho2)
-    if task==0:
+    if task==0 or task ==1:
         plt.xlim([-40, 10])
         plt.xticks([-40, -30, -20, -10, 0],fontsize=fontsize)
     else:
@@ -151,9 +155,18 @@ for task in range(3):
     plt.ylabel('Accuracy',fontsize=fontsize,fontweight='bold')
     plt.title(Mod_labels[task],fontsize=fontsize)
     plt.legend(fontsize=fontsize)
+    fig.savefig(os.path.join(fig_path, 'CMRrandMod_' + Mod_labels[task][0:4] +'.png'),format='png')
     
     
-
+fig,ax = plt.subplots(figsize=(12,10))
+fontsize=30
+ax.plot(CMR,color='k',linewidth=4)
+#plt.title('CMR',fontsize=fontsize)
+plt.xticks(ticks = [0,1,2,3],labels=Mod_labels,fontsize=fontsize)
+plt.yticks(ticks =[-3, 0, 4, 8, 12],fontsize=fontsize)
+plt.ylabel('CMR (dB)',fontsize=fontsize)
+plt.xlabel('Noise Modulation',fontsize=fontsize)
+fig.savefig(os.path.join(fig_path, 'CMRrandMod_summary'  +'.png'),format='png')
 
 
 

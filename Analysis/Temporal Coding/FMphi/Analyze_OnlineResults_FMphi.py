@@ -11,7 +11,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
-import pickle
+import os
+#import pickle
+
+fig_path = '/home/ravinderjit/Documents/Figures/FM_coherence/'
+
 
 StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_4.mat']
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_8.mat')
@@ -128,15 +132,32 @@ plt.title('Monaural')
 plt.ylim((0.2,1))
 plt.legend(AM)
 
-
+fontsize = 25
 for ph in range(len(phi_conds)):
-    fig, ax =plt.subplots()
-    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:])
-    plt.xticks(range(len(AM)),labels=AM)
-    plt.ylabel('Accuracy')
-    plt.xlabel('Modulation Freq')
-    plt.title('Phase: ' + str(phi_conds[ph]))
+    fig, ax =plt.subplots(figsize=(12,9))
+    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:],linewidth=2)
+    plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
+    plt.ylabel('Accuracy',fontsize=fontsize)
+    plt.xlabel('Modulation Freq',fontsize=fontsize)
+    #plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
     plt.ylim([0.2,1])
+    plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
+    fig.savefig(os.path.join(fig_path, 'FM_phi' + str(phi_conds[ph])  +'.png'),format='png')
+   
+    
+fig, ax =plt.subplots(figsize=(12,9))
+#ax.plot(range(len(AM)), AM_avgs.T,linewidth=2)
+for ph in range(len(phi_conds)):
+    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:],linewidth=2,label=str(int(phi_conds[ph]))+ u'\xb0')
+plt.legend(fontsize=fontsize)
+plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
+plt.ylabel('Accuracy',fontsize=fontsize)
+plt.xlabel('Modulation Freq',fontsize=fontsize)
+#plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
+plt.ylim([0.2,1])
+plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
+fig.savefig(os.path.join(fig_path, 'FM_phi_all'  +'.png'),format='png')
+   
 
 
 #plot Rav

@@ -112,8 +112,10 @@ linkaxes([ax1,ax2,ax3],'x');
 
 figure()
 ax1 = subplot(2,1,1);plot(t,env),title('gamma envs');
+legend()
 ax2 = subplot(2,1,2);plot(t,lp_gam_env),title('lp gamma envs');
 linkaxes([ax1,ax2],'x');
+
 
 figure,
 subplot(2,1,1), spectrogram(sws1,round(.02*fs),round(.02*0.9*fs),1:10000,fs,'yaxis'), title('SWS 1')
@@ -123,6 +125,9 @@ subplot(2,1,1),spectrogram(sws3,round(.02*fs),round(.02*0.9*fs),1:10000,fs,'yaxi
 subplot(2,1,2), spectrogram(sws4,round(.02*fs),round(.02*0.9*fs),1:10000,fs,'yaxis'), title('SWS 4')
 figure, spectrogram(raw_audio,round(.02*fs),round(.02*0.9*fs),1:10000,fs,'yaxis'), title('Raw Audio')
 
+
+figure,
+pmtm(sws4,3,1:8000,fs)
 
 %% Play Sounds
 soundsc(sws1,fs)

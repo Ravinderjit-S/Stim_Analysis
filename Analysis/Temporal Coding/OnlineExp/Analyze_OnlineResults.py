@@ -12,6 +12,11 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
 import pickle
+import os
+
+
+fig_path = '/home/ravinderjit/Documents/Figures/AM_coherence/'
+
 
 StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_4.mat']
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMphi/StimData_8.mat')
@@ -146,17 +151,21 @@ with open('AMphi_dichotic.pickle','rb') as f:
 # AM = AM[0:5]
 # AM_avgs = AM_avgs[:,0:5]
 # AM_sems = AM_sems[:,0:5]
+fontsize = 25
 for ph in range(len(phi_conds)):
-    fig, ax =plt.subplots()
-    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:])
-    ax.errorbar(range(len(AM)), AM_avgs_dichotic[ph,:],AM_sems_dichotic[ph,:])
-    plt.xticks(range(len(AM)),labels=AM)
-    plt.ylabel('Accuracy')
-    plt.xlabel('Modulation Freq')
-    plt.title('Phase: ' + str(phi_conds[ph]))
-    plt.legend(['Monaural','Dichotic'])
+    fig, ax =plt.subplots(figsize=(12,9))
+    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:],linewidth=2)
+    ax.errorbar(range(len(AM)), AM_avgs_dichotic[ph,:],AM_sems_dichotic[ph,:],linewidth=2)
+    plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
+    plt.ylabel('Accuracy',fontsize=fontsize)
+    plt.xlabel('Modulation Freq',fontsize=fontsize)
+    #plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
+    plt.legend(['Monaural','Dichotic'],fontsize=fontsize)
     plt.ylim([0.2,1])
-
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
+    fig.savefig(os.path.join(fig_path, 'AM_phi' + str(phi_conds[ph])  +'.png'),format='png')
+   
 
 
 

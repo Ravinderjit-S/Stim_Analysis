@@ -40,7 +40,7 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-Mod = [131,139]
+Mod = [16,24]
 #trial_cond = 1
 
 json_fname = 'CMR3AFC_FronzenMod_' + str(Mod[0]) + '_' + str(Mod[1]) + '.json'
