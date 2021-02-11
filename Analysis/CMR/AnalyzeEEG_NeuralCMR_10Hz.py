@@ -29,7 +29,11 @@ data_evnt = [];
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/CMR_10Hz/'
 subject = 'S_Varsha'
+#subject= 'S_Varsha_15dB'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
+
+if subject == 'S211':
+    exlude = exclude.extend(['GSR1', 'GSR2', 'Erg1', 'Erg2', 'Resp', 'Plet', 'Temp'])
 
 datapath = os.path.join(data_loc,subject)
 
@@ -113,6 +117,13 @@ plvtap_2, f = mtplv(dat_epochs_2,params)
 plvtap_3, f = mtplv(dat_epochs_3,params)
 plvtap_4, f = mtplv(dat_epochs_4,params)
 
+f1_ind = np.where(f>=36)[0][0]
+f2_ind = np.where(f>=44)[0][0]
+
+ch_40max_order_incoh = np.argsort(np.max(plvtap_1[:,f1_ind:f2_ind],axis=1))
+ch_40max_order_coh = np.argsort(np.max(plvtap_2[:,f1_ind:f2_ind],axis=1))
+
+
 fig, ax = plt.subplots()
 ax.plot(f,plvtap_1.T)
 plt.title(labels[0])
@@ -132,6 +143,10 @@ plt.title(labels[3])
 fig,ax = plt.subplots()
 ax.plot(f,plvtap_1.T,color='r')
 ax.plot(f,plvtap_2.T,color='b')
+
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_1[0,:].T,color='r')
+ax.plot(f,plvtap_2[0,:].T,color='b')
 
 fig,ax = plt.subplots()
 ax.plot(f,plvtap_1[:,:].T,color='r',label=labels[0])
