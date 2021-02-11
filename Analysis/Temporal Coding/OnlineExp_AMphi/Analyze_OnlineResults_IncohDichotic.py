@@ -12,33 +12,27 @@ import scipy.stats as spst
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
-import os
-#import pickle
+import pickle
 
-fig_path = '/home/ravinderjit/Documents/Figures/FM_coherence/'
+StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_AMIncohphi/StimData_diotic4.mat']
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMIncohphi/StimData_diotic8.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMIncohphi/StimData_diotic16.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMIncohphi/StimData_diotic32.mat')
+StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_AMIncohphi/StimData_diotic64.mat')
 
-
-StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_4.mat']
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_8.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_16.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_32.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_64.mat')
-StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_128.mat')
-
-Results_fname = ['FMphi_4_Rav_results.json']
-Results_fname.append('FMphi_8_Rav_results.json')
-Results_fname.append('FMphi_16_Rav_results.json')
-Results_fname.append('FMphi_32_Rav_results.json')
-Results_fname.append('FMphi_64_Rav_results.json')
+Results_fname = ['Task_AMphi_Incoh_4_Rav_results.json']
+Results_fname.append('Task_AMphi_Incoh_8_Rav_results.json')
+Results_fname.append('Task_AMphi_Incoh_16_Rav_results.json')
+Results_fname.append('Task_AMphi_Incoh_32_Rav_results.json')
+Results_fname.append('Task_AMphi_Incoh_64_Rav_results.json')
 
 AM = [4,8,16,32,64]
 
-AM_med = np.zeros((4,len(AM)))
-AM_mad_sem = np.zeros((4,len(AM)))
-AM_avgs = np.zeros((4,len(AM)))
-AM_sems = np.zeros((4,len(AM)))
-AM_rav = np.zeros((4,len(AM)))
-
+AM_med = np.zeros((3,len(AM)))
+AM_mad_sem = np.zeros((3,len(AM)))
+AM_avgs = np.zeros((3,len(AM)))
+AM_sems = np.zeros((3,len(AM)))
+AM_rav = np.zeros((3,len(AM)))
 
 for j in range(0,len(AM)):
     StimData_j = StimData[j]
@@ -94,7 +88,7 @@ for j in range(0,len(AM)):
     plt.ylabel('Accuracy')
     plt.xlabel('Phase Difference')
     plt.title(str(AM[j]))
-    #plt.legend(subjects)
+    plt.legend(subjects)
     
     sem = accuracy_conds.std(axis=1) / np.sqrt(accuracy_conds.shape[1])
     
@@ -107,39 +101,24 @@ for j in range(0,len(AM)):
     plt.title(str(AM[j]))
     
     AM_med[:,j] = np.median(accuracy_conds,axis=1)
-    AM_avgs[:,j] = accuracy_conds.mean(axis=1)
     AM_mad_sem[:,j] = spst.median_absolute_deviation(accuracy_conds,axis=1,scale=1.4826) / np.sqrt(accuracy_conds.shape[1])
-    
-    # np.sum(np.abs(accuracy_conds - 
-    #                             np.repeat(np.reshape(accuracy_conds.mean(axis=1),[4,1]),15,axis=1)
-    #                             [0,:]),axis=1)/accuracy_conds.shape[1]
+    AM_avgs[:,j] = accuracy_conds.mean(axis=1)
     AM_sems[:,j] = sem
-    #AM_rav[:,j] = accuracy_conds[:,0]
+    AM_rav[:,j] = accuracy_conds[:,0]
+    
     
 cmap = plt.get_cmap('hot')
-cmap_colors = cmap(np.linspace(0,0.8,len(AM)))
+cmap_colors = cmap(np.linspace(0,0.8,len(AM)))   
 fig, ax = plt.subplots()
+#ax.plot(range(len(phi_conds)),AM_avgs)
 for n in range(0,len(AM)):
-    ax.plot(range(len(phi_conds)),AM_avgs[:,n],color=cmap_colors[n,:])
     ax.errorbar(range(len(phi_conds)),AM_avgs[:,n],yerr = AM_sems[:,n],color=cmap_colors[n,:],linewidth=2)
 plt.xticks(range(len(phi_conds)),labels = phi_conds)
 plt.ylim((0.2,1))
 plt.ylabel('Accuracy')
 plt.xlabel('Phase Difference')
-plt.title('FMphi')
+plt.title('Dichotic')
 plt.legend(AM)
-
-fig,ax=plt.subplots()
-for n in range(0,len(AM)):
-    ax.plot(range(len(phi_conds)),AM_med[:,n],color=cmap_colors[n,:])
-    ax.errorbar(range(len(phi_conds)),AM_med[:,n],yerr=AM_mad_sem[:,n],color=cmap_colors[n,:],linewidth=2)
-plt.xticks(range(len(phi_conds)),labels = phi_conds)
-plt.ylim((0.2,1))
-plt.ylabel('Accuracy')
-plt.xlabel('Phase Difference')
-plt.title('FMphi MEDIAN')
-plt.legend(AM)
-
 
 t_diff = np.zeros(AM_avgs.shape)
 for m in range (len(AM)):
@@ -150,77 +129,39 @@ fig, ax = plt.subplots()
 ax.plot(t_diff,AM_avgs,marker='x',linewidth=0)
 plt.ylabel('Accuracy')
 plt.xlabel('Time Difference')
-plt.title('Monaural')
+plt.title('Dichotic')
 plt.ylim((0.2,1))
 plt.legend(AM)
 
-fontsize = 32
-for ph in range(len(phi_conds)):
-    fig, ax =plt.subplots(figsize=(12,9))
-    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:],linewidth=2)
-    plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
-    plt.ylabel('Accuracy',fontsize=fontsize)
-    plt.xlabel('Modulation Freq',fontsize=fontsize)
-    #plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
-    plt.ylim([0.2,1])
-    plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-    fig.savefig(os.path.join(fig_path, 'FM_phi' + str(phi_conds[ph])  +'.png'),format='png')
-   
-    
-    
+#plot Rav
+fig,ax = plt.subplots()
+for n in range(0,len(AM)):
+    ax.plot(range(len(phi_conds)),AM_rav[:,n],color=cmap_colors[n,:])
+plt.xticks(range(len(phi_conds)),labels = phi_conds)
+plt.ylabel('Accuracy')
+plt.xlabel('Phase Difference')
+plt.title('Rav Dichotic')
+plt.legend(AM)
+
+fontsize = 25
 conf_95 = spst.binom(n=20,p=1/3).interval(.95)[1]/20  #20 trials per condition
-fig, ax =plt.subplots(figsize=(10,8))
+fig, ax =plt.subplots(figsize=(12,9))
 #ax.plot(range(len(AM)), AM_avgs.T,linewidth=2)
 for ph in range(len(phi_conds)):
-    ax.errorbar(range(len(AM)), AM_avgs[ph,:],AM_sems[ph,:],linewidth=2,label=str(int(phi_conds[ph]))+ u'\xb0')
-ax.fill_between(range(len(AM)), np.repeat(conf_95,len(AM)),0,color='grey',alpha=0.5)
+    ax.errorbar(range(len(AM)), AM_med[ph,:],AM_mad_sem[ph,:],linewidth=2,label=str(int(phi_conds[ph]))+ u'\xb0')
+#ax.fill_between(range(len(AM)), np.repeat(conf_95,len(AM)),0,color='grey',alpha=0.5)
 plt.legend(fontsize=fontsize)
+plt.title('Incoh Dichotic')
 plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
 plt.ylabel('Accuracy',fontsize=fontsize)
 plt.xlabel('Modulation Freq',fontsize=fontsize)
 #plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
 plt.ylim([0.2,1])
 plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-fig.savefig(os.path.join(fig_path, 'FM_phi_all'  +'.png'),format='png')
-
-
-conf_95 = spst.binom(n=20,p=1/3).interval(.95)[1]/20  #20 trials per condition
-fig, ax =plt.subplots(figsize=(10,9))
-#ax.plot(range(len(AM)), AM_avgs.T,linewidth=2)
-for ph in range(len(phi_conds)):
-    ax.errorbar(range(len(AM)), AM_med[ph,:],AM_mad_sem[ph,:],linewidth=2,label=str(int(phi_conds[ph]))+ u'\xb0')
-#ax.fill_between(range(len(AM)), np.repeat(conf_95,len(AM)),0,color='grey',alpha=0.5)
-plt.legend(fontsize=fontsize)
-plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
-plt.ylabel('Accuracy',fontsize=fontsize)
-plt.xlabel('Modulation Freq',fontsize=fontsize)
-#plt.title('FM Incoherence Detection',fontsize=fontsize)
-plt.ylim([0.2,1])
-plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-fig.savefig(os.path.join(fig_path, 'FM_phi_all_median'  +'.png'),format='png')
 
 
 
+with open('AMphi_dichotic.pickle','wb') as f:
+    pickle.dump([AM_avgs,AM_sems, AM_med, AM_mad_sem],f)
 
 
-#plot Rav
-# fig,ax = plt.subplots()
-# for n in range(0,len(AM)):
-#     ax.plot(range(len(phi_conds)),AM_rav[:,n],color=cmap_colors[n,:])
-# plt.xticks(range(len(phi_conds)),labels = phi_conds)
-# plt.ylabel('Accuracy')
-# plt.xlabel('Phase Difference')
-# plt.title('Rav Monaural')
-# plt.legend(AM)
-
-
-
-
-
-
-
-
-
-
-
-    

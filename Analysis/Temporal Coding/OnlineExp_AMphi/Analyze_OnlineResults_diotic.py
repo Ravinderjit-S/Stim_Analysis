@@ -8,6 +8,7 @@ Created on Tue Aug 25 21:38:51 2020
 
 import json
 import numpy as np
+import scipy.stats as spst
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
 import matplotlib.colors as mcolors
@@ -29,6 +30,8 @@ Results_fname.append('Task_AMphi_diotic_128_Rav_results.json')
 
 AM = [4,8,16,32,64,128]
 
+AM_med = np.zeros((4,len(AM)))
+AM_mad_sem = np.zeros((4,len(AM)))
 AM_avgs = np.zeros((4,len(AM)))
 AM_sems = np.zeros((4,len(AM)))
 AM_rav = np.zeros((4,len(AM)))
@@ -99,6 +102,8 @@ for j in range(0,len(AM)):
     plt.xlabel('Phase Difference')
     plt.title(str(AM[j]))
     
+    AM_med[:,j] = np.median(accuracy_conds,axis=1)
+    AM_mad_sem[:,j] = spst.median_absolute_deviation(accuracy_conds,axis=1,scale=1.4826) / np.sqrt(accuracy_conds.shape[1])
     AM_avgs[:,j] = accuracy_conds.mean(axis=1)
     AM_sems[:,j] = sem
     AM_rav[:,j] = accuracy_conds[:,0]
@@ -140,7 +145,25 @@ plt.xlabel('Phase Difference')
 plt.title('Rav Dichotic')
 plt.legend(AM)
 
+fontsize = 25
+conf_95 = spst.binom(n=20,p=1/3).interval(.95)[1]/20  #20 trials per condition
+fig, ax =plt.subplots(figsize=(12,9))
+#ax.plot(range(len(AM)), AM_avgs.T,linewidth=2)
+for ph in range(len(phi_conds)):
+    ax.errorbar(range(len(AM)), AM_med[ph,:],AM_mad_sem[ph,:],linewidth=2,label=str(int(phi_conds[ph]))+ u'\xb0')
+#ax.fill_between(range(len(AM)), np.repeat(conf_95,len(AM)),0,color='grey',alpha=0.5)
+plt.legend(fontsize=fontsize)
+plt.title('Dichotic')
+plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
+plt.ylabel('Accuracy',fontsize=fontsize)
+plt.xlabel('Modulation Freq',fontsize=fontsize)
+#plt.title('Phase: ' + str(phi_conds[ph]),fontsize=fontsize)
+plt.ylim([0.2,1])
+plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
+
+
+
 with open('AMphi_dichotic.pickle','wb') as f:
-    pickle.dump([AM_avgs,AM_sems],f)
+    pickle.dump([AM_avgs,AM_sems, AM_med, AM_mad_sem],f)
 
 

@@ -1,10 +1,10 @@
 clear
 
-f1 = 1500;
+f1 = 1000;
 f2 = 4*f1;
 fs = 44100;
-tlen = 1.5;
-fm = 8;
+tlen = 1;
+fm = 4;
 phi_deg = 90;
 dichotic = 0;
 risetime = .125;
@@ -20,7 +20,8 @@ y = 0.5+ 0.5*sin(2*pi*fm.*t+phi_rad);
 figure,plot(t,x,t,y)
 
 figure,
-spectrogram(stim_fm{4}(1,:), round(.05*fs), round(0.05*fs*0.8),0:1:10000,fs,'yaxis')
+spectrogram(stim_fm{4}(1,:), round(.05*fs), round(0.05*fs*0.8),800:1:4500,fs,'yaxis')
+set(gca,'fontsize',18)
 
 figure,
 spectrogram(stim_am{3}(1,:), round(.05*fs), round(0.05*fs*0.8),0:1:5000,fs,'yaxis')
