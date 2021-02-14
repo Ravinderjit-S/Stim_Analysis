@@ -19,7 +19,7 @@ coh = 0;
 bp_mod_fo = 1/2 * 5 *fs; %filter order for slowest modulation instance ... keep same sharpness for all modulation filters so setting here
 
 tic()
-[Sig] = CMR_randMod(noise_bands,target_f,SNRdb,mod_band,target_modf,fs,tlen,coh,bp_mod_fo);
+[Sig] = CMR_randMod(noise_bands,target_f,SNRdb,mod_band,target_modf,fs,tlen,coh);
 toc()
 
 soundsc(Sig,fs)

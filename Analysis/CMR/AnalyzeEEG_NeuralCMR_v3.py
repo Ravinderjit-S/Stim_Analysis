@@ -28,12 +28,13 @@ data_evnt = [];
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
 subject = 'S211_plus12dB_tpsd'
+subject = 'SVarsha'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=100)
+data_eeg.filter(l_freq=1,h_freq=300)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0, h_freq=10)
@@ -59,11 +60,11 @@ data_eeg.plot(events=blinks,show_options=True)
 #           '2-10 coh 0','2-10 coh 1']
 #labels = ['6 coh 0', '6 coh 1', '40 coh 0','40 coh 1']
 labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
-
+labels = ['223 coh 0', '223 coh 1', '40 coh 0','40 coh 1']
 
 tmin = -0.5
 tmax = 4.5
-reject = dict(eeg=100e-6)
+reject = dict(eeg=500e-6)
 baseline = (-0.2,0)
 
 epochs_1 = mne.Epochs(data_eeg,data_evnt,[1],tmin=tmin,tmax=tmax,
@@ -141,18 +142,16 @@ t = t[t1:t2]
 # target_mods[1,:] = np.sin(2*np.pi*40*t)
 
 
-
-
 dat_epochs_1 = epochs_1.get_data()
 dat_epochs_2 = epochs_2.get_data()
 dat_epochs_3 = epochs_3.get_data()
 dat_epochs_4 = epochs_4.get_data()
 
 
-dat_epochs_1 = dat_epochs_1[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_3 = dat_epochs_3[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_1 = dat_epochs_1[0:280,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_2 = dat_epochs_2[0:280,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_3 = dat_epochs_3[0:280,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_4 = dat_epochs_4[0:280,0:32,t1:t2].transpose(1,0,2)
 
 
 
@@ -181,6 +180,16 @@ plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
 plt.xlim((35,45))
 plt.xticks([35,40,45],fontsize=fontsize)
 plt.yticks([0,0.04,0.08],fontsize=fontsize)
+
+
+fig, ax = plt.subplots(figsize=(5.5,5))
+fontsize=15
+ax.plot(f,plvtap_4.T,label='CORR',linewidth=2)
+ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2)
+
+plt.figure()
+plt.plot(f,plvtap_1.T)
+plt.title(labels[0])
 
 plt.figure()
 plt.plot(f,plvtap_2.T)
@@ -239,7 +248,9 @@ plt.title(labels[3])
 #     PLVn_Y1, Cohn_Y1, f = sa.PLV_Coh(targMod,Y_1,TW,fs)
 #     Cohnf_2[:,nf] = Cohn_Y1
     
-#     data_nf = dat_epochs_3
+#     data_nf = dat_epochs_3fig,ax = plt.subplots()
+ax.plot(f,plvtap_1.T,color='r')
+ax.plot(f,plvtap_2.T,color='b')
 #     targMod = target_mods[2,:]
 #     order = np.random.permutation(data_nf.shape[1])
 #     Y_1 = data_nf[:,order]
@@ -295,7 +306,9 @@ plt.title(labels[3])
 #     PLVn_Y1, Cohn_Y1, f = sa.PLV_Coh(targMod,Y_1,TW,fs)
 #     Cohnf_8[:,nf] = Cohn_Y1
 
-    
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_1.T,color='r')
+ax.plot(f,plvtap_2.T,color='b')
 
 # NF_4 = np.concatenate((Cohnf_1,Cohnf_4),axis=1)  
 # NF_4_bot = NF_4.mean(axis=1) - 2*NF_4.std(axis=1)

@@ -147,6 +147,27 @@ ZITD_plv, ZITD_plv_sem = Zscore(All_PlvITD,All_PlvITD_nfs)
 ZIAC_Hf, ZIAC_Hf_sem = Zscore(10*np.log10(All_IAChf),10*np.log10(All_IAChf_nfs))
 ZITD_Hf, ZITD_Hf_sem = Zscore(10*np.log10(All_ITDhf),10*np.log10(All_ITDhf_nfs))
 
+All_cohIAC_sem = All_CohIAC.std(axis=1) / np.sqrt(All_CohIAC.shape[1])
+font_size = 30
+fig,ax = plt.subplots(figsize=(12,9))
+ax.plot(f2,All_CohIAC.mean(axis=1),color='k',linewidth=2)
+conf = ax.fill_between(f2,All_CohIAC.mean(axis=1) + 1.96*All_cohIAC_sem, All_CohIAC.mean(axis=1) - 1.96*All_cohIAC_sem,
+                 color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+
+ax.plot(f2,All_CohIAC_nfs,color='lightcoral')
+ax.set_xlim([1,17])
+ax.set_ylim([0.05,0.105])
+ax.set_xscale('log')
+plt.xticks([1,10],['1','10',],fontsize=font_size)
+plt.yticks([0.06, 0.08, 0.10],fontsize=font_size)
+ax.set_ylabel('Coherence', fontsize=font_size)
+ax.set_xlabel('Binaural Modulation Frequency', fontsize=font_size)
+plt.legend(['Response 95% CI','Noise Floors'], fontsize=18,frameon=False)
+plt.title('IAC Tracking via EEG',fontsize=font_size)
+plt.tight_layout()
+fig.savefig(os.path.join(fig_path,'IAC_rawcoh_poster.png'),format='png')
+
+
 
 fig, ax = plt.subplots()
 resp = ax.plot(f2,ZIAC_plv,color='black',linewidth=2, label='Response')
@@ -224,6 +245,30 @@ plt.tight_layout()
 fig.savefig(os.path.join(fig_path,'ITD_coh.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'ITD_coh.png'),format='png')
 fig.savefig(os.path.join(fig_path,'ITD_coh.svg'),format='svg')
+
+#Figure for poster
+font_size = 30
+fig, ax = plt.subplots(figsize=(10,7))
+resp = ax.plot(f2,ZIAC_coh, color='black', linewidth=2, label='Response')
+conf = ax.fill_between(f2,ZIAC_coh + 1.96*ZIAC_coh_sem, ZIAC_coh - 1.96*ZIAC_coh_sem,
+                 color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,15])
+ax.set_ylim([0,18])
+ax.set_xscale('log')
+ax.set_ylabel('Coherence (Zscore re: NoisFloor)', fontsize=font_size)
+ax.set_xlabel('Frequency (Hz)',fontsize=font_size)
+#ax.legend()
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+plt.xticks([1,10],['1','10',],fontsize=font_size)
+plt.yticks([2, 8, 14],fontsize=font_size)
+plt.title('IAC Tracking via EEG',fontsize=font_size)
+plt.tight_layout()
+#fig.savefig(os.path.join(fig_path,'IAC_coh.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'IAC_coh_poster.png'),format='png')
+#fig.savefig(os.path.join(fig_path,'IAC_coh.svg'),format='svg')
 
 
 # plt.figure()
