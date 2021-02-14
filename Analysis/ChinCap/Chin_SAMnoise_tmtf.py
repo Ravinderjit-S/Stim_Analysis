@@ -90,9 +90,10 @@ AMlabels = []
 for AM in AMf: AMlabels.append(str(AM))
 plt.figure()
 plt.plot(np.log2(AMf),tmtf_plv.T)
+plt.xlim((0,1000))
 plt.xticks(ticks=np.log2(AMf),labels=AMlabels)
 plt.title('TMTF_PLV')
-plt.xlim((0,1000))
+
     
 
 fs = epochs_all[0].info['sfreq']
