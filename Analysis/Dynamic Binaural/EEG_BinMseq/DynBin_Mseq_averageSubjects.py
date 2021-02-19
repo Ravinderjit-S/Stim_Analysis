@@ -49,8 +49,8 @@ All_PlvITD_nfs = np.zeros([65536,100])
 All_IAChf_nfs = np.zeros([41,100])
 All_ITDhf_nfs = np.zeros([41,100])
 
-# fig_IACht,ax_IACht = plt.subplots(3,3,sharex=True)
-# fig_ITDht,ax_ITDht = plt.subplots(3,3,sharex=True)
+fig_IACht,ax_IACht = plt.subplots(3,3,sharex=True)
+fig_ITDht,ax_ITDht = plt.subplots(3,3,sharex=True)
 # fig_IAChf,ax_IAChf = plt.subplots(3,3,sharex=True)
 # fig_ITDhf,ax_ITDhf = plt.subplots(3,3,sharex=True)
 # fig_IACcoh,ax_IACcoh = plt.subplots(3,3,sharex=True)
@@ -68,21 +68,22 @@ for sub in range(0,len(Subjects)):
     ax_col = int(np.mod(sub,3))
     
     #%% Plot Stuff for each Subject
-    # ax_IACht[ax_row,ax_col].plot(t,IAC_nfs.T,color= mcolors.CSS4_COLORS['grey'])
-    # ax_IACht[ax_row,ax_col].plot(t,IAC_Ht,color='k')
-    # ax_IACht[ax_row,ax_col].set_xlim([0,1])
-    # ax_IACht[ax_row,ax_col].set_title(Subject + ' Ht IAC')
+    ax_IACht[ax_row,ax_col].plot(t,IAC_nfs.T,color= mcolors.CSS4_COLORS['grey'])
+    ax_IACht[ax_row,ax_col].plot(t,IAC_Ht,color='k')
+    ax_IACht[ax_row,ax_col].set_xlim([0,1])
+    ax_IACht[ax_row,ax_col].set_title(Subject + ' Ht IAC')
     
-    # ax_ITDht[ax_row,ax_col].plot(t,ITD_nfs.T,color= mcolors.CSS4_COLORS['grey'])
-    # ax_ITDht[ax_row,ax_col].plot(t,ITD_Ht,color='k')
-    # ax_ITDht[ax_row,ax_col].set_xlim([0,1])
-    # ax_ITDht[ax_row,ax_col].set_title(Subject + ' Ht ITD')
+    ax_ITDht[ax_row,ax_col].plot(t,ITD_nfs.T,color= mcolors.CSS4_COLORS['grey'])
+    ax_ITDht[ax_row,ax_col].plot(t,ITD_Ht,color='k')
+    ax_ITDht[ax_row,ax_col].set_xlim([0,1])
+    ax_ITDht[ax_row,ax_col].set_title(Subject + ' Ht ITD')
     
     # ax_IAChf[ax_row,ax_col].plot(f1,10*np.log10(NF_Hfs_IAC.T),color= mcolors.CSS4_COLORS['grey'])
     # ax_IAChf[ax_row,ax_col].plot(f1,10*np.log10(IAC_Hf),color='k')
     # ax_IAChf[ax_row,ax_col].set_xlim([1,20])
     # ax_IAChf[ax_row,ax_col].set_title(Subject + ' CrossCorr IAC')
     # ax_IAChf[ax_row,ax_col].set_xscale('log')
+    
         
     # ax_ITDhf[ax_row,ax_col].plot(f1,10*np.log10(NF_Hfs_ITD.T),color= mcolors.CSS4_COLORS['grey'])
     # ax_ITDhf[ax_row,ax_col].plot(f1,10*np.log10(ITD_Hf),color='k')

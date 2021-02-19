@@ -28,13 +28,13 @@ data_evnt = [];
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
 subject = 'S211_plus12dB_tpsd'
-subject = 'SVarsha'
+#subject = 'SVarsha'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=300)
+data_eeg.filter(l_freq=1,h_freq=100)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0, h_freq=10)
@@ -60,11 +60,11 @@ data_eeg.plot(events=blinks,show_options=True)
 #           '2-10 coh 0','2-10 coh 1']
 #labels = ['6 coh 0', '6 coh 1', '40 coh 0','40 coh 1']
 labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
-labels = ['223 coh 0', '223 coh 1', '40 coh 0','40 coh 1']
+#labels = ['223 coh 0', '223 coh 1', '40 coh 0','40 coh 1']
 
 tmin = -0.5
 tmax = 4.5
-reject = dict(eeg=500e-6)
+reject = dict(eeg=100e-6)
 baseline = (-0.2,0)
 
 epochs_1 = mne.Epochs(data_eeg,data_evnt,[1],tmin=tmin,tmax=tmax,
@@ -101,28 +101,28 @@ data_3 = evkd_3.data
 data_4 = evkd_4.data
 
 
-nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
+# nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
 
-pxx = np.zeros((int(nfft/2),34,9))
-f,p1 = sa.periodogram(data_1.T, fs, nfft)
-pxx[:,:,0] = p1.squeeze()
-f,p1 = sa.periodogram(data_2.T, fs, nfft)
-pxx[:,:,1] = p1.squeeze()
-f,p1 = sa.periodogram(data_3.T, fs, nfft)
-pxx[:,:,2] = p1.squeeze()
-f,p1 = sa.periodogram(data_4.T, fs, nfft)
-pxx[:,:,3] = p1.squeeze()
+# pxx = np.zeros((int(nfft/2),34,9))
+# f,p1 = sa.periodogram(data_1.T, fs, nfft)
+# pxx[:,:,0] = p1.squeeze()
+# f,p1 = sa.periodogram(data_2.T, fs, nfft)
+# pxx[:,:,1] = p1.squeeze()
+# f,p1 = sa.periodogram(data_3.T, fs, nfft)
+# pxx[:,:,2] = p1.squeeze()
+# f,p1 = sa.periodogram(data_4.T, fs, nfft)
+# pxx[:,:,3] = p1.squeeze()
 
 
 
     
-for j in np.arange(4):
-    plt.figure()
-    plt.plot(f,10*np.log10(pxx[:,:,j]))
-    plt.title(labels[j])
-    plt.legend(np.arange(32))
-#     plt.plot(f,10*np.log10(pxx[j,:]))
+# for j in np.arange(4):
+#     plt.figure()
+#     plt.plot(f,10*np.log10(pxx[:,:,j]))
 #     plt.title(labels[j])
+#     plt.legend(np.arange(32))
+# #     plt.plot(f,10*np.log10(pxx[j,:]))
+# #     plt.title(labels[j])
 
 
 # stim_loc = '/media/ravinderjit/Data_Drive/Stim_Analysis/Stimuli/CMR/SNR_plus9/target_mods_9dB.mat'
@@ -148,10 +148,10 @@ dat_epochs_3 = epochs_3.get_data()
 dat_epochs_4 = epochs_4.get_data()
 
 
-dat_epochs_1 = dat_epochs_1[0:280,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_2 = dat_epochs_2[0:280,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_3 = dat_epochs_3[0:280,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_4 = dat_epochs_4[0:280,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_1 = dat_epochs_1[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_3 = dat_epochs_3[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
 
 
 
@@ -167,6 +167,10 @@ plvtap_2, f = mtplv(dat_epochs_2,params)
 plvtap_3, f = mtplv(dat_epochs_3,params)
 plvtap_4, f = mtplv(dat_epochs_4,params)
 
+
+fig, ax = plt.subplots(figsize=(5.5,5))
+ax.plot(f,plvtap_4.T,label='CORR',linewidth=2,color='b')
+ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2,color='r')
 
 np.max(plvtap_4[:,150:167],axis=1)
 
@@ -184,8 +188,8 @@ plt.yticks([0,0.04,0.08],fontsize=fontsize)
 
 fig, ax = plt.subplots(figsize=(5.5,5))
 fontsize=15
-ax.plot(f,plvtap_4.T,label='CORR',linewidth=2)
-ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2)
+ax.plot(f,plvtap_4.T,label='CORR',linewidth=2,color='b')
+ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2,color='r')
 
 plt.figure()
 plt.plot(f,plvtap_1.T)

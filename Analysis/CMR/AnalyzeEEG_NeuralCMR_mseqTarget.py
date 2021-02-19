@@ -85,10 +85,12 @@ tmin = -1.0
 tmax = 14
 baseline = (-0.2,0)
 
+reject =dict(eeg=100e-6)
+
 epochs_1 = mne.Epochs(data_eeg,data_evnt,[1],tmin=tmin,tmax=tmax,
-                              baseline=baseline)
+                              baseline=baseline)#,reject=reject)
 epochs_2 = mne.Epochs(data_eeg,data_evnt,[2],tmin=tmin,tmax=tmax,
-                              baseline=baseline)
+                              baseline=baseline)#,reject=reject)
 
 evkd_1 = epochs_1.average()
 evkd_2 = epochs_2.average()
@@ -107,21 +109,72 @@ t2 = t1 + mseq.size
 # coh_1 = epochs_2.get_data(picks=31)
 # coh_1 = coh_1[:,0,t1:t2].T
 
-coh_0_ = epochs_1.get_data()[0:259,picks,t1:t2].transpose(1,0,2)
-coh_1_ = epochs_2.get_data()[0:259,picks,t1:t2].transpose(1,0,2)
+coh_0_ = epochs_1.get_data()[:,picks,t1:t2].transpose(1,0,2)
+coh_1_ = epochs_2.get_data()[:,picks,t1:t2].transpose(1,0,2)
 
 
 #%% Remove epochs with large deflections
-# Peak2Peak = coh_0.max(axis=0) - coh_0.min(axis=0) 
-# coh_0 = coh_0[:,Peak2Peak*1e6 < 100.]
+Peak2Peak = coh_0_.max(axis=2) - coh_0_.min(axis=2) 
+mask_trials = np.all(Peak2Peak < 100e-6,axis=0)
+coh_0_ = coh_0_[:,mask_trials,:]
 
-# Peak2Peak = coh_1.max(axis=0) - coh_1.min(axis=0)
-# coh_1 = coh_1[:,Peak2Peak*1e6<100.]
+Peak2Peak = coh_1_.max(axis=2) - coh_1_.min(axis=2) 
+mask_trials = np.all(Peak2Peak < 100e-6,axis=0)
+coh_1_ = coh_1_[:,mask_trials,:]
+
+trials_even = np.min([coh_1_.shape[1],coh_0_.shape[1]])
+coh_0_ = coh_0_[:,:trials_even,:]
+coh_1_ = coh_1_[:,:trials_even,:]
 
 #%% Compare same number of trials
 # tot_trials = min(coh_1.shape[1],coh_0.shape[1])
 # coh_0 = coh_0[:,0:tot_trials]
 # coh_1 = coh_1[:,0:tot_trials]
+
+#%% correlation analysis
+
+Resp_0 = coh_0_.mean(axis=1)
+Resp_1 = coh_1_.mean(axis=1)
+
+Ht_0 = np.zeros(Resp_0.shape)
+Ht_1 = np.zeros(Resp_1.shape)
+for ch in range(Ht_0.shape[0]):
+    Ht_0[ch,:] = np.correlate(Resp_0[ch,:], mseq[0,:],mode='full')[mseq.size-1:]
+    Ht_1[ch,:] = np.correlate(Resp_1[ch,:],mseq[0,:],mode='full')[mseq.size-1:]
+
+fs = epochs_1.info['sfreq']
+tt = np.arange(0,mseq.size/fs,1/fs)
+plt.figure()
+plt.plot(tt,Ht_0.T)
+
+plt.figure()
+plt.plot(tt,Ht_1.T)
+
+
+tend = 0.5
+ind_tend = np.where(tt>=tend)[0][0]
+Ht_0 = Ht_0[:,:ind_tend]
+Ht_1 = Ht_1[:,:ind_tend]
+nfft = 2**np.log2(Ht_0.size)
+Hf_0 = sp.fft(Ht_0,n=nfft,axis=1)
+Hf_1 = sp.fft(Ht_1,n=nfft,axis=1)
+f = np.arange(0,fs,fs/nfft)
+
+plt.figure()
+plt.plot(f,np.abs(Hf_0).T)
+
+plt.figure()
+plt.plot(f,np.abs(Hf_1).T)
+
+plt.figure()
+plt.plot(f,np.abs(Hf_0).T,color='r')
+plt.plot(f,np.abs(Hf_1).T,color='b')
+
+
+
+
+
+
 
 #%% Compute Coherence/PLV
 
