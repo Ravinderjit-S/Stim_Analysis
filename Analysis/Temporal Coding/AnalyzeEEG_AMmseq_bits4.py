@@ -21,6 +21,7 @@ import pickle
 from anlffr.spectral import mtspecraw
 from anlffr.spectral import mtplv
 from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA
 
 
 
@@ -80,6 +81,9 @@ datapath =  os.path.join(data_loc, subject)
 # datapath = '/media/ravinderjit/Data_Drive/Data/EEGdata/EFR'
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
 data_eeg.filter(l_freq=1,h_freq=200)
+
+if subject == 'S211':
+    data_eeg.info['bads'].append('A10') #Channel A10 bad in S211
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
@@ -158,7 +162,7 @@ Ht = []
 Htnf = []
 # do cross corr
 for m in range(len(epdat)): 
-    print('On mseq # ' + str(m))
+    print('On mseq # ' + str(m+1))
     resp_m = epdat[m].mean(axis=1)
     Ht_m = np.zeros(resp_m.shape)
     for ch in range(resp_m.shape[0]):
@@ -288,23 +292,96 @@ for m in range(len(pca_sp)):
     fig,axs = plt.subplots(4,1)
     axs[0].plot(tdat[m],pca_sp[m])
     for n in range(m*num_nfs,num_nfs*(m+1)):
-        axs[0].plot(tdat[m],pca_sp_nf[m],color='grey',alpha=0.5)
+        axs[0].plot(tdat[m],pca_sp_nf[n],color='grey',alpha=0.3)
     
     axs[1].plot(fdat[m],np.abs(pca_fft[m]))
     axs[1].set_xlim([0,100])
     for n in range(m*num_nfs,num_nfs*(m+1)):
-        axs[1].plot(fdat[m],pca_fft_nf[m],color='grey',alpha=0.5)
+        axs[1].plot(fdat[m],pca_fft_nf[n],color='grey',alpha=0.3)
     
     axs[2].plot(fdat[m],pca_phase[m])
     axs[2].set_xlim([0,100])
     
-    axs[3].plot(ch_picks,np.abs(pca_coeff[m].T))
+    axs[3].plot(ch_picks,pca_coeff[m].T)
     axs[3].set_xlabel('channel')
+    for n in range(m*num_nfs,num_nfs*(m+1)):
+        axs[3].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
+    fig.suptitle('PCA ' + labels[m])    
     
     
+
+#ICA decomposition of Ht
+ica_sp = []
+ica_fft = []
+ica_phase = []
+ica_coeff = []
+#ica_expVar = []
+
+ica_sp_nf = []
+ica_fft_nf = []
+ica_phase_nf = []
+ica_coeff_nf = []
+#ica_expVar_nf = []
+
+for m in range(len(Ht)):
+    ica = FastICA(n_components=2)
+    ica.fit(Ht[m])
+    ica_space = ica.fit_transform(Ht[m].T)
+    
+    nfft = 2**np.log2(Ht[m].shape[1])
+    ica_f = sp.fft(ica_space,n=nfft,axis=0)
+    
+    ica_sp.append(ica_space)
+    ica_fft.append(ica_f)
+    ica_phase.append(np.unwrap(np.angle(ica_f),axis=0))
+    ica_coeff.append(ica.components_)
+    #ica_expVar.append(ica.explained_variance_ratio_)
+    
+for n in range(len(Htnf)):
+    
+    ica = FastICA(n_components=2)
+    ica.fit(Ht[m])
+    ica_space = ica.fit_transform(Htnf[m].T)
+    
+    nfft = 2**np.log2(Htnf[m].shape[1])
+    ica_f = sp.fft(ica_space,n=nfft,axis=0)
+    
+    ica_sp_nf.append(ica_space)
+    ica_fft_nf.append(ica_f)
+    ica_phase_nf.append(np.unwrap(np.angle(ica_f),axis=0))
+    ica_coeff_nf.append(ica.components_)
+    #ica_expVar_nf.append(ica.explained_variance_ratio_)
+    
+
     
     
+for m in range(len(ica_sp)):
+    fig,axs = plt.subplots(4,1)
+    axs[0].plot(tdat[m],ica_sp[m])
+    for n in range(m*num_nfs,num_nfs*(m+1)):
+        axs[0].plot(tdat[m],ica_sp_nf[n],color='grey',alpha=0.3)
     
+    axs[1].plot(fdat[m],np.abs(ica_fft[m]))
+    axs[1].set_xlim([0,100])
+    for n in range(m*num_nfs,num_nfs*(m+1)):
+        axs[1].plot(fdat[m],ica_fft_nf[n],color='grey',alpha=0.3)
+    
+    axs[2].plot(fdat[m],ica_phase[m])
+    axs[2].set_xlim([0,100])
+    
+    axs[3].plot(ch_picks,ica_coeff[m].T)
+    axs[3].set_xlabel('channel')
+    # for n in range(m*num_nfs,num_nfs*(m+1)):
+    #     axs[3].plot(ch_picks,ica_coeff_nf[n].T,color='grey',alpha=0.1)
+    fig.suptitle('ICA ' + labels[m])    
+    
+    
+vmin = -4
+vmax = 4
+plt.figure()
+mne.viz.plot_topomap(ica_coeff[3][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+plt.figure()
+mne.viz.plot_topomap(ica_coeff[3][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
 
