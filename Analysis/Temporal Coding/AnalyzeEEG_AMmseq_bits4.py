@@ -111,7 +111,7 @@ for j in range(len(mseq)):
 
 #%% Extract part of response when stim is on
 ch_picks = np.arange(32)
-remove_chs = [9] # channel A10 bad in S211
+remove_chs = [9,10] # channel A10 bad in S211
 ch_picks = np.delete(ch_picks,remove_chs)
 
 epdat = []
@@ -130,21 +130,19 @@ fs = epochs[0].info['sfreq']
 for m in range(len(mseq)):
     Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
     mask_trials = np.all(Peak2Peak <100e-6,axis=0)
-    plt.figure()
-    plt.plot(Peak2Peak.T)
     print('rejected ' + str(epdat[m].shape[1] - sum(mask_trials)) + ' trials due to P2P')
     epdat[m] = epdat[m][:,mask_trials,:]
     
 
 
-params = dict()
-params['Fs'] = fs
-params['tapers'] = [2,2*2-1]
-params['fpass'] = [0, 200]
-params['itc'] = 0
+# params = dict()
+# params['Fs'] = fs
+# params['tapers'] = [2,2*2-1]
+# params['fpass'] = [0, 200]
+# params['itc'] = 0
 
-TW = 12
-Fres = (1/t[-1]) * TW * 2
+# TW = 12
+# Fres = (1/t[-1]) * TW * 2
 
 #PLV_AM, Coh_AM, f, Phase_AM = PLV_Coh(mseq2,AMch_2,TW,fs)
 # PLV_FM, Coh_FM, f, Phase_FM = PLV_Coh(mseq,FMdata,TW,fs)
@@ -186,8 +184,19 @@ for h in range(len(Ht)):
 
 
 # Plot Ht
-sbp = [5,3]
-sbp2 = [4,4]
+    
+if ch_picks.size == 31:
+    sbp = [5,3]
+    sbp2 = [4,4]
+elif ch_picks.size == 32:
+    sbp = [4,4]
+    sbp2 = [4,4]
+elif ch_picks.size == 30:
+    sbp = [5,3]
+    sbp2 = [5,3]
+    
+
+
 for m in range(len(Ht)):
     Ht_1 = Ht[m]
     t = tdat[m]
@@ -224,8 +233,8 @@ for m in range(len(Ht)):
 
     
 # Plot Hf
-sbp = [5,3]
-sbp2 = [4,4]
+# sbp = [5,3]
+# sbp2 = [5,3]
 for m in range(len(Hf)):
     Hf_1 = Hf[m]
     f = fdat[m]
@@ -261,8 +270,10 @@ pca_phase_nf = []
 pca_coeff_nf = []
 pca_expVar_nf = []
 
+n_comp = 3
+
 for m in range(len(Ht)):
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=n_comp)
     pca.fit(Ht[m])
     pca_space = pca.fit_transform(Ht[m].T)
     
@@ -276,7 +287,7 @@ for m in range(len(Ht)):
     pca_expVar.append(pca.explained_variance_ratio_)
     
 for n in range(len(Htnf)):
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=n_comp)
     pca.fit(Htnf[n])
     pca_space = pca.fit_transform(Htnf[n].T)
     
@@ -309,6 +320,18 @@ for m in range(len(pca_sp)):
     fig.suptitle('PCA ' + labels[m])    
     
     
+vmin = pca_coeff[2].mean() - 2 * pca_coeff[2].std()
+vmax = pca_coeff[2].mean() + 2 * pca_coeff[2].std()
+plt.figure()
+mne.viz.plot_topomap(pca_coeff[2][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+plt.figure()
+mne.viz.plot_topomap(pca_coeff[2][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+plt.figure()
+mne.viz.plot_topomap(pca_coeff[2][2,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+
+
+
+    
 
 #ICA decomposition of Ht
 ica_sp = []
@@ -324,7 +347,7 @@ ica_coeff_nf = []
 #ica_expVar_nf = []
 
 for m in range(len(Ht)):
-    ica = FastICA(n_components=2)
+    ica = FastICA(n_components=n_comp)
     ica.fit(Ht[m])
     ica_space = ica.fit_transform(Ht[m].T)
     
@@ -335,11 +358,11 @@ for m in range(len(Ht)):
     ica_fft.append(ica_f)
     ica_phase.append(np.unwrap(np.angle(ica_f),axis=0))
     ica_coeff.append(ica.components_)
-    #ica_expVar.append(ica.explained_variance_ratio_)
+    #ica_expVar.ap pend(ica.explained_variance_ratio_)
     
 for n in range(len(Htnf)):
     
-    ica = FastICA(n_components=2)
+    ica = FastICA(n_components=n_comp)
     ica.fit(Ht[m])
     ica_space = ica.fit_transform(Htnf[m].T)
     
@@ -376,12 +399,14 @@ for m in range(len(ica_sp)):
     fig.suptitle('ICA ' + labels[m])    
     
     
-vmin = -4
-vmax = 4
+vmin = ica_coeff[2].mean() - 2 * ica_coeff[2].std()
+vmax = ica_coeff[2].mean() + 2 * ica_coeff[2].std()
 plt.figure()
-mne.viz.plot_topomap(ica_coeff[3][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+mne.viz.plot_topomap(ica_coeff[2][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
 plt.figure()
-mne.viz.plot_topomap(ica_coeff[3][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+mne.viz.plot_topomap(ica_coeff[2][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+plt.figure()
+mne.viz.plot_topomap(ica_coeff[2][2,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
 

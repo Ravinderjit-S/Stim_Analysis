@@ -17,6 +17,9 @@ import os
 import spectralAnalysis as sa
 import scipy.io as sio
 from anlffr.spectral import mtplv
+from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA
+
 
 
 
@@ -109,8 +112,8 @@ t2 = t1 + mseq.size
 # coh_1 = epochs_2.get_data(picks=31)
 # coh_1 = coh_1[:,0,t1:t2].T
 
-coh_0_ = epochs_1.get_data()[:,picks,t1:t2].transpose(1,0,2)
-coh_1_ = epochs_2.get_data()[:,picks,t1:t2].transpose(1,0,2)
+coh_0_ = epochs_1.get_data()[:,:32,t1:t2].transpose(1,0,2)
+coh_1_ = epochs_2.get_data()[:,:32,t1:t2].transpose(1,0,2)
 
 
 #%% Remove epochs with large deflections
@@ -136,39 +139,80 @@ coh_1_ = coh_1_[:,:trials_even,:]
 Resp_0 = coh_0_.mean(axis=1)
 Resp_1 = coh_1_.mean(axis=1)
 
+fs = epochs_1.info['sfreq']
+tt = np.arange(0,mseq.size/fs,1/fs)
+
+tend = 0.5
+ind_tend = np.where(tt>=tend)[0][0]
+
 Ht_0 = np.zeros(Resp_0.shape)
 Ht_1 = np.zeros(Resp_1.shape)
 for ch in range(Ht_0.shape[0]):
     Ht_0[ch,:] = np.correlate(Resp_0[ch,:], mseq[0,:],mode='full')[mseq.size-1:]
     Ht_1[ch,:] = np.correlate(Resp_1[ch,:],mseq[0,:],mode='full')[mseq.size-1:]
 
-fs = epochs_1.info['sfreq']
-tt = np.arange(0,mseq.size/fs,1/fs)
-plt.figure()
-plt.plot(tt,Ht_0.T)
-
-plt.figure()
-plt.plot(tt,Ht_1.T)
-
-
-tend = 0.5
-ind_tend = np.where(tt>=tend)[0][0]
 Ht_0 = Ht_0[:,:ind_tend]
 Ht_1 = Ht_1[:,:ind_tend]
+tt = tt[:ind_tend]
+
+sbp = [4,4]
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(tt,Ht_1[p1*sbp[1]+p2,:])
+        axs[p1,p2].set_title(p1*sbp[1]+p2+1)    
+fig.suptitle('Ht1')
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(tt,Ht_1[p1*sbp[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].set_title(p1*sbp[1]+p2+1+sbp[0]*sbp[1])    
+fig.suptitle('Ht1')
+
+sbp = [4,4]
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(tt,Ht_0[p1*sbp[1]+p2,:])
+        axs[p1,p2].set_title(p1*sbp[1]+p2+1)    
+fig.suptitle('Ht0')
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(tt,Ht_0[p1*sbp[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].set_title(p1*sbp[1]+p2+1+sbp[0]*sbp[1])    
+fig.suptitle('Ht0')
+
+
+
 nfft = 2**np.log2(Ht_0.size)
 Hf_0 = sp.fft(Ht_0,n=nfft,axis=1)
 Hf_1 = sp.fft(Ht_1,n=nfft,axis=1)
 f = np.arange(0,fs,fs/nfft)
 
-plt.figure()
-plt.plot(f,np.abs(Hf_0).T)
-
-plt.figure()
-plt.plot(f,np.abs(Hf_1).T)
 
 plt.figure()
 plt.plot(f,np.abs(Hf_0).T,color='r')
 plt.plot(f,np.abs(Hf_1).T,color='b')
+
+
+pca = PCA(n_components=2)
+pca.fit(Ht_1)
+pca_space = pca.fit_transform(Ht_1.T)
+
+pca2 = PCA(n_components=2)
+pca2.fit(Ht_0)
+pca_space2 = pca2.fit_transform(Ht_0.T)
+
+plt.figure()
+plt.plot(tt,pca_space)
+
+plt.figure()
+plt.plot(tt,pca_space2)
+
+
 
 
 
@@ -179,9 +223,9 @@ plt.plot(f,np.abs(Hf_1).T,color='b')
 #%% Compute Coherence/PLV
 
 
-TW = 12
-Fres = (1/t[-1]) * TW * 2
-fs = epochs_1.info['sfreq']
+# TW = 12
+# Fres = (1/t[-1]) * TW * 2
+# fs = epochs_1.info['sfreq']
 
 # PLV_coh0, Coh_coh0, f = PLV_Coh(mseq,coh_0,TW,fs)
 # PLV_coh1, Coh_coh1, f = PLV_Coh(mseq,coh_1,TW,fs)
@@ -198,18 +242,18 @@ fs = epochs_1.info['sfreq']
 #del data_eeg, data_evnt, epochs_1, epochs_2, blinks, blink_epochs,evkd_1,evkd_2
 
 
-params=dict()
-params['Fs'] = fs
-params['tapers'] = [12,2*12-1]
-params['fpass'] = [1,100]
-params['itc'] = 0
+# params=dict()
+# params['Fs'] = fs
+# params['tapers'] = [12,2*12-1]
+# params['fpass'] = [1,100]
+# params['itc'] = 0
 
-plvtap_1, f = mtplv(coh_0_,params)
-plvtap_2, f = mtplv(coh_1_,params)
+# plvtap_1, f = mtplv(coh_0_,params)
+# plvtap_2, f = mtplv(coh_1_,params)
 
-plt.figure()
-plt.plot(f,plvtap_1.T[:,2],color='b')
-plt.plot(f,plvtap_2.T[:,2],color='r')
+# plt.figure()
+# plt.plot(f,plvtap_1.T[:,2],color='b')
+# plt.plot(f,plvtap_2.T[:,2],color='r')
 
 
 
