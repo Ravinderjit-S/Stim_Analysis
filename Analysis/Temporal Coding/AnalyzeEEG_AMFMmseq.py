@@ -8,7 +8,6 @@ Created on Mon Mar 16 10:21:25 2020
 
 import numpy as np
 import scipy as sp
-import pylab as pl
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import mne
@@ -18,8 +17,8 @@ from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
 
-from anlffr.spectral import mtspecraw
-from anlffr.spectral import mtplv
+# from anlffr.spectral import mtspecraw
+# from anlffr.spectral import mtplv
 
 
 

@@ -51,6 +51,7 @@ def PLV_Coh(X,Y,TW,fs):
 
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles')
+data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32')
 
 Mseq_mat = sio.loadmat(direct_Mseq)
 Mseq = Mseq_mat['Mseq_sig'].T
@@ -71,10 +72,10 @@ for subj in range(0,len(Subjects)):
     
     t = IAC_epochs.times
     fs = IAC_epochs.info['sfreq']
-    IAC32 = IAC_epochs.get_data()
-    ITD32 = ITD_epochs.get_data()
-    IAC32 = IAC32.T[:,0,:]
-    ITD32 = ITD32.T[:,0,:]
+    IAC_ep = IAC_epochs.get_data()
+    ITD_ep = ITD_epochs.get_data()
+    IAC32_ep = IAC32.T[:,0,:]
+    ITD32_ep = ITD32.T[:,0,:]
     
     #%% Plot PSD, should be clear ASSR at 20 Hz
     

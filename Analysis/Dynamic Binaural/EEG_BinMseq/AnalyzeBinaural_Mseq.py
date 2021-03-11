@@ -36,7 +36,7 @@ direct_ITD = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/ITDt/'
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
 
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/')
-pickles_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles/')
+pickles_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/')
 fig_format = 'png'
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
@@ -50,6 +50,8 @@ for s in range(0,len(Subjects)):
     print('\n\n\n\n' + Subject + '\n\n\n\n')
     IAC_eeg,IAC_evnt = EEGconcatenateFolder(direct_IAC+Subject+'/',nchans,refchans,exclude)
     ITD_eeg,ITD_evnt = EEGconcatenateFolder(direct_ITD+Subject+'/',nchans,refchans,exclude)
+    
+    
     IAC_eeg.filter(1,40)
     ITD_eeg.filter(1,40)
     
@@ -114,11 +116,12 @@ for s in range(0,len(Subjects)):
     
     StimIAC_epochs = mne.Epochs(IAC_eeg,IAC_evnt,1,tmin=-0.5,tmax=14,proj=True,baseline=(-0.2, 0.),reject=None)
     StimIAC_evoked = StimIAC_epochs.average()
-    StimIAC_evoked.plot(picks=channels,titles ='IACt_evoked')
+    # StimIAC_evoked.plot(picks=channels,titles ='IACt_evoked')
     
     StimITD_epochs = mne.Epochs(ITD_eeg,ITD_evnt,1,tmin=-0.5,tmax=14,proj=True,baseline=(-0.2, 0.),reject=None)
     StimITD_evoked = StimITD_epochs.average()
-    StimITD_evoked.plot(picks=channels,titles ='ITDt_evoked')
+    # StimITD_evoked.plot(picks=channels,titles ='ITDt_evoked')
+    
     
     # StimIAC_epochs = mne.Epochs(IAC_eeg,IAC_evnt,1,tmin=-0.2,tmax=12.75,baseline=(-0.2, 0.),proj=True)
     # StimIAC_evoked = StimIAC_epochs.average()
@@ -136,10 +139,10 @@ for s in range(0,len(Subjects)):
     # plt.plot(Mseq)
     
     
-    StimIAC_epochs.load_data()
-    StimITD_epochs.load_data()
-    StimIAC_epochs.pick_channels(['A32'])
-    StimITD_epochs.pick_channels(['A32'])
+
+    # StimIAC_epochs.pick_channels(['A32'])
+    # StimITD_epochs.pick_channels(['A32'])
+    
     # t = StimIAC_epochs.times
     # IAC32 = StimIAC_epochs.get_data()
     # ITD32 = StimITD_epochs.get_data()
@@ -160,6 +163,11 @@ for s in range(0,len(Subjects)):
     # plt.plot(t,ITD32.mean(axis=1)*1e6)
     # plt.title('ITD evoked')
     
+    StimIAC_epochs.decimate(2) #files are a bit too big so downsampling by factor of 2
+    StimITD_epochs.decimate(2)
+    StimIAC_epochs.load_data()
+    StimITD_epochs.load_data()
+
     
     with open(os.path.join(pickles_path, Subject + '_DynBin.pickle'),'wb') as f:
         pickle.dump([StimIAC_epochs,StimITD_epochs],f)
