@@ -37,6 +37,9 @@ All_ITDhf = np.zeros([41,len(Subjects)])
 All_PlvIAC = np.zeros([65536,len(Subjects)])
 All_PlvITD = np.zeros([65536,len(Subjects)])
 
+All_phaseIAC = np.zeros([65536,len(Subjects)])
+All_phaseITD = np.zeros([65536,len(Subjects)])
+
 
 All_CohIAC_nfs = np.zeros([65536,100])
 All_CohITD_nfs = np.zeros([65536,100])
@@ -46,8 +49,8 @@ All_PlvITD_nfs = np.zeros([65536,100])
 All_IAChf_nfs = np.zeros([41,100])
 All_ITDhf_nfs = np.zeros([41,100])
 
-# fig_IACht,ax_IACht = plt.subplots(3,3,sharex=True)
-# fig_ITDht,ax_ITDht = plt.subplots(3,3,sharex=True)
+fig_IACht,ax_IACht = plt.subplots(3,3,sharex=True)
+fig_ITDht,ax_ITDht = plt.subplots(3,3,sharex=True)
 # fig_IAChf,ax_IAChf = plt.subplots(3,3,sharex=True)
 # fig_ITDhf,ax_ITDhf = plt.subplots(3,3,sharex=True)
 # fig_IACcoh,ax_IACcoh = plt.subplots(3,3,sharex=True)
@@ -57,29 +60,30 @@ All_ITDhf_nfs = np.zeros([41,100])
 for sub in range(0,len(Subjects)):
     Subject = Subjects[sub]
 
-    with open(os.path.join(data_loc, Subject+'_DynBin_SysFunc.pickle'),'rb') as f:     
+    with open(os.path.join(data_loc, Subject+'_DynBin_SysFuncTW10.pickle'),'rb') as f:     
         IAC_Ht, IAC_nfs, IAC_Hf, NF_Hfs_IAC, PLV_IAC, Coh_IAC, PLVnf_IAC, Cohnf_IAC, \
-        ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t = pickle.load(f)
+        ITD_Ht, ITD_nfs, ITD_Hf, NF_Hfs_ITD, PLV_ITD, Coh_ITD, PLVnf_ITD, Cohnf_ITD, f1,f2,t, phase_IAC, phase_ITD = pickle.load(f)
         
     ax_row = int(np.floor(sub/3))
     ax_col = int(np.mod(sub,3))
     
     #%% Plot Stuff for each Subject
-    # ax_IACht[ax_row,ax_col].plot(t,IAC_nfs.T,color= mcolors.CSS4_COLORS['grey'])
-    # ax_IACht[ax_row,ax_col].plot(t,IAC_Ht,color='k')
-    # ax_IACht[ax_row,ax_col].set_xlim([0,1])
-    # ax_IACht[ax_row,ax_col].set_title(Subject + ' Ht IAC')
+    ax_IACht[ax_row,ax_col].plot(t,IAC_nfs.T,color= mcolors.CSS4_COLORS['grey'])
+    ax_IACht[ax_row,ax_col].plot(t,IAC_Ht,color='k')
+    ax_IACht[ax_row,ax_col].set_xlim([0,1])
+    ax_IACht[ax_row,ax_col].set_title(Subject + ' Ht IAC')
     
-    # ax_ITDht[ax_row,ax_col].plot(t,ITD_nfs.T,color= mcolors.CSS4_COLORS['grey'])
-    # ax_ITDht[ax_row,ax_col].plot(t,ITD_Ht,color='k')
-    # ax_ITDht[ax_row,ax_col].set_xlim([0,1])
-    # ax_ITDht[ax_row,ax_col].set_title(Subject + ' Ht ITD')
+    ax_ITDht[ax_row,ax_col].plot(t,ITD_nfs.T,color= mcolors.CSS4_COLORS['grey'])
+    ax_ITDht[ax_row,ax_col].plot(t,ITD_Ht,color='k')
+    ax_ITDht[ax_row,ax_col].set_xlim([0,1])
+    ax_ITDht[ax_row,ax_col].set_title(Subject + ' Ht ITD')
     
     # ax_IAChf[ax_row,ax_col].plot(f1,10*np.log10(NF_Hfs_IAC.T),color= mcolors.CSS4_COLORS['grey'])
     # ax_IAChf[ax_row,ax_col].plot(f1,10*np.log10(IAC_Hf),color='k')
     # ax_IAChf[ax_row,ax_col].set_xlim([1,20])
     # ax_IAChf[ax_row,ax_col].set_title(Subject + ' CrossCorr IAC')
     # ax_IAChf[ax_row,ax_col].set_xscale('log')
+    
         
     # ax_ITDhf[ax_row,ax_col].plot(f1,10*np.log10(NF_Hfs_ITD.T),color= mcolors.CSS4_COLORS['grey'])
     # ax_ITDhf[ax_row,ax_col].plot(f1,10*np.log10(ITD_Hf),color='k')
@@ -114,6 +118,9 @@ for sub in range(0,len(Subjects)):
     All_PlvIAC[:, sub] = PLV_IAC
     All_PlvITD[:, sub] = PLV_ITD
     
+    All_phaseIAC[:,sub] = phase_IAC
+    All_phaseITD[:,sub] = phase_ITD
+    
     
     All_CohIAC_nfs += Cohnf_IAC / len(Subjects)
     All_CohITD_nfs += Cohnf_ITD / len(Subjects)
@@ -121,8 +128,14 @@ for sub in range(0,len(Subjects)):
     All_PlvITD_nfs += PLVnf_ITD / len(Subjects)
     All_IAChf_nfs += NF_Hfs_IAC.T / len(Subjects)
     All_ITDhf_nfs += NF_Hfs_ITD.T / len(Subjects)
+
     
     
+#%% Plot Responses
+
+plt.figure()
+plt.plot(f2,All_PlvIAC)
+
 #%%  Average across subjects
 # z = (x-u) / sigma
 
@@ -134,6 +147,27 @@ ZITD_plv, ZITD_plv_sem = Zscore(All_PlvITD,All_PlvITD_nfs)
 
 ZIAC_Hf, ZIAC_Hf_sem = Zscore(10*np.log10(All_IAChf),10*np.log10(All_IAChf_nfs))
 ZITD_Hf, ZITD_Hf_sem = Zscore(10*np.log10(All_ITDhf),10*np.log10(All_ITDhf_nfs))
+
+All_cohIAC_sem = All_CohIAC.std(axis=1) / np.sqrt(All_CohIAC.shape[1])
+font_size = 30
+fig,ax = plt.subplots(figsize=(12,9))
+ax.plot(f2,All_CohIAC.mean(axis=1),color='k',linewidth=2)
+conf = ax.fill_between(f2,All_CohIAC.mean(axis=1) + 1.96*All_cohIAC_sem, All_CohIAC.mean(axis=1) - 1.96*All_cohIAC_sem,
+                 color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+
+ax.plot(f2,All_CohIAC_nfs,color='lightcoral')
+ax.set_xlim([1,17])
+ax.set_ylim([0.05,0.105])
+ax.set_xscale('log')
+plt.xticks([1,10],['1','10',],fontsize=font_size)
+plt.yticks([0.06, 0.08, 0.10],fontsize=font_size)
+ax.set_ylabel('Coherence', fontsize=font_size)
+ax.set_xlabel('Binaural Modulation Frequency', fontsize=font_size)
+plt.legend(['Response 95% CI','Noise Floors'], fontsize=18,frameon=False)
+plt.title('IAC Tracking via EEG',fontsize=font_size)
+plt.tight_layout()
+fig.savefig(os.path.join(fig_path,'IAC_rawcoh_poster.png'),format='png')
+
 
 
 fig, ax = plt.subplots()
@@ -213,6 +247,30 @@ fig.savefig(os.path.join(fig_path,'ITD_coh.eps'),format='eps')
 fig.savefig(os.path.join(fig_path,'ITD_coh.png'),format='png')
 fig.savefig(os.path.join(fig_path,'ITD_coh.svg'),format='svg')
 
+#Figure for poster
+font_size = 30
+fig, ax = plt.subplots(figsize=(10,7))
+resp = ax.plot(f2,ZIAC_coh, color='black', linewidth=2, label='Response')
+conf = ax.fill_between(f2,ZIAC_coh + 1.96*ZIAC_coh_sem, ZIAC_coh - 1.96*ZIAC_coh_sem,
+                 color=mcolors.CSS4_COLORS['grey'],alpha=0.7,linewidth=0, label='95% Confidence')
+ax.set_xlim([1,15])
+ax.set_ylim([0,18])
+ax.set_xscale('log')
+ax.set_ylabel('Coherence (Zscore re: NoisFloor)', fontsize=font_size)
+ax.set_xlabel('Frequency (Hz)',fontsize=font_size)
+#ax.legend()
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.yaxis.set_ticks_position('left')
+ax.xaxis.set_ticks_position('bottom')
+plt.xticks([1,10],['1','10',],fontsize=font_size)
+plt.yticks([2, 8, 14],fontsize=font_size)
+plt.title('IAC Tracking via EEG',fontsize=font_size)
+plt.tight_layout()
+#fig.savefig(os.path.join(fig_path,'IAC_coh.eps'),format='eps')
+fig.savefig(os.path.join(fig_path,'IAC_coh_poster.png'),format='png')
+#fig.savefig(os.path.join(fig_path,'IAC_coh.svg'),format='svg')
+
 
 # plt.figure()
 # plt.plot(f1,ZIAC_Hf)
@@ -243,6 +301,21 @@ f_index = np.arange(f_1,f_15)
 
 IAC_fmax = f2[ZIAC_coh[f_index].argmax() +f_1]
 ITD_fmax = f2[ZITD_coh[f_index].argmax() + f_1]
+
+#%% Phase Response
+fig, ax = plt.subplots()
+ax.plot(f2,All_phaseIAC)
+plt.title('Phase IAC')
+plt.xlim([0,20])
+plt.ylim([-4,4])
+
+fig, ax = plt.subplots()
+ax.plot(f2,All_phaseITD.mean(axis=1))
+plt.title('Phase ITD')
+plt.xlim([0,20])
+plt.ylim([-4,4])
+
+
 
 
 

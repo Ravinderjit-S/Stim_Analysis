@@ -10,8 +10,8 @@ function [stim] = FM_phi(f1,f2,fs,tlen,fm,phi_deg,dichotic,ref)
 %ref = (boolean) add a reference for participants to hear before the 3-AFC
 
 
-dF1 = f1 * 0.05;
-dF2 = f2 * 0.05;
+dF1 = f1 * 0.1;
+dF2 = f2 * 0.1;
 
 phi_rad = (phi_deg/360) * 2*pi;
 t = 0:1/fs:tlen-1/fs;

@@ -50,7 +50,7 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-trial_cond = 64
+trial_cond = 128
 test_cond = 1 #use this for testing accuracy in flow of experiment
 
 json_fname = 'Demo_AMphi_AM_diotic' + str(trial_cond) + '.json'

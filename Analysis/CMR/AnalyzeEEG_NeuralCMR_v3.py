@@ -28,6 +28,7 @@ data_evnt = [];
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
 subject = 'S211_plus12dB_tpsd'
+#subject = 'SVarsha'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
@@ -59,7 +60,7 @@ data_eeg.plot(events=blinks,show_options=True)
 #           '2-10 coh 0','2-10 coh 1']
 #labels = ['6 coh 0', '6 coh 1', '40 coh 0','40 coh 1']
 labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
-
+#labels = ['223 coh 0', '223 coh 1', '40 coh 0','40 coh 1']
 
 tmin = -0.5
 tmax = 4.5
@@ -100,28 +101,28 @@ data_3 = evkd_3.data
 data_4 = evkd_4.data
 
 
-nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
+# nfft = 2**np.ceil(np.log(data_1[picks,:].size)/np.log(2))
 
-pxx = np.zeros((int(nfft/2),34,9))
-f,p1 = sa.periodogram(data_1.T, fs, nfft)
-pxx[:,:,0] = p1.squeeze()
-f,p1 = sa.periodogram(data_2.T, fs, nfft)
-pxx[:,:,1] = p1.squeeze()
-f,p1 = sa.periodogram(data_3.T, fs, nfft)
-pxx[:,:,2] = p1.squeeze()
-f,p1 = sa.periodogram(data_4.T, fs, nfft)
-pxx[:,:,3] = p1.squeeze()
+# pxx = np.zeros((int(nfft/2),34,9))
+# f,p1 = sa.periodogram(data_1.T, fs, nfft)
+# pxx[:,:,0] = p1.squeeze()
+# f,p1 = sa.periodogram(data_2.T, fs, nfft)
+# pxx[:,:,1] = p1.squeeze()
+# f,p1 = sa.periodogram(data_3.T, fs, nfft)
+# pxx[:,:,2] = p1.squeeze()
+# f,p1 = sa.periodogram(data_4.T, fs, nfft)
+# pxx[:,:,3] = p1.squeeze()
 
 
 
     
-for j in np.arange(4):
-    plt.figure()
-    plt.plot(f,10*np.log10(pxx[:,:,j]))
-    plt.title(labels[j])
-    plt.legend(np.arange(32))
-#     plt.plot(f,10*np.log10(pxx[j,:]))
+# for j in np.arange(4):
+#     plt.figure()
+#     plt.plot(f,10*np.log10(pxx[:,:,j]))
 #     plt.title(labels[j])
+#     plt.legend(np.arange(32))
+# #     plt.plot(f,10*np.log10(pxx[j,:]))
+# #     plt.title(labels[j])
 
 
 # stim_loc = '/media/ravinderjit/Data_Drive/Stim_Analysis/Stimuli/CMR/SNR_plus9/target_mods_9dB.mat'
@@ -141,8 +142,6 @@ t = t[t1:t2]
 # target_mods[1,:] = np.sin(2*np.pi*40*t)
 
 
-
-
 dat_epochs_1 = epochs_1.get_data()
 dat_epochs_2 = epochs_2.get_data()
 dat_epochs_3 = epochs_3.get_data()
@@ -158,7 +157,7 @@ dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
 
 params = dict()
 params['Fs'] = fs
-params['tapers'] = [1,2*1-1]
+params['tapers'] = [2,2*2-1]
 params['fpass'] = [1,300]
 params['itc'] = 0
 
@@ -169,18 +168,32 @@ plvtap_3, f = mtplv(dat_epochs_3,params)
 plvtap_4, f = mtplv(dat_epochs_4,params)
 
 
+fig, ax = plt.subplots(figsize=(5.5,5))
+ax.plot(f,plvtap_4.T,label='CORR',linewidth=2,color='b')
+ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2,color='r')
+
 np.max(plvtap_4[:,150:167],axis=1)
 
 fig, ax = plt.subplots(figsize=(5.5,5))
 fontsize=15
-ax.plot(f,plvtap_4[30,:],label='Coh',linewidth=2)
-ax.plot(f,plvtap_3[30,:],label='Incoh',linewidth=2)
+ax.plot(f,plvtap_4[30,:],label='CORR',linewidth=2)
+ax.plot(f,plvtap_3[30,:],label='ACORR',linewidth=2)
 ax.legend(fontsize=fontsize)
 plt.xlabel('Frequency (Hz)',fontsize=fontsize,fontweight='bold')
 #plt.ylabel('PLV',fontsize=fontsize,fontweight='bold')
 plt.xlim((35,45))
 plt.xticks([35,40,45],fontsize=fontsize)
 plt.yticks([0,0.04,0.08],fontsize=fontsize)
+
+
+fig, ax = plt.subplots(figsize=(5.5,5))
+fontsize=15
+ax.plot(f,plvtap_4.T,label='CORR',linewidth=2,color='b')
+ax.plot(f,plvtap_3.T,label='ACORR',linewidth=2,color='r')
+
+plt.figure()
+plt.plot(f,plvtap_1.T)
+plt.title(labels[0])
 
 plt.figure()
 plt.plot(f,plvtap_2.T)
@@ -239,7 +252,9 @@ plt.title(labels[3])
 #     PLVn_Y1, Cohn_Y1, f = sa.PLV_Coh(targMod,Y_1,TW,fs)
 #     Cohnf_2[:,nf] = Cohn_Y1
     
-#     data_nf = dat_epochs_3
+#     data_nf = dat_epochs_3fig,ax = plt.subplots()
+ax.plot(f,plvtap_1.T,color='r')
+ax.plot(f,plvtap_2.T,color='b')
 #     targMod = target_mods[2,:]
 #     order = np.random.permutation(data_nf.shape[1])
 #     Y_1 = data_nf[:,order]
@@ -295,7 +310,9 @@ plt.title(labels[3])
 #     PLVn_Y1, Cohn_Y1, f = sa.PLV_Coh(targMod,Y_1,TW,fs)
 #     Cohnf_8[:,nf] = Cohn_Y1
 
-    
+fig,ax = plt.subplots()
+ax.plot(f,plvtap_1.T,color='r')
+ax.plot(f,plvtap_2.T,color='b')
 
 # NF_4 = np.concatenate((Cohnf_1,Cohnf_4),axis=1)  
 # NF_4_bot = NF_4.mean(axis=1) - 2*NF_4.std(axis=1)

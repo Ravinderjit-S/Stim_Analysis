@@ -1,6 +1,10 @@
+%test CMRrandMod_mseqTarget
+
 clear
 path = '../CommonExperiment';
 addpath(genpath(path));
+
+load('mseqEEG_80.mat'); %loads mseqEEG,
 
 fs = 48828;
 tlen = 2;
@@ -11,20 +15,18 @@ ERBspacing = 1.5;
 target_f = 4000;
 noise_bands = CMRbands(target_f, ERB_halfwidth, ERBspacing);
 
-SNRdb = -10;
+
+SNRdb = 12;
 mod_band = [2 10];
-target_modf = 40;
 
 coh = 0;
-bp_mod_fo = 1/2 * 5 *fs; %filter order for slowest modulation instance ... keep same sharpness for all modulation filters so setting here
 
 tic()
-[Sig] = CMR_randMod(noise_bands,target_f,SNRdb,mod_band,target_modf,fs,tlen,coh);
+[Sig] = CMRrandMod_mseqTargetMod(noise_bands,target_f,SNRdb,mod_band,fs,coh,mseqEEG,Point_len);
 toc()
 
 soundsc(Sig,fs)
 
 figure,pmtm(Sig,2.5,[],fs)
 figure,spectrogram(Sig,round(0.02*fs),round(0.02*fs*.8),2000:1:7000,fs,'yaxis')
-
 

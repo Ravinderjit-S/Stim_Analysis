@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 19 23:41:41 2020
+Created on Sat Aug 29 20:34:09 2020
 
 @author: ravinderjit
 """
 
+
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jul 27 11:48:44 2020
+Author: Ravinderjit Singh
+"""
 
 import json
 import dropbox
@@ -44,10 +50,10 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-trial_cond = 32
+trial_cond = 64
 test_cond = 1 #use this for testing accuracy in flow of experiment
 
-json_fname = 'Demo_FMphi_' + str(trial_cond) + '.json'
+json_fname = 'Demo_AMIncohphi_AM' + str(trial_cond) + '.json'
 instructions = ["Welcome to the Demo! "]
 feedback = True
 holdfeedback = False
@@ -58,16 +64,17 @@ randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path_demo = '/OnlineStimWavs/FMphi/DEMO_FMphi_' + str(trial_cond) # Path to folder in dropbox
-folder_path_prac = '/OnlineStimWavs/FMphi/DEMOprac_FMphi_' + str(trial_cond) 
+folder_path_demo = '/OnlineStimWavs/AMIncohphi_diotic/DEMO_AMIncohphi_' + str(trial_cond) # Path to folder in dropbox
+folder_path_prac = '/OnlineStimWavs/AMIncohphi_diotic/DEMOprac_AMIncohphi_' + str(trial_cond) 
 trial_plugin = 'hari-audio-button-response'
 trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-demo_info_file = loadmat('DEMO_StimData_' + str(trial_cond) + '.mat') #update this in folder 
-demo_prac_file = loadmat('DEMOprac_StimData_' + str(trial_cond) + '.mat')
+demo_info_file = loadmat('DEMO_StimData_diotic' + str(trial_cond) + '.mat') #update this in folder 
+demo_prac_file = loadmat('DEMOprac_StimData_Incohdiotic' + str(trial_cond) + '.mat')
 demo_correct_answers = demo_info_file['correct'].squeeze()
 prac_correct_answers = demo_prac_file['correct_k'].squeeze()
 phi_annotation = demo_info_file['phis'].squeeze()
+
 
 
 data = {}
@@ -125,7 +132,8 @@ data['trials'].append({
         'plugin': 'html-button-response',
         'prompt': 'INSTRUCTIONS: You will hear a reference stimlus followed by three more stimuli. '
         'Your goal is to detect the stimulus most different from the reference. <br> '
-        'To DETECT this difference, try focusing on the middle of each stimulus interval ',
+        'To DETECT this difference, try focusing on the middle of each stimulus interval. '
+        'Also focus on the temporal aspects of the stimulus like how out of synch the beeps may be ',
         'choices': ['Continue']
         })
 
@@ -209,3 +217,9 @@ with open(json_fname, 'w') as outfile:
 
         
             
+            
+            
+    
+
+
+\

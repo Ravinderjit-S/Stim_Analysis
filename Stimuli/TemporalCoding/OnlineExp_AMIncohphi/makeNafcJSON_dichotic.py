@@ -25,7 +25,7 @@ def getFiles(folder_path):
     wavFiles = []
     for x in range(len(fentries)):
         fname = fentries[x].name
-        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='volstim.wav':
+        if fname[len(fname)-4:len(fname)].lower() == '.wav' and fname!='diotic_volstim.wav':
             trial_num.append(int(fname[fname.find('trial_')+6:fname.find('.wav')]))
             wavFiles.append(fname)
     sortIndex = sorted(range(len(trial_num)), key = lambda k: trial_num[k])
@@ -40,31 +40,27 @@ dbx = dropbox.Dropbox(dbxAPIkey)
 
 # Find detailed documentation here https://snaplabonline.com/task/howto/
 
-Mod = [16,24]
-#trial_cond = 1
+AM =64
+trial_cond = 1
 
-json_fname = 'CMR3AFC_FronzenMod_' + str(Mod[0]) + '_' + str(Mod[1]) + '.json'
-
-instructions = ['Welcome to the experiment! <br> You will hear 3 itervals of sound (A,B,C). Your goal is to select the interval with a steady beep<br> '
-                'In some cases the beep will be faint. Try your best! ']
+json_fname = 'AMphi_AMIncoh_dichotic' + str(AM) + '.json'
+instructions = ["Welcome to the actual experiment! "]
 feedback = True
 holdfeedback = False
-feedbackdur = 500 #duration of feedback in ms
+feedbackdur = 750 #duration of feedback in ms
 serveraudio = False
 #estimatedduration: 
 randomize = False #randomize trial order
 isi = 0 # interstimulus interval in ms
 
 
-folder_path = '/OnlineStimWavs/CMR_frozenMod/Mod_' + str(Mod[0]) +'_'+str(Mod[1])  # Path to folder in dropbox
+folder_path = '/OnlineStimWavs/AMIncohphi_diotic/AMIncohphi_' + str(AM) # Path to folder in dropbox
 trial_plugin = 'hari-audio-button-response'
-trial_prompt = 'Select the interval <strong> that contains a steady beep. </strong> <br> Stimuli Order: Stim A, Stim B, Stim C'
+trial_prompt = 'Select the interval <strong> most different from the reference. </strong> <br> Stimuli Order: Reference, Stim A, Stim B, Stim C'
 trial_choices = ['A', 'B', 'C']
-stim_info_file = loadmat('/home/ravinderjit/Documents/OnlineStim_WavFiles/CMR_frozenMod/Mod_' + str(Mod[0]) +'_'+str(Mod[1]) +'/Stim_Data.mat')
+stim_info_file = loadmat('StimData_diotic' + str(AM) + '.mat')
 correct_answers = stim_info_file['correct'].squeeze()
-SNRdB_exp = stim_info_file['SNRdB_exp'].squeeze()
-SNRdB = SNRdB_exp[:,0]
-coh = SNRdB_exp[:,1]
+phi_annotation = stim_info_file['phis'].squeeze()
 
 
 
@@ -77,7 +73,7 @@ data['serveraudio'] = serveraudio
 data['randomize'] = randomize
 data['isi'] = isi
 
-flink = dbx.sharing_create_shared_link(folder_path+'/volstim.wav')
+flink = dbx.sharing_create_shared_link(folder_path+'/diotic_volstim.wav')
 dd_link = dlURL(flink.url) 
 
 data['volume'] = []
@@ -118,10 +114,7 @@ data['volume'].append({
 
 
 wavFiles = getFiles(folder_path)
-# wavFiles = wavFiles[-1::-1] #go from easy to hard
-# SNRdB = SNRdB[-1::-1]
-# coh = coh[-1::-1]
-# correct_answers = correct_answers[-1::-1]
+
 data['trials'] = []
 for i in range(len(wavFiles)):
     flink = dbx.sharing_create_shared_link(folder_path+'/'+wavFiles[i])
@@ -130,10 +123,10 @@ for i in range(len(wavFiles)):
         'plugin': trial_plugin,
         'prompt': trial_prompt,
         'choices': trial_choices,
-        'answer': int(correct_answers[i]),
+        'answer': int(correct_answers[i])-1,
         'stimulus': dd_link,
-        'cond': int(coh[i]+1),
-        'annot': {'SNR': int(SNRdB[i])}
+        'cond': trial_cond,
+        'annot': {'phi': int(phi_annotation[i])}
         })
     
 

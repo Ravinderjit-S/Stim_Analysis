@@ -18,6 +18,7 @@ noise_bands = CMRbands(target_f, ERB_halfwidth, ERBspacing);
 SNRdB_1 = 4:-6:-38;
 SNRdB_2 = 6:-6:-30; 
 mod_bands = [2 10; 36 44; 131 139];
+mod_bands = [16 24];
 %mod_bands = [12 20; 20 50];
 target_modf = 0;
 bp_mod_fo = 1/2 * 5 *fs;
