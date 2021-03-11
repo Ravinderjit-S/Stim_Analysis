@@ -90,19 +90,9 @@ for m in np.arange(len(AMf)):
 AMlabels = []
 for AM in AMf: AMlabels.append(str(AM))
 plt.figure()
-<<<<<<< HEAD
 plt.semilogx(AMf,tmtf_plv.T)
 plt.xticks(ticks=AMf,labels=AMlabels)
 plt.title('TMTF_PLV')
-#plt.xlim((0,1000))
-=======
-plt.plot(np.log2(AMf),tmtf_plv.T)
-plt.xlim((0,1000))
-plt.xticks(ticks=np.log2(AMf),labels=AMlabels)
-plt.title('TMTF_PLV')
-
->>>>>>> 3fbb9c529c19c9cd43f4b71bb499f8d58d83869a
-    
 
 fs = epochs_all[0].info['sfreq']
 nfft = int(2**np.ceil(np.log2(epoch_dat[0].shape[2])))
