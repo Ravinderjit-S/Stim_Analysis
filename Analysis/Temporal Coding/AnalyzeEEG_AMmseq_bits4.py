@@ -96,6 +96,7 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A10') #Channel A10 bad in S211
     elif subject == 'S207':
         data_eeg.info['bads'].append('A15') 
+        data_eeg.info['bads'].append('A17') 
     elif subject =='S228':
         data_eeg.info['bads'].append('EXG1') 
         data_eeg.info['bads'].append('A30')

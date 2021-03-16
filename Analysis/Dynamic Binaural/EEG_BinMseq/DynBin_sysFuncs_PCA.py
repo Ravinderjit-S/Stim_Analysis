@@ -41,7 +41,7 @@ Num_noiseFloors = 100
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
-#Subjects = ['S132']
+Subjects = ['S208']
 tend = 2 #keep Ht until
 tend_ind =  round(tend*2048) -1 
 
@@ -99,15 +99,15 @@ for subj in range(0,len(Subjects)):
     #%% Calculate Ht
     resp_IAC = IAC_ep.mean(axis=1)
     resp_ITD = ITD_ep.mean(axis=1)
-    IAC_Ht = np.zeros(resp_IAC.shape)
-    ITD_Ht = np.zeros(resp_ITD.shape)
+    IAC_Ht = np.zeros([resp_IAC.shape[0],resp_IAC.shape[1]*2-1])
+    ITD_Ht = np.zeros([resp_ITD.shape[0],resp_ITD.shape[1]*2-1])
     for ch in ch_picks:
-        IAC_Ht[ch,:] = np.correlate(resp_IAC[ch,:],Mseq[:,0],mode='full')[Mseq.size-1:]
-        ITD_Ht[ch,:] = np.correlate(resp_ITD[ch,:],Mseq[:,0],mode='full')[Mseq.size-1:]
+        IAC_Ht[ch,:] = np.correlate(resp_IAC[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
+        ITD_Ht[ch,:] = np.correlate(resp_ITD[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
 
-    IAC_Ht = IAC_Ht[:,:tend_ind]
-    ITD_Ht = ITD_Ht[:,:tend_ind]
-    t = t[:tend_ind]
+    # IAC_Ht = IAC_Ht[:,:tend_ind]
+    # ITD_Ht = ITD_Ht[:,:tend_ind]
+    # t = t[:tend_ind]
     
     #%% Calculate Noise Floors
     IAC_Htnf = []
@@ -121,13 +121,13 @@ for subj in range(0,len(Subjects)):
         ITD_nf[:,ITDrnd_inds,:] = - ITD_nf[:,ITDrnd_inds,:]
         resp_IAC_nf = IAC_nf.mean(axis=1)
         resp_ITD_nf = ITD_nf.mean(axis=1)
-        IAC_Htnf_n = np.zeros(resp_IAC_nf.shape)
-        ITD_Htnf_n = np.zeros(resp_ITD_nf.shape)
+        IAC_Htnf_n = np.zeros([resp_IAC_nf.shape[0],resp_IAC_nf.shape[1]*2-1])
+        ITD_Htnf_n = np.zeros([resp_ITD_nf.shape[0],resp_ITD_nf.shape[1]*2-1])
         for ch in ch_picks:
-            IAC_Htnf_n[ch,:] = np.correlate(resp_IAC_nf[ch,:],Mseq[:,0],mode='full')[Mseq.size-1:]
-            ITD_Htnf_n[ch,:] = np.correlate(resp_ITD_nf[ch,:],Mseq[:,0],mode='full')[Mseq.size-1:]
-        IAC_Htnf_n = IAC_Htnf_n[:,:tend_ind]
-        ITD_Htnf_n = ITD_Htnf_n[:,:tend_ind]
+            IAC_Htnf_n[ch,:] = np.correlate(resp_IAC_nf[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
+            ITD_Htnf_n[ch,:] = np.correlate(resp_ITD_nf[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
+        # IAC_Htnf_n = IAC_Htnf_n[:,:tend_ind]
+        # ITD_Htnf_n = ITD_Htnf_n[:,:tend_ind]
         IAC_Htnf.append(IAC_Htnf_n)
         ITD_Htnf.append(ITD_Htnf_n)
     
@@ -191,12 +191,12 @@ for subj in range(0,len(Subjects)):
 
     
     #%% Calculate Hf
-    nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
-    IAC_Hf = sp.fft(IAC_Ht,n=nfft,axis=1)
-    ITD_Hf = sp.fft(ITD_Ht,n=nfft,axis=1)
-    f = np.arange(0,fs,fs/nfft)
-    Phase_IAC = np.unwrap(np.angle(IAC_Hf))
-    Phase_ITD = np.unwrap(np.angle(ITD_Hf))
+    # nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
+    # IAC_Hf = sp.fft(IAC_Ht,n=nfft,axis=1)
+    # ITD_Hf = sp.fft(ITD_Ht,n=nfft,axis=1)
+    # f = np.arange(0,fs,fs/nfft)
+    # Phase_IAC = np.unwrap(np.angle(IAC_Hf))
+    # Phase_ITD = np.unwrap(np.angle(ITD_Hf))
     
     #%% Plot Hf
     
@@ -252,27 +252,27 @@ for subj in range(0,len(Subjects)):
     #%% PCA Decomposition
     
 
-    pca_space_IAC_nf = []
-    pca_f_IAC_nf = []
-    pca_coeffs_IAC_nf =[]
-    pca_expVar_IAC_nf = []
-    n_comp = 2
+    # pca_space_IAC_nf = []
+    # pca_f_IAC_nf = []
+    # pca_coeffs_IAC_nf =[]
+    # pca_expVar_IAC_nf = []
+    # n_comp = 2
     
-    pca = PCA(n_components=n_comp)
-    pca_space_IAC = pca.fit_transform(IAC_Ht.T)
+    # pca = PCA(n_components=n_comp)
+    # pca_space_IAC = pca.fit_transform(IAC_Ht.T)
     
-    nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
-    pca_f_IAC = sp.fft(pca_space_IAC,n=nfft,axis=0)
+    # nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
+    # pca_f_IAC = sp.fft(pca_space_IAC,n=nfft,axis=0)
     
-    pca_expVar_IAC = pca.explained_variance_ratio_
-    pca_coeff_IAC = pca.components_
+    # pca_expVar_IAC = pca.explained_variance_ratio_
+    # pca_coeff_IAC = pca.components_
     
-    for nf in range(num_nfs):
-        pca = PCA(n_components=n_comp)
-        pca_space_IAC_nf.append(pca.fit_transform(IAC_Htnf[nf].T))
-        pca_f_IAC_nf.append(sp.fft(pca_space_IAC_nf[nf],n=nfft,axis=0))
-        pca_expVar_IAC_nf.append( pca.explained_variance_ratio_)
-        pca_coeffs_IAC_nf.append(pca.components_)
+    # for nf in range(num_nfs):
+    #     pca = PCA(n_components=n_comp)
+    #     pca_space_IAC_nf.append(pca.fit_transform(IAC_Htnf[nf].T))
+    #     pca_f_IAC_nf.append(sp.fft(pca_space_IAC_nf[nf],n=nfft,axis=0))
+    #     pca_expVar_IAC_nf.append( pca.explained_variance_ratio_)
+    #     pca_coeffs_IAC_nf.append(pca.components_)
         
 
     # plt.figure()
@@ -298,26 +298,26 @@ for subj in range(0,len(Subjects)):
     # plt.title('Componenet 2 PCA IAC')
     
     
-    pca_space_ITD_nf = []
-    pca_f_ITD_nf = []
-    pca_coeffs_ITD_nf =[]
-    pca_expVar_ITD_nf = []
+    # pca_space_ITD_nf = []
+    # pca_f_ITD_nf = []
+    # pca_coeffs_ITD_nf =[]
+    # pca_expVar_ITD_nf = []
     
-    for nf in range(num_nfs):
-        pca = PCA(n_components=n_comp)
-        pca_space_ITD_nf.append(pca.fit_transform(ITD_Htnf[nf].T))
-        pca_f_ITD_nf.append(sp.fft(pca_space_ITD_nf[nf],n=nfft,axis=0))
-        pca_expVar_ITD_nf.append( pca.explained_variance_ratio_)
-        pca_coeffs_ITD_nf.append(pca.components_)
+    # for nf in range(num_nfs):
+    #     pca = PCA(n_components=n_comp)
+    #     pca_space_ITD_nf.append(pca.fit_transform(ITD_Htnf[nf].T))
+    #     pca_f_ITD_nf.append(sp.fft(pca_space_ITD_nf[nf],n=nfft,axis=0))
+    #     pca_expVar_ITD_nf.append( pca.explained_variance_ratio_)
+    #     pca_coeffs_ITD_nf.append(pca.components_)
 
-    pca = PCA(n_components=n_comp)
-    pca_space_ITD = pca.fit_transform(ITD_Ht.T)
+    # pca = PCA(n_components=n_comp)
+    # pca_space_ITD = pca.fit_transform(ITD_Ht.T)
     
-    nfft = 2**np.ceil(np.log2(ITD_Ht.shape[1]))
-    pca_f_ITD = sp.fft(pca_space_ITD,n=nfft,axis=0)
+    # nfft = 2**np.ceil(np.log2(ITD_Ht.shape[1]))
+    # pca_f_ITD = sp.fft(pca_space_ITD,n=nfft,axis=0)
     
-    pca_expVar_ITD = pca.explained_variance_ratio_
-    pca_coeff_ITD = pca.components_
+    # pca_expVar_ITD = pca.explained_variance_ratio_
+    # pca_coeff_ITD = pca.components_
     
     # plt.figure()
     # plt.plot(t,pca_space_ITD)
@@ -347,38 +347,38 @@ for subj in range(0,len(Subjects)):
 
     
     #%% ICA Decomposition
-    n_comp = 1
+    # n_comp = 1
     
-    ica_space_ITD_nf = []
-    ica_f_ITD_nf = []
-    ica_coeffs_ITD_nf =[]
+    # ica_space_ITD_nf = []
+    # ica_f_ITD_nf = []
+    # ica_coeffs_ITD_nf =[]
     
-    for nf in range(num_nfs):
-        ica = FastICA(n_components=n_comp)
-        ica_space_ITD_nf.append(ica.fit_transform(ITD_Htnf[nf].T))
-        ica_f_ITD_nf.append(sp.fft(ica_space_ITD_nf[nf],n=nfft,axis=0))
-        ica_coeffs_ITD_nf.append(ica.whitening_)
+    # for nf in range(num_nfs):
+    #     ica = FastICA(n_components=n_comp)
+    #     ica_space_ITD_nf.append(ica.fit_transform(ITD_Htnf[nf].T))
+    #     ica_f_ITD_nf.append(sp.fft(ica_space_ITD_nf[nf],n=nfft,axis=0))
+    #     ica_coeffs_ITD_nf.append(ica.whitening_)
         
         
-    ica_space_IAC_nf = []
-    ica_f_IAC_nf = []
-    ica_coeffs_IAC_nf =[]
+    # ica_space_IAC_nf = []
+    # ica_f_IAC_nf = []
+    # ica_coeffs_IAC_nf =[]
     
-    for nf in range(num_nfs):
-        ica = FastICA(n_components=n_comp)
-        ica_space_IAC_nf.append(ica.fit_transform(IAC_Htnf[nf].T))
-        ica_f_IAC_nf.append(sp.fft(ica_space_IAC_nf[nf],n=nfft,axis=0))
-        ica_coeffs_IAC_nf.append(ica.whitening_)
+    # for nf in range(num_nfs):
+    #     ica = FastICA(n_components=n_comp)
+    #     ica_space_IAC_nf.append(ica.fit_transform(IAC_Htnf[nf].T))
+    #     ica_f_IAC_nf.append(sp.fft(ica_space_IAC_nf[nf],n=nfft,axis=0))
+    #     ica_coeffs_IAC_nf.append(ica.whitening_)
         
         
     
-    ica = FastICA(n_components=n_comp)
-    ica_space_IAC = ica.fit_transform(IAC_Ht.T)
+    # ica = FastICA(n_components=n_comp)
+    # ica_space_IAC = ica.fit_transform(IAC_Ht.T)
     
-    nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
-    ica_f_IAC = sp.fft(ica_space_IAC,n=nfft,axis=0)
+    # nfft = 2**np.ceil(np.log2(IAC_Ht.shape[1]))
+    # ica_f_IAC = sp.fft(ica_space_IAC,n=nfft,axis=0)
     
-    ica_coeff_IAC = ica.whitening_
+    # ica_coeff_IAC = ica.whitening_
     
     # plt.figure()
     # plt.plot(t,ica_space_IAC)
@@ -401,13 +401,13 @@ for subj in range(0,len(Subjects)):
     # plt.title('ICA IAC')
 
 
-    ica = FastICA(n_components=n_comp)
-    ica_space_ITD = ica.fit_transform(ITD_Ht.T)
+    # ica = FastICA(n_components=n_comp)
+    # ica_space_ITD = ica.fit_transform(ITD_Ht.T)
     
-    nfft = 2**np.ceil(np.log2(ITD_Ht.shape[1]))
-    ica_f_ITD = sp.fft(ica_space_ITD,n=nfft,axis=0)
+    # nfft = 2**np.ceil(np.log2(ITD_Ht.shape[1]))
+    # ica_f_ITD = sp.fft(ica_space_ITD,n=nfft,axis=0)
     
-    ica_coeff_ITD = ica.whitening_
+    # ica_coeff_ITD = ica.whitening_
     
     # plt.figure()
     # plt.plot(t,ica_space_ITD)
@@ -448,19 +448,20 @@ for subj in range(0,len(Subjects)):
     
     
     with open(os.path.join(data_loc,'SystemFuncs32_2', Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
-        pickle.dump([t,IAC_Ht,ITD_Ht,IAC_Htnf,ITD_Htnf,
-                      pca_space_IAC,pca_coeff_IAC,pca_expVar_IAC,
-                      pca_space_ITD,pca_coeff_ITD,pca_expVar_ITD, 
-                      pca_space_IAC_nf,pca_coeffs_IAC_nf,
-                      pca_expVar_IAC_nf, pca_space_ITD_nf,
-                      pca_coeffs_ITD_nf,pca_expVar_ITD_nf, ica_space_ITD,
-                      ica_coeff_ITD, ica_space_IAC, ica_coeff_IAC, 
-                      ica_space_ITD_nf,ica_f_ITD_nf,ica_coeffs_ITD_nf,
-                      ica_space_IAC_nf,ica_coeffs_IAC_nf],file)
+        # pickle.dump([t,IAC_Ht,ITD_Ht,IAC_Htnf,ITD_Htnf,
+        #               pca_space_IAC,pca_coeff_IAC,pca_expVar_IAC,
+        #               pca_space_ITD,pca_coeff_ITD,pca_expVar_ITD, 
+        #               pca_space_IAC_nf,pca_coeffs_IAC_nf,
+        #               pca_expVar_IAC_nf, pca_space_ITD_nf,
+        #               pca_coeffs_ITD_nf,pca_expVar_ITD_nf, ica_space_ITD,
+        #               ica_coeff_ITD, ica_space_IAC, ica_coeff_IAC, 
+        #               ica_space_ITD_nf,ica_f_ITD_nf,ica_coeffs_ITD_nf,
+        #               ica_space_IAC_nf,ica_coeffs_IAC_nf],file)
+        pickle.dump([t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf],file)
 
     
     
-    
+    del t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf
     
         
         

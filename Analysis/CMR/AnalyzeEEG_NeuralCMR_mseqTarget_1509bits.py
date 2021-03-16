@@ -30,7 +30,7 @@ data_evnt = [];
   
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/CMR_mseqTarget/'
-subject = 'S207'
+subject = 'S237'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 Mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits9_4096.mat' 
@@ -45,6 +45,8 @@ data_eeg.filter(l_freq=1,h_freq=200)
 if subject == 'S207':
     data_eeg.info['bads'].append('A15') 
     data_eeg.info['bads'].append('A17') 
+    
+data_eeg.plot_psd(fmin=0,fmax=250)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0, h_freq=10)
@@ -81,7 +83,7 @@ for m in range(3):
 ch_picks = np.arange(32)
 remove_chs = []
 if subject == 'S207':
-    remove_chs = [13,14,16] #Ch15 % 16 has high P2P for many trials
+    remove_chs = [14,16] #Ch15 % 16 has high P2P for many trials
 ch_picks = np.delete(ch_picks,remove_chs)
 
 t = epochs[0].times
@@ -98,9 +100,9 @@ for m in range(3):
 
 
 #%% Remove epochs with large deflections
-    
-Reject_Thresh = 200e-6
-
+Reject_Thresh = 150e-6
+if subject == 'S207':
+    Reject_Thresh = 200e-6
 
 for m in range(len(epdat)):
     Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
@@ -175,37 +177,37 @@ fig.suptitle('Ht ' + labels[m])
 
 
 #%% Plot Hf
-Hf = []
-Phase = []
-#compute HF
-nfft = 2**np.log2(Ht[m].shape[1])
-f = np.arange(0,fs,fs/nfft)
-for m in range(len(Ht)):
-    Hf.append(sp.fft(Ht[m],n=nfft,axis=1))
-    Phase.append(np.unwrap(np.angle(Hf[m])))
+# Hf = []
+# Phase = []
+# #compute HF
+# nfft = 2**np.log2(Ht[m].shape[1])
+# f = np.arange(0,fs,fs/nfft)
+# for m in range(len(Ht)):
+#     Hf.append(sp.fft(Ht[m],n=nfft,axis=1))
+#     Phase.append(np.unwrap(np.angle(Hf[m])))
     
 
 
-fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp[0]):
-    for p2 in range(sbp[1]):
-        axs[p1,p2].plot(f,np.abs(Hf[0][p1*sbp[1]+p2,:]),color='b')
-        axs[p1,p2].plot(f,np.abs(Hf[1][p1*sbp[1]+p2,:]),color='r')
-        axs[p1,p2].plot(f,np.abs(Hf[2][p1*sbp[1]+p2,:]),color='k')
-        axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])  
-        axs[p1,p2].set_xlim([0,150])
-fig.suptitle('Hf ' + labels[m])
+# fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+# for p1 in range(sbp[0]):
+#     for p2 in range(sbp[1]):
+#         axs[p1,p2].plot(f,np.abs(Hf[0][p1*sbp[1]+p2,:]),color='b')
+#         axs[p1,p2].plot(f,np.abs(Hf[1][p1*sbp[1]+p2,:]),color='r')
+#         axs[p1,p2].plot(f,np.abs(Hf[2][p1*sbp[1]+p2,:]),color='k')
+#         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])  
+#         axs[p1,p2].set_xlim([0,150])
+# fig.suptitle('Hf ' + labels[m])
 
 
-fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp2[0]):
-    for p2 in range(sbp2[1]):
-        axs[p1,p2].plot(f,np.abs(Hf[0][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='b')
-        axs[p1,p2].plot(f,np.abs(Hf[1][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='r')
-        axs[p1,p2].plot(f,np.abs(Hf[2][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='k')
-        axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])  
-        axs[p1,p2].set_xlim([0,150])
-fig.suptitle('Hf ' + labels[m])  
+# fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
+# for p1 in range(sbp2[0]):
+#     for p2 in range(sbp2[1]):
+#         axs[p1,p2].plot(f,np.abs(Hf[0][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='b')
+#         axs[p1,p2].plot(f,np.abs(Hf[1][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='r')
+#         axs[p1,p2].plot(f,np.abs(Hf[2][p1*sbp2[1]+p2+sbp[0]*sbp[1],:]),color='k')
+#         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])  
+#         axs[p1,p2].set_xlim([0,150])
+# fig.suptitle('Hf ' + labels[m])  
 
 
 
@@ -230,12 +232,7 @@ for m in range(len(Ht)):
     pca.fit(Ht[m])
     pca_space = pca.fit_transform(Ht[m].T)
     
-    nfft = 2**np.log2(Ht[m].shape[1])
-    pca_f = sp.fft(pca_space,n=nfft,axis=0)
-    
     pca_sp.append(pca_space)
-    pca_fft.append(pca_f)
-    pca_phase.append(np.unwrap(np.angle(pca_f),axis=0))
     pca_coeff.append(pca.components_)
     pca_expVar.append(pca.explained_variance_ratio_)
     
@@ -253,21 +250,15 @@ for m in range(len(Ht)):
 #     pca_expVar_nf.append(pca.explained_variance_ratio_)
     
 for m in range(len(pca_sp)):
-    fig,axs = plt.subplots(4,1)
+    fig,axs = plt.subplots(2,1)
     axs[0].plot(t,pca_sp[m])
     # for n in range(m*num_nfs,num_nfs*(m+1)):
     #     axs[0].plot(tdat[m],pca_sp_nf[n],color='grey',alpha=0.3)
     
-    axs[1].plot(f,np.abs(pca_fft[m]))
-    axs[1].set_xlim([0,100])
-    # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #     axs[1].plot(fdat[m],pca_fft_nf[n],color='grey',alpha=0.3)
+
     
-    axs[2].plot(f,pca_phase[m])
-    axs[2].set_xlim([0,100])
-    
-    axs[3].plot(ch_picks,pca_coeff[m].T)
-    axs[3].set_xlabel('channel')
+    axs[1].plot(ch_picks,pca_coeff[m].T)
+    axs[1].set_xlabel('channel')
     # for n in range(m*num_nfs,num_nfs*(m+1)):
     #     axs[3].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
     fig.suptitle('PCA ' + labels[m])    

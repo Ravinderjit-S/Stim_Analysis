@@ -27,11 +27,15 @@ passive =1;
 % mseq2 = load('mseqEEG_150_reps3.mat'); %Ponit_len,bits,fs,mseqEEG
 
 mseq1 = load('mseqEEG_150_bits7.mat');
-mseq2 = load('mseqEEG_150_bits8.mat');
-mseq3 = load('mseqEEG_150_bits9.mat');
 mseq4 = load('mseqEEG_150_bits10.mat');
 
-mseqs = [mseq1,mseq2, mseq3,mseq4];
+mseqs = [mseq1,mseq4];
+
+%playing mseq1 2000 times and mseq4 300 times
+
+mplay = [ones(1,2000),2*ones(1,300)];
+mplay = mplay(randperm(length(mplay)));
+
 
 %% Startup parameters
 FsamptTDT = 3; %48828.125 Hz
@@ -51,18 +55,24 @@ invoke(PS.RP, 'SoftTrg', 6);
 pause(2.0);
 
 
-for i =1:ntrials*nconds
+for i =1:length(mplay)
     fprintf(1, 'Running Trial #%d/%d\n',i, ntrials*nconds);
-    order = randperm(length(mseqs));
-    for j = 1:length(order)
-        mseq_j = mseqs(order(j));
-        stim_dur = length(mseq_j.mseqEEG)/fs;
-        tic();
-        stim = AM_mseq(mseq_j.mseqEEG,mseq_j.Point_len);
-        genStimTime = toc();
-        PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', order(j), TypePhones);
-        WaitSecs(stim_dur - genStimTime + 0.5 + rand()*0.1);
+    
+    mseq_j = mseqs(mplay(i));
+    stim_dur = length(mseq_j.mseqEEG)/fs;
+    tic();
+    stim = AM_mseq(mseq_j.mseqEEG,mseq_j.Point_len);
+    genStimTime = toc();
+    
+    if mplay(i) == 1
+        wait_dur = 0.3;
+    else
+        wait_dur = 0.4;
     end
+    
+    PlayStim(stim,fs,risetime,PS,L,useTDT, 'NONE', mplay(i), TypePhones);
+    WaitSecs(stim_dur - genStimTime + 0.5 + rand()*0.1);
+
 end
 
 % % Turns EEG Saving off ('Pause on')
