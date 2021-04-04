@@ -19,6 +19,8 @@ import pickle
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
+from anlffr.spectral import mtplv
+
 
 nchans = 34;
 refchans = ['EXG1','EXG2']
@@ -35,8 +37,8 @@ mseq_loc = os.path.join(data_loc, 'TMTFmseq_resampled.mat')
 Mseq_dat = sio.loadmat(mseq_loc)
 mseq = Mseq_dat['m'].astype('float')
 mseq = 2*mseq - 1
-# mseq[mseq<0] = -1
-# mseq[mseq>0] =  1
+mseq[mseq<0] = -1
+mseq[mseq>0] =  1
 
 plt.figure()
 plt.plot(mseq)
@@ -53,7 +55,8 @@ exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra e
     
 datapath =  os.path.join(data_loc, subject)
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=2,h_freq=1000)
+data_eeg.filter(l_freq=1,h_freq=1000)
+#data_eeg, data_evnt = data_eeg.resample(4096,events=data_evnt)
 
 #%% Blink Removal
 blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
@@ -71,20 +74,19 @@ data_eeg.plot(events=blinks,show_options=True)
 del ocular_projs, blink_epochs, Projs, blinks
 
 #%% Plot data and extract epochs
-
-reject = dict(eeg=200e-6)
+fs = data_eeg.info['sfreq']
+reject = dict(eeg=150e-6)
 epochs = []
-# for j in range(2):
-#     epochs.append(mne.Epochs(data_eeg, data_evnt, [j+1], tmin=-0.5, 
-#                              tmax=np.ceil(mseq.size/4096),reject=reject, baseline=(-0.2, 0.)) )
-#     epochs[j].average().plot(picks=[31],titles = str(j))
-    
-Evoked_resp = []
+# Evoked_resp = []
 for j in range(2):
-    epoch = mne.Epochs(data_eeg, data_evnt, [j+1], tmin=-0.5, 
-                             tmax=np.ceil(mseq.size/4096),reject=reject, baseline=(-0.2, 0.)) 
-    Evoked_resp.append(epoch.average())
-    Evoked_resp[j].plot(picks=[31],titles=str(j))
+    epochs.append(mne.Epochs(data_eeg, data_evnt, [j+1], tmin=-0.5, 
+                              tmax=np.ceil(mseq.size/fs),reject=reject, reject_tmin = 0, reject_tmax=mseq.size/fs, baseline=(-0.2, 0.)) )
+    # Evoked_resp.append(epochs[j].average())
+    #Evoked_resp[j]
+    epochs[j].average().plot(picks=[31],titles=str(j))
+    
+
+
     
 
 
@@ -96,17 +98,17 @@ ch_picks = np.delete(ch_picks,remove_chs)
 
 epdat = []
 evkdat = []
-# fs = epochs[0].info['sfreq']
-# t = epochs[0].times
-fs = Evoked_resp[0].info['sfreq']
-t = Evoked_resp[0].times
+fs = epochs[0].info['sfreq']
+t = epochs[0].times
+# fs = Evoked_resp[0].info['sfreq']
+# t = Evoked_resp[0].times
 t1 = np.where(t>=0)[0][0]
 t2 = t1 + mseq.size
 t = t[t1:t2]  
-#for m in range(len(epochs)):
-for m in range(len(Evoked_resp)):
-    #epdat.append(epochs[m].get_data(picks=ch_picks)[:,ch_picks,t1:t2].transpose(1,0,2))
-    evkdat.append(Evoked_resp[m].data[ch_picks,t1:t2])
+for m in range(len(epochs)):
+# for m in range(len(Evoked_resp)):
+    epdat.append(epochs[m].get_data(picks=ch_picks)[:,ch_picks,t1:t2].transpose(1,0,2))
+    # evkdat.append(Evoked_resp[m].data[ch_picks,t1:t2])
 
 
 
@@ -121,8 +123,29 @@ for m in range(len(epochs)):
     print('Total Trials Left: ' + str(epdat[m].shape[1]))
     Tot_trials[m] = epdat[m].shape[1]
     
-# plt.figure()
-# plt.plot(Peak2Peak.T)
+plt.figure()
+plt.plot(Peak2Peak.T)
+
+
+#%% compute PLV
+TW = 6
+Fres = (1/t[-1]) * TW * 2
+
+params = dict()
+params['Fs'] = fs
+params['tapers'] = [TW,2*TW-1]
+params['fpass'] = [0, 1000]
+params['itc'] = 0
+
+plv_m=[]
+for m in range(len(epdat)):
+    print('On mseq # ' + str(m+1))
+    plv,f = mtplv(epdat[m][30:,:,:],params)
+    plv_m.append(plv)
+    
+plt.figure()
+plt.plot(f,plv_m[1].T)
+    
 
 #%% Correlation Analysis
     
@@ -133,11 +156,11 @@ tend_ind = round(tend*fs) - 1
 Ht = []
 Htnf = []
 # do cross corr
-#for m in range(len(epdat)): 
-for m in range(len(evkdat)): 
+for m in range(len(epdat)): 
+# for m in range(len(evkdat)): 
     print('On mseq # ' + str(m+1))
-    #resp_m = epdat[m].mean(axis=1)
-    resp_m = evkdat[m]
+    resp_m = epdat[m].mean(axis=1)
+    # resp_m = evkdat[m]
     Ht_m = np.zeros(resp_m.shape)
     for ch in range(resp_m.shape[0]):
         Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq[:,0],mode='full')[mseq.size-1:]
@@ -242,9 +265,9 @@ p_ind = 1
 vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
 vmax = pca_coeff[p_ind].mean() + 2 * pca_coeff[p_ind].std()
 plt.figure()
-mne.viz.plot_topomap(pca_coeff[p_ind][0,:], mne.pick_info(Evoked_resp[0].info, ch_picks),vmin=vmin,vmax=vmax)
+mne.viz.plot_topomap(pca_coeff[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
 plt.figure()
-mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(Evoked_resp[0].info, ch_picks),vmin=vmin,vmax=vmax)
+mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
            

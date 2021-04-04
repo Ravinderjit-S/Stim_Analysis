@@ -21,12 +21,19 @@ from multiprocessing import Pool
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 import mne
+from numpy.fft import fft
+from numpy.fft import ifft
+
 # import mne
 
-
+def periodic_corr(x, y):
+    """Periodic correlation, implemented using the FFT.
+    x and y must be real sequences with the same length.
+    """
+    return ifft(fft(x) * fft(y).conj()).real
 
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
-data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32')
+data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_IIR')
 
 Mseq_mat = sio.loadmat(direct_Mseq)
 Mseq = Mseq_mat['Mseq_sig'].T
@@ -37,13 +44,15 @@ Mseq[Mseq<0] = -1
 Mseq[Mseq>0] = 1
 
 
-Num_noiseFloors = 100
+Num_noiseFloors = 10
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
-Subjects = ['S208']
-tend = 2 #keep Ht until
-tend_ind =  round(tend*2048) -1 
+Subjects = ['S203','S204','S205','S206','S207','S208','S211'] #issue with 'S132'?
+Subjects = ['S207']
+
+# tend = 2 #keep Ht until
+# tend_ind =  round(tend*2048) -1 
 
 for subj in range(0,len(Subjects)):
     Subject = Subjects[subj]
@@ -145,6 +154,8 @@ for subj in range(0,len(Subjects)):
     elif ch_picks.size == 30:
         sbp = [5,3]
         sbp2 = [5,3]
+        
+    # t = np.concatenate((-t[-1:0:-1],t))
         
     # fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
     # for p1 in range(sbp[0]):
@@ -447,7 +458,8 @@ for subj in range(0,len(Subjects)):
     
     
     
-    with open(os.path.join(data_loc,'SystemFuncs32_2', Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
+    # with open(os.path.join(data_loc,'SystemFuncs32_2', Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
+    with open(os.path.join(data_loc,'SysFunc_32_IIR', Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
         # pickle.dump([t,IAC_Ht,ITD_Ht,IAC_Htnf,ITD_Htnf,
         #               pca_space_IAC,pca_coeff_IAC,pca_expVar_IAC,
         #               pca_space_ITD,pca_coeff_ITD,pca_expVar_ITD, 
@@ -461,7 +473,7 @@ for subj in range(0,len(Subjects)):
 
     
     
-    del t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf
+    del t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf, IAC_epochs, ITD_epochs
     
         
         

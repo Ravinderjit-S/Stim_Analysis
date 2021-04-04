@@ -27,8 +27,8 @@ data_evnt = [];
   
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/Neural_CMR'
-subject = 'S211_plus12dB_tpsd'
-#subject = 'SVarsha'
+#subject = 'S211_plus12dB_tpsd'
+subject = 'SVarsha'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 datapath = os.path.join(data_loc,subject)
@@ -64,7 +64,7 @@ labels = ['4 coh 0', '4 coh 1', '40 coh 0','40 coh 1']
 
 tmin = -0.5
 tmax = 4.5
-reject = dict(eeg=100e-6)
+reject = dict(eeg=150-6)
 baseline = (-0.2,0)
 
 epochs_1 = mne.Epochs(data_eeg,data_evnt,[1],tmin=tmin,tmax=tmax,
@@ -148,11 +148,15 @@ dat_epochs_3 = epochs_3.get_data()
 dat_epochs_4 = epochs_4.get_data()
 
 
-dat_epochs_1 = dat_epochs_1[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_2 = dat_epochs_2[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_3 = dat_epochs_3[0:200,0:32,t1:t2].transpose(1,0,2)
-dat_epochs_4 = dat_epochs_4[0:200,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_1 = dat_epochs_1[:,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_2 = dat_epochs_2[:,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_3 = dat_epochs_3[:,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_4 = dat_epochs_4[:,0:32,t1:t2].transpose(1,0,2)
 
+trials = np.min([dat_epochs_3.shape[1],dat_epochs_4.shape[1]])
+
+dat_epochs_3 = dat_epochs_3[:,:trials,:]
+dat_epochs_4 = dat_epochs_4[:,:trials,:]
 
 
 params = dict()
@@ -166,6 +170,28 @@ plvtap_1, f = mtplv(dat_epochs_1,params)
 plvtap_2, f = mtplv(dat_epochs_2,params)
 plvtap_3, f = mtplv(dat_epochs_3,params)
 plvtap_4, f = mtplv(dat_epochs_4,params)
+
+sbp = [4,4]
+sbp2 = [4,4]
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(f,plvtap_4[p1*sbp[1]+p2,:])
+        axs[p1,p2].plot(f,plvtap_3[p1*sbp[1]+p2,:])
+        axs[p1,p2].set_xlim((35,45))
+        axs[p1,p2].set_title(p1*sbp[1]+p2)    
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(f,plvtap_4[p1*sbp2[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].plot(f,plvtap_3[p1*sbp2[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].set_xlim((35,45))
+        axs[p1,p2].set_title(p1*sbp2[1]+p2+sbp[0]*sbp[1])    
+
+
+
 
 
 fig, ax = plt.subplots(figsize=(5.5,5))
@@ -324,7 +350,53 @@ ax.plot(f,plvtap_2.T,color='b')
     
 # NF_223 = np.concatenate((Cohnf_3,Cohnf_6),axis=1)
 # NF_223_bot = NF_223.mean(axis=1) - 2*NF_223.std(axis=1)
-# NF_223_top = NF_223.mean(axis=1) + 2*NF_223.std(axis=1)   
+# NF_223_top = NF_223.mean(axis=1) + 2*NF_223.stfs = evkd_1.info['sfreq']
+
+t = epochs_1.times
+t1 = np.where(t>=0)[0][0]
+t2 = np.where(t>=2.0)[0][0]
+t = t[t1:t2]
+
+dat_epochs_1 = epochs_1.get_data()
+dat_epochs_2 = epochs_2.get_data()
+
+dat_epochs_1 = dat_epochs_1[:,0:32,t1:t2].transpose(1,0,2)
+dat_epochs_2 = dat_epochs_2[:,0:32,t1:t2].transpose(1,0,2)
+
+trials = np.min([dat_epochs_1.shape[1],dat_epochs_2.shape[1]])
+
+dat_epochs_1 = dat_epochs_1[:,:trials,:]
+dat_epochs_2 = dat_epochs_2[:,:trials,:]
+
+params = dict()
+params['Fs'] = fs
+params['tapers'] = [2,2*2-1]
+params['fpass'] = [1,300]
+params['itc'] = 0
+
+
+plvtap_1, f = mtplv(dat_epochs_1,params)
+plvtap_2, f = mtplv(dat_epochs_2,params)
+
+sbp = [4,4]
+sbp2 = [4,4]
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(f,plvtap_2[p1*sbp[1]+p2,:])
+        axs[p1,p2].plot(f,plvtap_1[p1*sbp[1]+p2,:])
+        axs[p1,p2].set_xlim((35,45))
+        axs[p1,p2].set_title(p1*sbp[1]+p2)    
+
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        axs[p1,p2].plot(f,plvtap_2[p1*sbp2[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].plot(f,plvtap_1[p1*sbp2[1]+p2+sbp[0]*sbp[1],:])
+        axs[p1,p2].set_xlim((35,45))
+        axs[p1,p2].set_title(p1*sbp2[1]+p2+sbp[0]*sbp[1])    
+d(axis=1)   
 
 # NF_2_10 = np.concatenate((Cohnf_7,Cohnf_8),axis=1)
 # NF_2_10_bot = NF_2_10.mean(axis=1) - 2*NF_2_10.std(axis=1)

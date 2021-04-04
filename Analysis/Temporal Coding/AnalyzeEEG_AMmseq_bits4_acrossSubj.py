@@ -15,14 +15,13 @@ import matplotlib.pyplot as plt
 from scipy.signal import freqz
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-pickle_loc = data_loc + 'Pickles/'
+pickle_loc = data_loc + 'Pickles_full/'
 
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
 
 m_bits = [7,8,9,10]
 
-num_nf = 100
 
 fs = 4096
 
@@ -150,6 +149,7 @@ plt.suptitle('Component 2')
 #%% Extract NFs into numpy arrays
     
 t = tdat[0]   
+num_nf = len(A_Htnf[0]) / len(m_bits)
     
 subj_pca1_nf = np.zeros([t.size,len(m_bits*num_nf),len(Subjects)])
 subj_pca2_nf = np.zeros([t.size,len(m_bits*num_nf),len(Subjects)])
@@ -232,13 +232,50 @@ plt.title('10 bits: Component 2')
 fig,ax = plt.subplots(4,len(Subjects),sharex=True)
 for s in range(len(Subjects)):
     for m in range(len(m_bits)):
-        ax[m,s].plot(t,A_Ht[s][m][-1,:])
+        ax[m,s].plot(tdat[m],A_Ht[s][m][-1,:]) #Just Channel A32 (last channel)
     ax[0,s].set_title(Subjects[s])
     
+
+sbp = [4,4]
+sbp2 = [4,4]
+
+for m in range(len(Ht)):
+    fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
+    t = tdat[m]
+    for s in range(len(Subjects)):
+        Ht_1 = A_Ht[s][m]
+        ch_picks_s = A_ch_picks[s]
+        for p1 in range(sbp[0]):
+            for p2 in range(sbp[1]):
+                cur_ch = p1*sbp[1]+p2
+                if np.any(cur_ch==ch_picks_s):
+                    ch_ind = np.where(cur_ch==ch_picks_s)[0][0]
+                    axs[p1,p2].plot(t,Ht_1[ch_ind,:])
+                    axs[p1,p2].set_title(ch_picks[ch_ind])    
+                    for n in range(int(m*num_nf),int(num_nf*(m+1))):
+                        axs[p1,p2].plot(t,A_Htnf[s][n][ch_ind,:],color='grey',alpha=0.3)
+                
+    fig.suptitle('Ht ' + str(m_bits[m]) + ' bits')
     
-# A_32_avg = np.zeros()
-# for s in range(len(Subjects)):
-#     for m in range(len(m_bits)):
+for m in range(len(Ht)):    
+    fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
+    t = tdat[m]
+    for s in range(len(Subjects)):
+        Ht_1 = A_Ht[s][m]
+        ch_picks_s = A_ch_picks[s]
+        for p1 in range(sbp2[0]):
+            for p2 in range(sbp2[1]):
+                cur_ch = p1*sbp2[1]+p2+sbp[0]*sbp[1]
+                if np.any(cur_ch==ch_picks_s):
+                    ch_ind = np.where(cur_ch==ch_picks_s)[0][0]
+                    axs[p1,p2].plot(t,Ht_1[ch_ind,:])
+                    axs[p1,p2].set_title(ch_picks[ch_ind])   
+                    for n in range(int(m*num_nf),int(num_nf*(m+1))):
+                        axs[p1,p2].plot(t,A_Htnf[s][n][ch_ind,:],color='grey',alpha=0.3)
+            
+    fig.suptitle('Ht ' +  str(m_bits[m]) + ' bits')   
+
+
 
 
 #%% Plot Frequency Domian bits
