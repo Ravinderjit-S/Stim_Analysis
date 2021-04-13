@@ -17,13 +17,15 @@ from EEGpp import EEGconcatenateFolder
 from mne.preprocessing.ssp import compute_proj_epochs
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
-Subjects = ['S207']
 nchans = 34;
+
+
 #if Subject == 'S203':
 #    refchans = ['EXG3', 'EXG4']
 #else:    
 #    refchans = ['EXG1','EXG2']
 refchans = ['EXG1','EXG2']
+refchans = None
     
 IAC_eeg = [];
 IAC_evnt = [];
@@ -35,10 +37,10 @@ direct_ITD = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/ITDt/'
 direct_Mseq = '/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Mseq_4096fs_compensated.mat'
 
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/')
-pickles_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_IIR/')
+pickles_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32_refAvg')
 fig_format = 'png'
 
-exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
+exclude = ['EXG1','EXG2','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 #if Subject == 'Rav': #accidentally saved a bunch of empty channels so removing them
 #    exclude = exclude + ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'B12', 'B13', 'B14', 'B15', 'B16', 'B17', 'B18', 'B19', 'B20', 'B21', 'B22', 'B23', 'B24', 'B25', 'B26', 'B27', 'B28', 'B29', 'B30', 'B31', 'B32', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', u'C18', 'C19', 'C20', 'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12', 'D13', 'D14', 'D15', 'D16', 'D17', 'D18', 'D19', 'D20', 'D21', 'D22', 'D23', 'D24', 'D25', 'D26', 'D27', 'D28', 'D29', 'D30', 'D31', 'D32']     
 #elif Subject == 'S203': #accidentally saved some sensor thing and plugged references into 3&4 instead of 1&2 like usual
@@ -51,8 +53,8 @@ for s in range(0,len(Subjects)):
     ITD_eeg,ITD_evnt = EEGconcatenateFolder(direct_ITD+Subject+'/',nchans,refchans,exclude)
     
     
-    IAC_eeg.filter(1,40,method='iir')
-    ITD_eeg.filter(1,40,method='iir')
+    IAC_eeg.filter(1,1000)
+    ITD_eeg.filter(1,1000)
     
     ## blink removal
     blinks_IAC = find_blinks(IAC_eeg, ch_name = ['A1'], thresh = 100e-6,  l_trans_bandwidth=0.5, l_freq = 1.0) 
@@ -119,14 +121,14 @@ for s in range(0,len(Subjects)):
     
     dat = StimIAC_epochs.get_data()
     dat = dat[:,:32,:]
-    resp = np.median(dat,axis=0)
-    t = StimIAC_epochs.times
-    plt.figure()
-    plt.plot(t,resp[31,:])
+    # resp = np.median(dat,axis=0)
+    # t = StimIAC_epochs.times
+    # plt.figure()
+    # plt.plot(t,resp[31,:])
     
     StimITD_epochs = mne.Epochs(ITD_eeg,ITD_evnt,1,tmin=-0.5,tmax=14,proj=True,baseline=(-0.2, 0.),reject=None)
     StimITD_evoked = StimITD_epochs.average()
-    # StimITD_evoked.plot(picks=channels,titles ='ITDt_evoked')
+    StimITD_evoked.plot(picks=channels,titles ='ITDt_evoked')
     
     
     # StimIAC_epochs = mne.Epochs(IAC_eeg,IAC_evnt,1,tmin=-0.2,tmax=12.75,baseline=(-0.2, 0.),proj=True)

@@ -20,6 +20,10 @@ from anlffr.spectral import mtplv
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
+import sys
+sys.path.append(os.path.abspath('../mseqAnalysis/'))
+from mseqHelper import mseqXcorr
+
 
 
 nchans = 34;
@@ -40,7 +44,7 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=200)
+data_eeg.filter(l_freq=1,h_freq=1000)
 
 # if subject == 'S207':
 #     data_eeg.info['bads'].append('A15') 
@@ -66,7 +70,7 @@ data_eeg.plot(events=blinks,show_options=True)
 labels = ['Coh 0', 'Coh 1', 'Just mseq']
 
 tmin = -0.3
-tmax = 7.1
+tmax = 7.3
 baseline = (-0.2,0)
 reject = dict(eeg=500e-6)
 epochs=[]
@@ -95,9 +99,9 @@ ch_picks = np.delete(ch_picks,remove_chs)
 
 t = epochs[0].times
 t1 = np.where(t>=0)[0][0]
-t2 = t1 + mseq.size + int(round(fs*0.3)) #go 300 ms past end of stim
+t2 = t1 + mseq.size + int(round(fs*0.4)) #go 300 ms past end of stim
 t = t[t1:t2]
-
+t = np.concatenate((-t[-int(np.round(0.4*fs)):0:-1],t[:-1]))
 fs = epochs[0].info['sfreq']
 
 
@@ -124,25 +128,16 @@ plt.plot(Peak2Peak.T)
 
 #%% correlation analysis
 
-tend = 0.5 #time of Ht to keep
-tend_ind = round(tend*fs) - 1
 
 Ht = []
 Htnf = []
 # do cross corr
 for m in range(len(epdat)): 
     print('On mseq # ' + str(m+1))
-    resp_m = epdat[m].mean(axis=1)
-    Ht_m = np.zeros(resp_m.shape)
-    for ch in range(resp_m.shape[0]):
-        resp_m = resp_m - resp_m.mean(axis=1)[:,np.newaxis]
-        Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq[0,:],mode='full')[mseq.size-1:]
+    # resp_m = epdat[m].mean(axis=1)
+    Ht_m = mseqXcorr(epdat[m],mseq[0,:])
     Ht.append(Ht_m)
 
-#only keep Ht up to tend 
-for h in range(len(Ht)):
-    Ht[h] = Ht[h][:,:tend_ind]
-t = t[:tend_ind]
 
 #%% Plot Ht
 
@@ -282,59 +277,67 @@ mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(epochs[0].info, ch_pic
 # mne.viz.plot_topomap(pca_coeff[2][2,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
-#%% PCA decomposition in 2 chunks 
-t_split1 = .050
-
-t_2 = np.where(t>=t_split1)[0][0]
+#%% PCA decomposition on t_splits
+t_cuts = [.015, 0.040,.125]
 
 
-pca_sp_s1 = []
-pca_coeff_s1 = []
-pca_expVar_s1 = []
 
-n_comp = 1
+pca_sp_cuts_cond = []
+pca_expVar_cuts_cond = []
+pca_coeff_cuts_cond = []
+pca = PCA(n_components=1)
+t__ = [list() for i in range(len(t_cuts))]
 
+for m in range(len(Ht)): #each condition
+    pca_sp_cuts = [list() for i in range(len(t_cuts))]
+    pca_expVar_cuts = [list() for i in range(len(t_cuts))]
+    pca_coeff_cuts = [list() for i in range(len(t_cuts))]
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = np.where(t>=0)[0][0]
+        else:
+            t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        t_2 = np.where(t>=t_cuts[t_c])[0][0]
+        
+        pca_sp_cuts[t_c] = pca.fit_transform(Ht[m][:,t_1:t_2].T)
+        pca_expVar_cuts[t_c] = pca.explained_variance_ratio_
+        pca_coeff_cuts[t_c] = pca.components_
+        
+        if pca_coeff_cuts[t_c][0,-1] < 0:
+            pca_coeff_cuts[t_c] = -pca_coeff_cuts[t_c]
+            pca_sp_cuts[t_c] = -pca_sp_cuts[t_c]
+            
+        t__[t_c] = t[t_1:t_2]
+    
+    pca_sp_cuts_cond.append(pca_sp_cuts)
+    pca_expVar_cuts_cond.append(pca_expVar_cuts)
+    pca_coeff_cuts_cond.append(pca_coeff_cuts)
+
+
+
+for t_c in range(len(t_cuts)):
+    plt.figure()
+    for m in range(len(Ht)):
+        plt.plot(t__[t_c],pca_sp_cuts_cond[m][t_c])
+    
+    
+vmin = pca_coeff_cuts_cond[0][0].mean() - 2 * pca_coeff_cuts_cond[0][0].std()
+vmax = pca_coeff_cuts_cond[0][0].mean() + 2 * pca_coeff_cuts_cond[0][0].std()
 for m in range(len(Ht)):
-    pca = PCA(n_components=n_comp)
-    pca_space = pca.fit_transform(Ht[m][:,:t_2].T)
-    
-    pca_sp_s1.append(pca_space)
-    pca_coeff_s1.append(pca.components_)
-    pca_expVar_s1.append(pca.explained_variance_ratio_)
-    
+    plt.figure()
+    for t_c in range(len(t_cuts)):
+        plt.subplot(1,len(t_cuts),t_c+1)
+        mne.viz.plot_topomap(pca_coeff_cuts_cond[m][t_c][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
 
-pca_sp_s2 = []
-pca_coeff_s2 = []
-pca_expVar_s2 = []
+        
 
-n_comp = 1
-
-for m in range(len(Ht)):
-    pca = PCA(n_components=n_comp)
-    pca_space = pca.fit_transform(Ht[m][:,t_2:].T)
-    
-    pca_sp_s2.append(pca_space)
-    pca_coeff_s2.append(pca.components_)
-    pca_expVar_s2.append(pca.explained_variance_ratio_)
-    
-plt.figure()
-for m in range(len(pca_sp_s1)):
-    plt.plot(t[:t_2],pca_sp_s1[m])
-plt.legend(labels)
-
-plt.figure()
-for m in range(len(pca_sp_s1)):
-    plt.plot(t[t_2:],pca_sp_s2[m])
-plt.legend(labels)
-
-
-p_ind = 1
-vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
-vmax = pca_coeff[p_ind].mean() + 2 * pca_coeff[p_ind].std()
-plt.figure()
-mne.viz.plot_topomap(pca_coeff_s1[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
-plt.figure()
-mne.viz.plot_topomap(pca_coeff_s2[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+# p_ind = 1
+# vmin = pca_coeff_s1[p_ind].mean() - 2 * pca_coeff_s1[p_ind].std()
+# vmax = pca_coeff_s1[p_ind].mean() + 2 * pca_coeff_s1[p_ind].std()
+# plt.figure()
+# mne.viz.plot_topomap(pca_coeff_s1[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+# plt.figure()
+# mne.viz.plot_topomap(pca_coeff_s2[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
 

@@ -19,7 +19,7 @@ from sklearn.decomposition import FastICA
 
 
 #data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_2')
-data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_IIR/SysFunc_32_IIR')
+data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32_refAvg/')
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin')
 
 
@@ -51,7 +51,7 @@ del IAC_epochs, ITD_epochs
 for sub in range(len(Subjects)):
     Subject = Subjects[sub]
     with open(os.path.join(data_loc, Subject+'_DynBin_SysFunc.pickle'),'rb') as file:     
-        [t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf] = pickle.load(file)
+        [t, IAC_Ht, ITD_Ht, IAC_Htnf, ITD_Htnf,Tot_trials_IAC,Tot_trials_ITD] = pickle.load(file)
         
         print(sub)
         
@@ -81,12 +81,11 @@ for sub in range(len(Subjects)):
     A_ITD_Ht_nf.append(ITD_Htnf[:10])
     
              
-    
+
     
 #%% Plot time domain
 #get Ht into numpy vector
 
-t2 = np.concatenate((-t[-1:0:-1],t))
     
 Anp_Ht_IAC = np.zeros([A_IAC_Ht[0].shape[0],A_IAC_Ht[0].shape[1],len(Subjects)])
 Anp_Ht_ITD = np.zeros([A_ITD_Ht[0].shape[0],A_ITD_Ht[0].shape[1],len(Subjects)])
@@ -105,10 +104,10 @@ fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
 for p1 in range(sbp[0]):
     for p2 in range(sbp[1]):
         for s in range(len(Subjects)):
-            axs[p1,p2].plot(t2,Anp_Ht_IAC[p1*sbp[1]+p2,:,s])
+            axs[p1,p2].plot(t,Anp_Ht_IAC[p1*sbp[1]+p2,:,s])
             for n in range(len(A_IAC_Ht_nf[s])):
-                axs[p1,p2].plot(t2,A_IAC_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-        axs[p1,p2].plot(t2,Ht_avg_IAC[p1*sbp[1]+p2,:],color='black',linewidth=2)            
+                axs[p1,p2].plot(t,A_IAC_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
+        axs[p1,p2].plot(t,Ht_avg_IAC[p1*sbp[1]+p2,:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
 
 fig.suptitle('Ht IAC')
@@ -117,10 +116,10 @@ fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True)
 for p1 in range(sbp2[0]):
     for p2 in range(sbp2[1]):
         for s in range(len(Subjects)):
-            axs[p1,p2].plot(t2,Anp_Ht_IAC[p1*sbp2[1]+p2+sbp[0]*sbp[1],:,s])
+            axs[p1,p2].plot(t,Anp_Ht_IAC[p1*sbp2[1]+p2+sbp[0]*sbp[1],:,s])
             for n in range(len(A_IAC_Ht_nf[s])):
-                axs[p1,p2].plot(t2,A_IAC_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
-        axs[p1,p2].plot(t2,Ht_avg_IAC[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
+                axs[p1,p2].plot(t,A_IAC_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
+        axs[p1,p2].plot(t,Ht_avg_IAC[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
          
 fig.suptitle('Ht IAC')
@@ -130,10 +129,10 @@ fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
 for p1 in range(sbp[0]):
     for p2 in range(sbp[1]):
         for s in range(len(Subjects)):
-            axs[p1,p2].plot(t2,Anp_Ht_ITD[p1*sbp[1]+p2,:,s])
+            axs[p1,p2].plot(t,Anp_Ht_ITD[p1*sbp[1]+p2,:,s])
             for n in range(len(A_ITD_Ht_nf[s])):
-                axs[p1,p2].plot(t2,A_ITD_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-        axs[p1,p2].plot(t2,Ht_avg_ITD[p1*sbp[1]+p2,:],color='black',linewidth=2)            
+                axs[p1,p2].plot(t,A_ITD_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
+        axs[p1,p2].plot(t,Ht_avg_ITD[p1*sbp[1]+p2,:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
 
 fig.suptitle('Ht ITD')
@@ -142,28 +141,30 @@ fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True)
 for p1 in range(sbp2[0]):
     for p2 in range(sbp2[1]):
         for s in range(len(Subjects)):
-            axs[p1,p2].plot(t2,Anp_Ht_ITD[p1*sbp2[1]+p2+sbp[0]*sbp[1],:,s])
+            axs[p1,p2].plot(t,Anp_Ht_ITD[p1*sbp2[1]+p2+sbp[0]*sbp[1],:,s])
             for n in range(len(A_ITD_Ht_nf[s])):
-                axs[p1,p2].plot(t2,A_ITD_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
-        axs[p1,p2].plot(t2,Ht_avg_ITD[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
+                axs[p1,p2].plot(t,A_ITD_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
+        axs[p1,p2].plot(t,Ht_avg_ITD[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
          
 fig.suptitle('Ht ITD')
 
     
 
+
 #%% Get response from pca on average response
 
-Ht_avg_IAC = Anp_Ht_IAC.mean(axis=2)
-Ht_avg_ITD = Anp_Ht_ITD.mean(axis=2)
+t_1 = np.where(t>=-1.25)[0][0]
+t_2 = np.where(t>=-0.75)[0][0]
+
 
 pca = PCA(n_components=1)
-pca_sp_Htavg_IAC = pca.fit_transform(Ht_avg_IAC.T)
+pca_sp_Htavg_IAC = pca.fit_transform(Ht_avg_IAC[:,t_1:t_2].T)
 pca_Htavg_IACcoeffs = pca.components_
 pca_Htavg_IACexpVar = pca.explained_variance_ratio_
 
 pca = PCA(n_components=1)
-pca_sp_Htavg_ITD = pca.fit_transform(Ht_avg_ITD.T)
+pca_sp_Htavg_ITD = pca.fit_transform(Ht_avg_ITD[:,t_1:t_2].T)
 pca_Htavg_ITDcoeffs = pca.components_
 pca_Htavg_ITDexpVar = pca.explained_variance_ratio_
 
@@ -181,6 +182,7 @@ if pca_Htavg_ITDcoeffs[0,channels].mean() < pca_Htavg_ITDcoeffs[0,:].mean():
 
 vmin = pca_Htavg_IACcoeffs.mean() - 2*pca_Htavg_IACcoeffs.std()
 vmax = pca_Htavg_IACcoeffs.mean() + 2*pca_Htavg_IACcoeffs.std()
+
 plt.figure()
 mne.viz.plot_topomap(pca_Htavg_IACcoeffs.squeeze(), info_obj,vmin=vmin,vmax=vmax)
 plt.title('IAC: Avg Subjects then calculate coeffs')
@@ -195,33 +197,51 @@ plt.title('ITD: Avg Subjects then calculate coeffs')
 
 
 plt.figure()
-plt.plot(t2, pca_sp_Htavg_IAC)
+plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC)
+plt.title('IAC')
 
 plt.figure()
-plt.plot(t2, pca_sp_Htavg_ITD)
-
+plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD)
+plt.title('ITD')
 
 #%% Leave one out - jacknife
 
 pca_sp_Htavg_IAC_JN = np.zeros([pca_sp_Htavg_IAC.shape[0],len(Subjects)])
 pca_sp_Htavg_ITD_JN = np.zeros([pca_sp_Htavg_ITD.shape[0],len(Subjects)])
+
+pca_IAC_comp = np.zeros([32,Anp_Ht_IAC.shape[2]])
+
 snums = np.arange(len(Subjects))
 pca = PCA(n_components=1)
 for jn in range(len(Subjects)):
     s_jn = np.delete(snums,jn)
-    Ht_avg_IAC_JN = Anp_Ht_IAC[:,:,s_jn].mean(axis=2)
-    Ht_avg_ITD_JN = Anp_Ht_ITD[:,:,s_jn].mean(axis=2)
+    Ht_avg_IAC_JN = Anp_Ht_IAC[:,t_1:t_2,s_jn].mean(axis=2)
+    Ht_avg_ITD_JN = Anp_Ht_ITD[:,t_1:t_2,s_jn].mean(axis=2)
     pca_IAC_JN = pca.fit_transform(Ht_avg_IAC_JN.T)[:,0]
     pca_IAC_coeffs = pca.components_
+    
+    
     if pca_IAC_coeffs[0,channels].mean() < pca_IAC_coeffs[0,:].mean():
+        pca_IAC_coeffs = - pca_IAC_coeffs
+        pca_IAC_JN = - pca_IAC_JN
+        
+    if pca_IAC_coeffs[0,channels].mean() < 0: ## Make center channels positive if negative
         pca_IAC_coeffs = - pca_IAC_coeffs
         pca_IAC_JN = - pca_IAC_JN
         
     pca_ITD_JN = pca.fit_transform(Ht_avg_ITD_JN.T)[:,0]
     pca_ITD_coeffs = pca.components_
+    
+    
     if pca_ITD_coeffs[0,channels].mean() < pca_ITD_coeffs[0,:].mean():
         pca_ITD_coeffs = - pca_ITD_coeffs
         pca_ITD_JN = - pca_ITD_JN
+        
+    if pca_ITD_coeffs[0,channels].mean() < 0: ## Make center channels positive if negative
+        pca_ITD_coeffs = - pca_ITD_coeffs
+        pca_ITD_JN = - pca_ITD_JN
+    
+    pca_IAC_comp[:,jn] = pca_IAC_coeffs.squeeze()
     
     pca_sp_Htavg_IAC_JN[:,jn] = pca_IAC_JN
     pca_sp_Htavg_ITD_JN[:,jn] = pca_ITD_JN
@@ -230,101 +250,174 @@ IAC_pcaJN_se = np.sqrt( (pca_sp_Htavg_IAC_JN.shape[1]-1) * np.sum( (pca_sp_Htavg
 ITD_pcaJN_se = np.sqrt( (pca_sp_Htavg_ITD_JN.shape[1]-1) * np.sum( (pca_sp_Htavg_ITD_JN - pca_sp_Htavg_ITD_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / pca_sp_Htavg_ITD_JN.shape[1] )
 
 plt.figure()
-plt.plot(t2, pca_sp_Htavg_IAC,color='k')
-plt.fill_between(t2,pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
+plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
 
 
 plt.figure()
-plt.plot(t2, pca_sp_Htavg_ITD,color='k')
-plt.fill_between(t2,pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
+plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
+
+
+plt.figure()
+mne.viz.plot_topomap(pca_IAC_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
+plt.title('IAC: PCA coeffs mean JN')
 
 #%% Noise Floor computation 
 
 Anp_IAC_Ht_nf = np.zeros([A_IAC_Ht_nf[0][0].shape[0],A_IAC_Ht_nf[0][0].shape[1],len(A_IAC_Ht_nf[0]*len(Subjects))])
+Anp_ITD_Ht_nf = np.zeros([A_ITD_Ht_nf[0][0].shape[0],A_ITD_Ht_nf[0][0].shape[1],len(A_ITD_Ht_nf[0]*len(Subjects))])
 for s in range(len(Subjects)):
     for nf in range(len(A_IAC_Ht_nf[0])):
         Anp_IAC_Ht_nf[:,:,s*nf+nf] = A_IAC_Ht_nf[s][nf]
+        Anp_ITD_Ht_nf[:,:,s*nf+nf] = A_ITD_Ht_nf[s][nf]
         
 pca_nf_HTavg_IAC_JN = np.zeros([pca_sp_Htavg_IAC.shape[0],Anp_IAC_Ht_nf.shape[2]])
 pca_IACnf_comp = np.zeros([32,Anp_IAC_Ht_nf.shape[2]])
+
+pca_nf_HTavg_ITD_JN = np.zeros([pca_sp_Htavg_ITD.shape[0],Anp_ITD_Ht_nf.shape[2]])
+pca_ITDnf_comp = np.zeros([32,Anp_ITD_Ht_nf.shape[2]])
+
 for jn in range(Anp_IAC_Ht_nf.shape[2]):
     print('On nf JN: ' + str(jn))
     s_jn = np.delete(np.arange(Anp_IAC_Ht_nf.shape[2]),jn)
-    Htnf_avg_IAC_JN = Anp_IAC_Ht_nf[:,:,s_jn].mean(axis=2)
+    Htnf_avg_IAC_JN = Anp_IAC_Ht_nf[:,t_1:t_2,s_jn].mean(axis=2)
+    Htnf_avg_ITD_JN = Anp_ITD_Ht_nf[:,t_1:t_2,s_jn].mean(axis=2)
+    
     pca_IACnf_JN = pca.fit_transform(Htnf_avg_IAC_JN.T)[:,0]
     pca_IACnf_coeffs = pca.components_
-    if pca_IACnf_coeffs[0,channels].mean() < pca_IACnf_coeffs[0,:].mean():
+    
+    pca_ITDnf_JN = pca.fit_transform(Htnf_avg_ITD_JN.T)[:,0]
+    pca_ITDnf_coeffs = pca.components_
+    
+
+    
+    if pca_IACnf_coeffs[0,channels].mean() < pca_IACnf_coeffs[0,:].mean(): 
         pca_IACnf_coeffs = - pca_IACnf_coeffs
         pca_IACnf_JN = - pca_IACnf_JN
+        
+    if pca_IACnf_coeffs[0,channels].mean() < 0:
+        pca_IACnf_coeffs = - pca_IACnf_coeffs
+        pca_IACnf_JN = - pca_IACnf_JN
+    
+    if pca_ITDnf_coeffs[0,channels].mean() < pca_IACnf_coeffs[0,:].mean():
+        pca_ITDnf_coeffs = -pca_ITDnf_coeffs
+        pca_ITDnf_JN = -pca_ITDnf_JN
+        
+    if pca_ITDnf_coeffs[0,channels].mean() < 0:
+        pca_ITDnf_coeffs = - pca_ITDnf_coeffs
+        pca_ITDnf_JN = - pca_ITDnf_JN
+        
     pca_IACnf_comp[:,jn] = pca_IACnf_coeffs.squeeze()
     pca_nf_HTavg_IAC_JN[:,jn] = pca_IACnf_JN
     
-IACnf_pcaJN_se = np.sqrt( (pca_nf_HTavg_IAC_JN.shape[1]-1) * np.sum( (pca_nf_HTavg_IAC_JN - pca_nf_HTavg_IAC_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / pca_sp_Htavg_IAC_JN.shape[1]  )
+    pca_ITDnf_comp[:,jn] = pca_ITDnf_coeffs.squeeze()
+    pca_nf_HTavg_ITD_JN[:,jn] = pca_ITDnf_JN
+
+IACnf_pcaJN_var = (pca_nf_HTavg_IAC_JN.shape[1]-1) * np.sum( (pca_nf_HTavg_IAC_JN - pca_nf_HTavg_IAC_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1)
+IACnf_pcaJN_se = np.sqrt(IACnf_pcaJN_var / pca_sp_Htavg_IAC_JN.shape[1])
+
+ITDnf_pcaJN_var = (pca_nf_HTavg_ITD_JN.shape[1]-1) * np.sum( (pca_nf_HTavg_ITD_JN - pca_nf_HTavg_ITD_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1)
+ITDnf_pcaJN_se = np.sqrt(ITDnf_pcaJN_var / pca_sp_Htavg_ITD_JN.shape[1])
 
 plt.figure()
-plt.plot(t2,pca_nf_HTavg_IAC_JN.mean(axis=1),color='grey')
-plt.fill_between(t2,pca_nf_HTavg_IAC_JN.mean(axis=1)-2*IACnf_pcaJN_se,pca_nf_HTavg_IAC_JN.mean(axis=1)+2*IACnf_pcaJN_se,color='grey',alpha=0.3)
-plt.plot(t2, pca_sp_Htavg_IAC,color='k')
-plt.fill_between(t2,pca_sp_Htavg_IAC[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*ITD_pcaJN_se)
+plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
+plt.plot(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1),color='grey')
+plt.fill_between(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1)-2*IACnf_pcaJN_se,pca_nf_HTavg_IAC_JN.mean(axis=1)+2*IACnf_pcaJN_se,color='grey',alpha=0.3)
+
+
+plt.figure()
+plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
+plt.plot(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1),color='grey')
+plt.fill_between(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1)-2*ITDnf_pcaJN_se,pca_nf_HTavg_ITD_JN.mean(axis=1)+2*ITDnf_pcaJN_se,color='grey',alpha=0.3)
+
 
 
 plt.figure()
 mne.viz.plot_topomap(pca_IACnf_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
 plt.title('IAC: Noise PCA coeffs')
 
+plt.figure()
+mne.viz.plot_topomap(pca_ITDnf_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
+plt.title('ITD: Noise PCA coeffs')
 
 
-#%% Frequency domain && Compare to behavioral IAC
-       
+
+#%% Behavioral Binaural Unmasking Dynamics
+
+def expFit(x,A,tau):
+    Out = A*(1 - np.exp(-x/tau))
+    return Out
+
+
 beh_dataPath = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/'
 beh_IACsq = loadmat(os.path.abspath(beh_dataPath+'IACsquareTone_Processed.mat'))
 
-f_beh = beh_IACsq['WindowSizes'][0][1:]**-1
-SNRs_beh = beh_IACsq['AcrossSubjectsSNR'][1:] - beh_IACsq['AcrossSubjectsSNR'][0]
-AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM'][1:]
-
-mask6dB_beh = (SNRs_beh > SNRs_beh.max()-6).squeeze()
-       
-b = pca_IAC_comp1.mean(axis=1)
-#b = b[:int(np.round(.2*fs))]
-
-w,h = freqz(b,a=1,worN=4000,fs=fs)
-
-phase_IAC = np.unwrap(np.angle(h))
-
-mask6dB_physio = (20*np.log10(np.abs(h))) > (20*np.log10(np.abs(h))).max()-6
-
-fig,ax = plt.subplots()
-ax.plot(w[mask6dB_physio],20*np.log10(np.abs(h[mask6dB_physio])))
-ax.set_xscale('log')
-ax.set_xlim([0.5,20])
-ax2 = ax.twinx()
-ax2.errorbar(f_beh[mask6dB_beh],SNRs_beh[mask6dB_beh],AcrossSubjectSEM[mask6dB_beh],color='r')
-ax2.set_xscale('log')
+Window_t = beh_IACsq['WindowSizes'][0]
+f_beh = Window_t[1:]**-1
+SNRs_beh = beh_IACsq['AcrossSubjectsSNR'] - beh_IACsq['AcrossSubjectsSNR'][0]
+AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
 
 plt.figure()
-plt.plot(w,np.abs(h))
+plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
+
+popt, pcov = sp.optimize.curve_fit(expFit, Window_t,SNRs_beh[:,0],bounds=([0,-np.inf],[np.inf,np.inf]),p0=[10,0.1])
+A = popt[0]
+tau = popt[1]
+fit_t = np.arange(Window_t[0],Window_t[-1],1/fs)
+exp_fit = expFit(fit_t,A,tau)
+
+
+plt.figure()
+plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
+plt.plot(fit_t,exp_fit)
+
+
+w,h_behFit = freqz(exp_fit,a=1,worN=2000,fs=fs)
+
+plt.figure()
+plt.plot(w,np.abs(20*np.log10(h_behFit)))
 plt.xlim([0,20])
 
-f_2_ind = np.where(w>=2)[0][0]
-f_8_ind = np.where(w>=8)[0][0]
+plt.figure()
+plt.errorbar(f_beh,SNRs_beh[1:,0],AcrossSubjectSEM[1:,0])
 
-coeff = np.polyfit(w[f_2_ind:f_8_ind],phase_IAC[f_2_ind:f_8_ind],deg=1)
-GD_line = coeff[0] * w[f_2_ind:f_8_ind] + coeff[1]
-GD = -coeff[0] / (2*np.pi)
+
+#%% Frequency domain 
+      
+b_IAC = pca_sp_Htavg_IAC
+#b = b[:int(np.round(.2*fs))]
+
+w,h_IAC = freqz(b_IAC,a=1,worN=2000,fs=fs)
+
+phase_IAC = np.unwrap(np.angle(h_IAC))
+
+
+plt.figure()
+plt.plot(w,np.abs(h_IAC))
+plt.xlim([0,20])
+
+f_2_ind = np.where(w>=2.5)[0][0]
+f_5_ind = np.where(w>=6)[0][0]
+
+coeff = np.polyfit(w[f_2_ind:f_5_ind],phase_IAC[f_2_ind:f_5_ind],deg=1)
+GD_line = coeff[0] * w[f_2_ind:f_5_ind] + coeff[1]
+GD_IAC = -coeff[0] / (2*np.pi)
 
 plt.figure()
 plt.plot(w,phase_IAC)
-plt.plot(w[f_2_ind:f_8_ind],GD_line,color='k')
+plt.plot(w[f_2_ind:f_5_ind],GD_line,color='k')
 plt.xlim([0,20])
 plt.ylim([-30,5])
 
 
 
-b_ITD = pca_ITD_comp1.mean(axis=1)
+b_ITD = pca_sp_Htavg_ITD
 #b_ITD = b_ITD[:int(np.round(.2*fs))]
 
-w_itd,h_itd = freqz(b_ITD,a=1,worN=4000,fs=fs)
+w_itd,h_itd = freqz(b_ITD,a=1,worN=2000,fs=fs)
 phase_itd = np.unwrap(np.angle(h_itd))
 
 plt.figure()
@@ -333,22 +426,22 @@ plt.xlim([0,20])
 
 plt.figure()
 plt.plot(w_itd,np.abs(h_itd))
-plt.plot(w,np.abs(h))
+plt.plot(w,np.abs(h_IAC))
 plt.xlim([0,20])
 
 plt.figure()
-plt.plot(w,20*np.log10(np.abs(h)),label='IAC')
+plt.plot(w,20*np.log10(np.abs(h_IAC)),label='IAC')
 plt.plot(w_itd, 20*np.log10(np.abs(h_itd)),label='ITD')
 plt.xlim([0,20])
 plt.ylim([-40,5])
 plt.legend()
 
-f_2_ind = np.where(w_itd>=2)[0][0]
-f_8_ind = np.where(w_itd>=8)[0][0]
+f_2_ind = np.where(w_itd>=2.5)[0][0]
+f_8_ind = np.where(w_itd>=6)[0][0]
 
 coeff = np.polyfit(w_itd[f_2_ind:f_8_ind],phase_itd[f_2_ind:f_8_ind],deg=1)
 GD_line = coeff[0] * w_itd[f_2_ind:f_8_ind] + coeff[1]
-GD = -coeff[0] / (2*np.pi)
+GD_ITD = -coeff[0] / (2*np.pi)
 
 plt.figure()
 plt.plot(w_itd,phase_itd)

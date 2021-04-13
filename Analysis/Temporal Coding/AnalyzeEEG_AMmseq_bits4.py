@@ -17,7 +17,7 @@ from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
 import sys
-sys.path.append('../mseqAnalysis/mseqHelper.py')
+sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
 
 # from anlffr.spectral import mtspecraw
@@ -76,9 +76,10 @@ for m in mseq_locs:
 
 #data_loc = '/media/ravinderjit/Storage2/EEGdata/'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-pickle_loc = data_loc + 'Pickles_full/'
+pickle_loc = data_loc + 'Pickles_full_wholeHead/'
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
+Subjects = ['S228', 'S238']
 num_nfs = 1
 
 for subject in Subjects:
@@ -87,6 +88,10 @@ for subject in Subjects:
     
     if subject == 'S228':
         refchans = ['EXG2']
+        
+    exclude = ['EXG1', 'EXG2',
+               'EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
+    refchans = None #average reference
     
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
@@ -98,7 +103,7 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A15') 
         data_eeg.info['bads'].append('A17') 
     elif subject =='S228':
-        data_eeg.info['bads'].append('EXG1') 
+        # data_eeg.info['bads'].append('EXG1') 
         data_eeg.info['bads'].append('A30')
 
    

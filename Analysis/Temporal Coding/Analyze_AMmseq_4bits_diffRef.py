@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Thu Apr  8 16:15:05 2021
+
+@author: ravinderjit
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Sun Mar  7 15:40:45 2021
 
 @author: ravinderjit
@@ -20,8 +28,9 @@ import scipy.io as sio
 
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-# pickle_loc = data_loc + 'Pickles_full_wholeHead/'
 pickle_loc = data_loc + 'Pickles_full/'
+pickle_loc2 = data_loc + 'Pickles_full_wholeHead/'
+
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
 
@@ -44,8 +53,13 @@ A_Htnf =[]
 A_info_obj = []
 A_ch_picks = []
 
+A_Ht2 =[]
+A_Htnf2 =[]
 
-#%% Load data
+A_info_obj2 = []
+
+
+#%% Load data 1 
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
@@ -63,6 +77,22 @@ for sub in range(len(Subjects)):
     A_info_obj.append(info_obj)
     A_ch_picks.append(ch_picks)
     
+#%% Load data 2
+
+for sub in range(len(Subjects)):
+    subject = Subjects[sub]
+    with open(os.path.join(pickle_loc2,subject+'_AMmseqbits4.pickle'),'rb') as file:
+        # [tdat, Tot_trials, Ht, Htnf, pca_sp, pca_coeff, pca_expVar, 
+        #  pca_sp_nf, pca_coeff_nf,pca_expVar_nf,ica_sp,
+        #  ica_coeff,ica_sp_nf,ica_coeff_nf, info_obj, ch_picks] = pickle.load(file)
+        [tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
+    
+    A_Tot_trials.append(Tot_trials)
+    A_Ht2.append(Ht)
+    A_Htnf2.append(Htnf)
+    
+    
+    A_info_obj2.append(info_obj)
     
 
 #%% Plot time domain Ht
@@ -163,6 +193,9 @@ for m in range(len(Ht)):
 #         ica_coeff_s2[s][m] = ica.components_
         
 #%% Get average Ht
+    
+sbp = [4,4]
+sbp2 = [4,4]
 
 perCh = np.zeros([32,1])
 for s in range(len(Subjects)):
@@ -170,21 +203,29 @@ for s in range(len(Subjects)):
         perCh[ch,0] += np.sum(A_ch_picks[s] == ch)
 
 Avg_Ht = []
+Avg_Ht2 = []
 for m in range(len(Ht)):
     Avg_m = np.zeros([32,tdat[m].size])
+    Avg_m2 = np.zeros([32,tdat[m].size])
     for s in range(len(Subjects)):
         Avg_m[A_ch_picks[s],:] += A_Ht[s][m]
+        Avg_m2[A_ch_picks[s],:] += A_Ht2[s][m]
     Avg_m = Avg_m / perCh
+    Avg_m2 = Avg_m2 / perCh
     Avg_Ht.append(Avg_m)
+    Avg_Ht2.append(Avg_m2)
+    
     
    
 for m in range(len(Avg_Ht)):
    Ht_1 = Avg_Ht[m]
+   Ht_2 = Avg_Ht2[m]
    t = tdat[m]
    fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
    for p1 in range(sbp[0]):
        for p2 in range(sbp[1]):
            axs[p1,p2].plot(t,Ht_1[p1*sbp[1]+p2,:],color='k')
+           axs[p1,p2].plot(t,Ht_2[p1*sbp[1]+p2,:],color='tab:orange')
            axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
            axs[p1,p2].set_xlim([0,0.5])
            # for n in range(m*num_nfs,num_nfs*(m+1)):
@@ -197,6 +238,7 @@ for m in range(len(Avg_Ht)):
    for p1 in range(sbp2[0]):
        for p2 in range(sbp2[1]):
            axs[p1,p2].plot(t,Ht_1[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
+           axs[p1,p2].plot(t,Ht_2[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='tab:orange')
            axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
            axs[p1,p2].set_xlim([0,0.5])
            # for n in range(m*num_nfs,num_nfs*(m+1)):
