@@ -299,9 +299,20 @@ for t_c in range(len(t_cuts)):
     plt.plot(t_,pca_sp_cuts[t_c])
     
 plt.figure()
+t_1 = np.where(t>=0)[0][0]
+t_2 = np.where(t>=t_cuts[-1])[0][0]+1
+t_s = t[t_1:t_2]
+Mean_pca_sp_cuts = np.zeros(t_2-t_1)
 for t_c in range(len(t_cuts)):
     plt.plot(A_t_[t_c],pca_sp_cuts[t_c][:,0])
-
+    if t_c ==0:
+        t_1 = 0
+    else:
+        t_1 = np.where(t_s>=t_cuts[t_c-1])[0][0]
+            
+    t_2 = np.where(t_s>=t_cuts[t_c])[0][0]
+    Mean_pca_sp_cuts[t_1:t_2] = pca_sp_cuts[t_c][:,0]
+    
 plt.figure()
 labels = ['subcortical','mixed','cortical','higher cortical']
 vmin = pca_coeff_cuts[-1][0,:].mean() - 2* pca_coeff_cuts[-1][0,:].std()
@@ -334,9 +345,83 @@ mne.viz.plot_topomap(pca_coeff_whole[1,:], mne.pick_info(A_info_obj[2], A_ch_pic
 
 
 
+#%% Save PCA template
+
+with open(os.path.join(pickle_loc, 'PCA_tsplit_temp' + '.pickle'),'wb') as file:     
+    pickle.dump([t_cuts,A_t_,pca_coeff_cuts,pca_sp_cuts,pca_expVar_cuts],file)
 
 
+#%% Use PCA template on t_splits for individuals
+    
+    
+pca_sp_cuts_temp_sub = []
+    
+for sub in range(len(Subjects)):
+    H_t_ = A_Ht[sub][3].T
+    pca_sp_cuts_ = [list() for i in range(len(t_cuts))]
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = np.where(t>=0)[0][0]
+        else:
+            t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+            
+        t_2 = np.where(t>=t_cuts[t_c])[0][0]
+        
+        H_tc = H_t_[t_1:t_2,:] - H_t_[t_1:t_2,:].mean(axis=0)[np.newaxis,:]
+        pca_sp_cuts_[t_c] = np.matmul(H_tc,pca_coeff_cuts[t_c][0,A_ch_picks[sub]])
+    
+    pca_sp_cuts_temp_sub.append(pca_sp_cuts)
     
 
+for t_c in range(len(t_cuts)):
+    plt.figure()
+    for sub in range(len(Subjects)):
+        plt.plot(A_t_[t_c],pca_sp_cuts_temp_sub[sub][t_c])
+        
+     
 
+colors = ['tab:blue','tab:orange','tab:green','tab:red','tab:purple']
+plt.figure()
+for t_c in range(len(t_cuts)):
+    for sub in range(len(Subjects)):
+        plt.plot(A_t_[t_c],pca_sp_cuts_temp_sub[sub][t_c],label=Subjects[sub],color=colors[sub])
+    
+plt.legend(Subjects)
+
+#concatentate diff segments
+t_1 = np.where(t>=0)[0][0]
+t_2 = np.where(t>=t_cuts[-1])[0][0]+1
+t_s = t[t_1:t_2]
+sub_temp_sPCA = np.zeros([t_2-t_1,len(Subjects)])
+for sub in range(len(Subjects)):
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = 0
+        else:
+            t_1 = np.where(t_s>=t_cuts[t_c-1])[0][0]
+            
+        t_2 = np.where(t_s>=t_cuts[t_c])[0][0]
+        sub_temp_sPCA[t_1:t_2,sub] = pca_sp_cuts_temp_sub[sub][t_c]
+        
+        
+plt.figure()
+plt.plot(t_s,sub_temp_sPCA)       
+plt.legend(Subjects) 
+plt.title('Un-Normalized')  
+plt.plot(t_s,Mean_pca_sp_cuts,color='k')
+
+#normalize to first peak
+sub_temp_sPCA_norm = sub_temp_sPCA.copy()
+for sub in range(len(Subjects)):
+    sub_temp_sPCA_norm[:,sub] = sub_temp_sPCA[:,sub] / np.max(pca_sp_cuts_temp_sub[sub][0])
+        
+
+plt.figure()
+plt.plot(t_s,sub_temp_sPCA_norm)  
+plt.legend(Subjects) 
+plt.title('Normazlied to max of brainstem componenet')
+        
+    
+    
+    
     

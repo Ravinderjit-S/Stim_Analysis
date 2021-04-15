@@ -325,14 +325,14 @@ plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
 plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
 plt.plot(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1),color='grey')
 plt.fill_between(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1)-2*IACnf_pcaJN_se,pca_nf_HTavg_IAC_JN.mean(axis=1)+2*IACnf_pcaJN_se,color='grey',alpha=0.3)
-
+plt.title('IAC')
 
 plt.figure()
 plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
 plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
 plt.plot(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1),color='grey')
 plt.fill_between(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1)-2*ITDnf_pcaJN_se,pca_nf_HTavg_ITD_JN.mean(axis=1)+2*ITDnf_pcaJN_se,color='grey',alpha=0.3)
-
+plt.title('ITD')
 
 
 plt.figure()

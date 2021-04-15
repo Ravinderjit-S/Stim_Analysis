@@ -19,6 +19,7 @@ import scipy.io as sio
 from anlffr.spectral import mtplv
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
+import pickle
 
 import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
@@ -31,11 +32,13 @@ refchans = ['EXG1','EXG2']
 
 data_eeg = [];
 data_evnt = [];
-  
+ 
 #data_loc = '/media/ravinderjit/Storage2/EEGdata'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/CMR_mseqTarget/CMR_mseq150_10bit'
 subject = 'S211'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
+
+
 
 Mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat' 
 Mseq_dat = sio.loadmat(Mseq_loc)
@@ -111,18 +114,18 @@ for m in range(3):
 
 
 #%% Remove epochs with large deflections
-Reject_Thresh = 150e-6
+# Reject_Thresh = 150e-6
 
 
-for m in range(len(epdat)):
-    Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
-    mask_trials = np.all(Peak2Peak <Reject_Thresh,axis=0)
-    print('rejected ' + str(epdat[m].shape[1] - sum(mask_trials)) + ' trials due to P2P')
-    epdat[m] = epdat[m][:,mask_trials,:]
-    print('Total Trials Left: ' + str(epdat[m].shape[1]))
+# for m in range(len(epdat)):
+#     Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
+#     mask_trials = np.all(Peak2Peak <Reject_Thresh,axis=0)
+#     print('rejected ' + str(epdat[m].shape[1] - sum(mask_trials)) + ' trials due to P2P')
+#     epdat[m] = epdat[m][:,mask_trials,:]
+#     print('Total Trials Left: ' + str(epdat[m].shape[1]))
     
-plt.figure()
-plt.plot(Peak2Peak.T)
+# plt.figure()
+# plt.plot(Peak2Peak.T)
 
 
 
@@ -216,71 +219,69 @@ fig.suptitle('Ht ' + labels[m])
 
 
 #%% PCA decomposition of Ht
-pca_sp = []
-pca_fft = []
-pca_phase = []
-pca_coeff = []
-pca_expVar = []
+# pca_sp = []
+# pca_fft = []
+# pca_phase = []
+# pca_coeff = []
+# pca_expVar = []
 
-pca_sp_nf = []
-pca_fft_nf = []
-pca_phase_nf = []
-pca_coeff_nf = []
-pca_expVar_nf = []
+# pca_sp_nf = []
+# pca_fft_nf = []
+# pca_phase_nf = []
+# pca_coeff_nf = []
+# pca_expVar_nf = []
 
-n_comp = 2
+# n_comp = 2
 
-for m in range(len(Ht)):
-    pca = PCA(n_components=n_comp)
-    pca.fit(Ht[m])
-    pca_space = pca.fit_transform(Ht[m].T)
-    
-    pca_sp.append(pca_space)
-    pca_coeff.append(pca.components_)
-    pca_expVar.append(pca.explained_variance_ratio_)
-    
-# for n in range(len(Htnf)):
+# for m in range(len(Ht)):
 #     pca = PCA(n_components=n_comp)
-#     pca.fit(Htnf[n])
-#     pca_space = pca.fit_transform(Htnf[n].T)
+#     pca.fit(Ht[m])
+#     pca_space = pca.fit_transform(Ht[m].T)
     
-#     nfft=2**np.log2(Htnf[n].shape[1])
-#     pca_f = sp.fft(pca_space,n=nfft,axis=0)
+#     pca_sp.append(pca_space)
+#     pca_coeff.append(pca.components_)
+#     pca_expVar.append(pca.explained_variance_ratio_)
     
-#     pca_sp_nf.append(pca_space)
-#     pca_fft_nf.append(pca_f)
-#     pca_coeff_nf.append(pca.components_)
-#     pca_expVar_nf.append(pca.explained_variance_ratio_)
+# # for n in range(len(Htnf)):
+# #     pca = PCA(n_components=n_comp)
+# #     pca.fit(Htnf[n])
+# #     pca_space = pca.fit_transform(Htnf[n].T)
     
-for m in range(len(pca_sp)):
-    fig,axs = plt.subplots(2,1)
-    axs[0].plot(t,pca_sp[m])
-    # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #     axs[0].plot(tdat[m],pca_sp_nf[n],color='grey',alpha=0.3)
+# #     nfft=2**np.log2(Htnf[n].shape[1])
+# #     pca_f = sp.fft(pca_space,n=nfft,axis=0)
+    
+# #     pca_sp_nf.append(pca_space)
+# #     pca_fft_nf.append(pca_f)
+# #     pca_coeff_nf.append(pca.components_)
+# #     pca_expVar_nf.append(pca.explained_variance_ratio_)
+    
+# for m in range(len(pca_sp)):
+#     fig,axs = plt.subplots(2,1)
+#     axs[0].plot(t,pca_sp[m])
+#     # for n in range(m*num_nfs,num_nfs*(m+1)):
+#     #     axs[0].plot(tdat[m],pca_sp_nf[n],color='grey',alpha=0.3)
     
 
     
-    axs[1].plot(ch_picks,pca_coeff[m].T)
-    axs[1].set_xlabel('channel')
-    # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #     axs[3].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
-    fig.suptitle('PCA ' + labels[m])    
+#     axs[1].plot(ch_picks,pca_coeff[m].T)
+#     axs[1].set_xlabel('channel')
+#     # for n in range(m*num_nfs,num_nfs*(m+1)):
+#     #     axs[3].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
+#     fig.suptitle('PCA ' + labels[m])    
     
-p_ind = 2
-vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
-vmax = pca_coeff[p_ind].mean() + 2 * pca_coeff[p_ind].std()
-plt.figure()
-mne.viz.plot_topomap(pca_coeff[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
-plt.figure()
-mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+# p_ind = 2
+# vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
+# vmax = pca_coeff[p_ind].mean() + 2 * pca_coeff[p_ind].std()
 # plt.figure()
-# mne.viz.plot_topomap(pca_coeff[2][2,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
+# mne.viz.plot_topomap(pca_coeff[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+# plt.figure()
+# mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+# # plt.figure()
+# # mne.viz.plot_topomap(pca_coeff[2][2,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
 
 
 #%% PCA decomposition on t_splits
-t_cuts = [.015, 0.040,.125]
-
-
+t_cuts = [.015,.040,.125,.500]
 
 pca_sp_cuts_cond = []
 pca_expVar_cuts_cond = []
@@ -338,6 +339,46 @@ for m in range(len(Ht)):
 # mne.viz.plot_topomap(pca_coeff_s1[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
 # plt.figure()
 # mne.viz.plot_topomap(pca_coeff_s2[p_ind][0,:], mne.pick_info(epochs[0].info, ch_picks),vmin=vmin,vmax=vmax)
+
+#%% PCA decomposition with template
+
+pca_template_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/Pickles_full/PCA_tsplit_temp.pickle'
+with open(pca_template_loc,'rb') as file:
+    [t_cuts,A_t_,pca_coeff_cuts,pca_sp_cuts,pca_expVar_cuts] = pickle.load(file)
+
+pca_sp_cuts_temp_cond = []
+pca = PCA(n_components=1)
+t__ = [list() for i in range(len(t_cuts))]
+
+ 
+for m in range(len(Ht)): #each condition
+    pca_sp_cuts = [list() for i in range(len(t_cuts))]
+
+    
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = np.where(t>=0)[0][0]
+        else:
+            t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        t_2 = np.where(t>=t_cuts[t_c])[0][0]
+        
+        Ht_segment = Ht[m][:,t_1:t_2].T
+        Ht_segment = Ht_segment - Ht_segment.mean(axis=0)[np.newaxis,:] #demean
+        pca_sp_cuts[t_c] = np.matmul(Ht_segment,pca_coeff_cuts[t_c][0,ch_picks].T)
+     
+        t__[t_c] = t[t_1:t_2]
+    
+    pca_sp_cuts_temp_cond.append(pca_sp_cuts)
+
+
+
+for t_c in range(len(t_cuts)):
+    plt.figure()
+    for m in range(len(Ht)):
+        plt.plot(t__[t_c],pca_sp_cuts_temp_cond[m][t_c])
+
+
+
 
 
 
