@@ -52,6 +52,7 @@ Num_noiseFloors = 10
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
+Subjects = ['S207']
 
 # tend = 2 #keep Ht until
 # tend_ind =  round(tend*2048) -1 

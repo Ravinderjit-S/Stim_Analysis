@@ -118,50 +118,7 @@ for m in range(len(Ht)):
             
     fig.suptitle('Ht ' +  str(m_bits[m]) + ' bits')   
 
-#%% Split Ht into two times and do PCA
-    
-# t_split1 = .050
-# t_split2 = .5
 
-# pca_sp_s1 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-# pca_sp_s2 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-
-# pca_expVar_s1 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-# pca_expVar_s2 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-
-# pca_coeff_s1 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-# pca_coeff_s2 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-
-# ica_sp_s1 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-# ica_sp_s2 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-
-# ica_coeff_s1 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-# ica_coeff_s2 = [[list() for i in range(len(A_Ht[0]))] for j in range(len(A_Ht))]
-
-
-# pca = PCA(n_components=2)
-# ica = FastICA(n_components=1)
-# for s in range(len(Subjects)):
-#     for m in range(len(Ht)):
-#         t = tdat[m]
-#         t_1 = np.where(t>=0)[0][0]
-#         t_2 = np.where(t>=t_split1)[0][0]
-#         t_3 = np.where(t>=t_split2)[0][0]
-        
-#         pca_sp_s1[s][m] = pca.fit_transform(A_Ht[s][m][:,t_1:t_2].T)
-#         pca_expVar_s1[s][m] = pca.explained_variance_ratio_
-#         pca_coeff_s1[s][m] = pca.components_
-        
-#         pca_sp_s2[s][m] = pca.fit_transform(A_Ht[s][m][:,t_2:t_3].T)
-#         pca_expVar_s2[s][m] = pca.explained_variance_ratio_
-#         pca_coeff_s2[s][m] = pca.components_
-        
-#         ica_sp_s1[s][m] = ica.fit_transform(A_Ht[s][m][:,t_1:t_2].T)
-#         ica_coeff_s1[s][m] = ica.components_
-        
-#         ica_sp_s2[s][m] = ica.fit_transform(A_Ht[s][m][:,t_2:t_3].T)
-#         ica_coeff_s2[s][m] = ica.components_
-        
 #%% Get average Ht
 
 perCh = np.zeros([32,1])
