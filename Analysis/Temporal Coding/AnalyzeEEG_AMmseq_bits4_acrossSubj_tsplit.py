@@ -327,7 +327,7 @@ for sub in range(len(Subjects)):
         H_tc = H_t_[t_1:t_2,:] - H_t_[t_1:t_2,:].mean(axis=0)[np.newaxis,:]
         pca_sp_cuts_[t_c] = np.matmul(H_tc,pca_coeff_cuts[t_c][0,A_ch_picks[sub]])
     
-    pca_sp_cuts_temp_sub.append(pca_sp_cuts)
+    pca_sp_cuts_temp_sub.append(pca_sp_cuts_)
     
 
 for t_c in range(len(t_cuts)):
@@ -366,6 +366,7 @@ plt.plot(t_s,sub_temp_sPCA)
 plt.legend(Subjects) 
 plt.title('Un-Normalized')  
 plt.plot(t_s,Mean_pca_sp_cuts,color='k')
+plt.xlabel('Time (s)')
 
 #normalize to first peak
 sub_temp_sPCA_norm = sub_temp_sPCA.copy()
@@ -375,8 +376,10 @@ for sub in range(len(Subjects)):
 
 plt.figure()
 plt.plot(t_s,sub_temp_sPCA_norm)  
+plt.plot(t_s,sub_temp_sPCA_norm.mean(axis=1),color='k')
 plt.legend(Subjects) 
 plt.title('Normazlied to max of brainstem componenet')
+plt.xlabel('Time (s)')
         
     
     

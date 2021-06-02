@@ -16,18 +16,23 @@ Trials = 300;
 %windw = hann(round(M_dur*fs))'; windw = [windw;windw];
 t_windw = 0:1/fs:M_samps/fs-1/fs;
 windw = 0.5*(1+sin(2*pi*(1/M_dur)*t_windw-pi/2)); windw = [windw;windw];
-
-for j = 1:300
+shifts = [];
+for j = 1:Trials
     stimL = [];
     stimR = [];
+    shift_j = randi(length(Mseq));
+    shifts = [shifts,shift_j]; 
+    Mseq_j = circshift(Mseq,shift_j);
     for i =1:length(Mseq)
-        nbn = makeNBNfft_binaural_V2(flow,fhigh,M_dur,fs,Mseq(i),0);
+        nbn = makeNBNfft_binaural_V2(flow,fhigh,M_dur,fs,Mseq_j(i),0);
+        nbn = nbn(:,1:end-1);
         nbn = nbn.*windw;
         stimL = [stimL nbn(1,:)]; stimR = [stimR nbn(2,:)]; %#ok
     end
     stimIAC = [stimL;stimR];
-    save(['StimMseq_IAC/stim_Mseq_IAC' num2str(j)],'stimIAC')
+    save(['StimMseqShuff_IAC/stim_Mseq_IAC' num2str(j)],'stimIAC','shift_j')
 end
+save('StimMseqShuff_IAC/MseqShifts.mat','shifts','Mseq')
 %sound(stim,fs)
    
 % t = 0:1/fs:length(stimR)/fs-1/fs;
@@ -36,21 +41,22 @@ end
 
 
 ITD_jump = 500e-6;
-for j = 1:300
+for j = 1:Trials
     stimL = [];
     stimR = [];
     for i =1:length(Mseq)
         if Mseq(i) == 1
-            IPD = pi/2;
+            ITD = ITD_jump;
         else
-            IPD = 0;
+            ITD = 0;
         end
-        nbn = makeNBNfft_binaural_V3(flow,fhigh,M_dur,fs,1,0,IPD);
+        nbn = makeNBNfft_binaural_V2(flow,fhigh,M_dur,fs,1,ITD);
+        nbn = nbn(:,1:end-1);
         nbn = nbn.*windw;
         stimL = [stimL nbn(1,:)]; stimR = [stimR nbn(2,:)]; %#ok
     end
-    stimIPD = [stimL;stimR];
-    save(['StimMseq_IPD/stim_Mseq_IPD' num2str(j)],'stimIPD')
+    stimITD = [stimL;stimR];
+    save(['StimMseqShuff_ITD/stim_Mseq_ITD' num2str(j)],'stimITD')
 end
 
 

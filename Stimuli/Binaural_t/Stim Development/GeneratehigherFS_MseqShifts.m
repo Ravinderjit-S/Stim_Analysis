@@ -1,5 +1,7 @@
 clear
-load('Mseq_IAC_ITD.mat')
+%load('Mseq_IAC_ITD.mat')
+load('StimMseqShuff_IAC/MseqShifts.mat')
+
 
 
 EEG_fs=4096;
@@ -12,23 +14,30 @@ AddPoints_ideal = EachPoint*EEG_fs;
 AddPoints = round(EachPoint*EEG_fs); 
 CompensateEvery = ceil(1/(AddPoints - AddPoints_ideal));
 
-Mseq_sig = [];
+
 Mseq_sig2 = [];
-for i =1:length(Mseq)
-    if mod(i,CompensateEvery)==0
-        Mseq_sig = [Mseq_sig Mseq(i) * ones(1,AddPoints-1)];
-    else
-        Mseq_sig = [Mseq_sig Mseq(i)*ones(1,AddPoints)];
+Mseq_trial = [];
+for sh = 1:length(shifts)
+    Mseq_sig = [];
+    Mseq_sh = circshift(Mseq,shifts(sh));
+    for i =1:length(Mseq_sh)
+        if mod(i,CompensateEvery)==0
+            Mseq_sig = [Mseq_sig Mseq_sh(i) * ones(1,AddPoints-1)];
+        else
+            Mseq_sig = [Mseq_sig Mseq_sh(i)*ones(1,AddPoints)];
+        end
+        %Mseq_sig2 = [Mseq_sig2 Mseq(i)*ones(1,2441)];
     end
-    Mseq_sig2 = [Mseq_sig2 Mseq(i)*ones(1,2441)];
+    Mseq_trial(:,sh) = Mseq_sig;
 end
 
+
 t = 0:1/EEG_fs:(length(Mseq_sig)-1)/EEG_fs;
-t2 = 0:1/Sound_fs:length(Mseq_sig2)/Sound_fs - 1/Sound_fs;
+% t2 = 0:1/Sound_fs:length(Mseq_sig2)/Sound_fs - 1/Sound_fs;
 
-figure, plot(t,Mseq_sig,'b',t2,Mseq_sig2,'r')
+% figure, plot(t,Mseq_sig,'b',t2,Mseq_sig2,'r')
 
-mm = xcorr(Mseq_sig);
+% mm = xcorr(Mseq_sig);
 
 % [f,p]=MagSpec(Mseq_sig,EEG_fs); 
 % figure,plot(f,p), title('MagSpec(Mseq)')

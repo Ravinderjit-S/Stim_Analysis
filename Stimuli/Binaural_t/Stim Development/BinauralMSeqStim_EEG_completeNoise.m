@@ -31,7 +31,7 @@ for j = 1:1
         stimL = [stimL nbn]; stimR = [stimR nbn2]; %#ok
     end
     stimIAC = [stimL;stimR];
-    %save(['StimMseq_IAC/stim_Mseq_IAC' num2str(j)],'stimIAC')
+    save(['StimMseq_IAC/stim_Mseq_IAC' num2str(j)],'stimIAC')
 end
 %sound(stim,fs)
    

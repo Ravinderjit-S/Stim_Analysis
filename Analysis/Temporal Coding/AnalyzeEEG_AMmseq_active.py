@@ -17,7 +17,7 @@ from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
 import sys
-sys.path.append('../mseqAnalysis/mseqHelper.py')
+sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
 
 # from anlffr.spectral import mtspecraw
@@ -128,7 +128,7 @@ fig.suptitle('Ht ')
     
 fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
 for p1 in range(sbp2[0]):
-    for p2 in range(sbp2[1]):
+    for p2 in range(sbp2[1]): 
         axs[p1,p2].plot(t,Ht[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
         # for n in range(m*num_nfs,num_nfs*(m+1)):
