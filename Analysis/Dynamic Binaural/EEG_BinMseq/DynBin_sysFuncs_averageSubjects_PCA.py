@@ -14,6 +14,7 @@ import mne
 import matplotlib.pyplot as plt
 from scipy.signal import freqz
 from scipy.io import loadmat
+from scipy.special import erf
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
@@ -157,6 +158,9 @@ fig.suptitle('Ht ITD')
 t_1 = np.where(t>=-1.25)[0][0]
 t_2 = np.where(t>=-0.75)[0][0]
 
+t_1 = np.where(t>=0)[0][0]
+t_2 = np.where(t>=0.5)[0][0]
+
 
 pca = PCA(n_components=1)
 pca_sp_Htavg_IAC = pca.fit_transform(Ht_avg_IAC[:,t_1:t_2].T)
@@ -263,87 +267,40 @@ plt.figure()
 mne.viz.plot_topomap(pca_IAC_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
 plt.title('IAC: PCA coeffs mean JN')
 
-#%% Noise Floor computation 
 
-Anp_IAC_Ht_nf = np.zeros([A_IAC_Ht_nf[0][0].shape[0],A_IAC_Ht_nf[0][0].shape[1],len(A_IAC_Ht_nf[0]*len(Subjects))])
-Anp_ITD_Ht_nf = np.zeros([A_ITD_Ht_nf[0][0].shape[0],A_ITD_Ht_nf[0][0].shape[1],len(A_ITD_Ht_nf[0]*len(Subjects))])
-for s in range(len(Subjects)):
+#%% Compute Noise Floors By applying real topomap coeffs to NFs
+
+All_IACnfs = np.zeros([t_2-t_1, len(Subjects)*len(A_IAC_Ht_nf[0])])
+All_ITDnfs = np.zeros([t_2-t_1, len(Subjects)*len(A_ITD_Ht_nf[0])])
+it = 0
+for sub in range(len(Subjects)):
     for nf in range(len(A_IAC_Ht_nf[0])):
-        Anp_IAC_Ht_nf[:,:,s*nf+nf] = A_IAC_Ht_nf[s][nf]
-        Anp_ITD_Ht_nf[:,:,s*nf+nf] = A_ITD_Ht_nf[s][nf]
+        _IACnf = A_IAC_Ht_nf[sub][nf][:,t_1:t_2] - A_IAC_Ht_nf[sub][nf][:,t_1:t_2].mean(axis=1)[:,np.newaxis]
+        _ITDnf = A_ITD_Ht_nf[sub][nf][:,t_1:t_2] - A_ITD_Ht_nf[sub][nf][:,t_1:t_2].mean(axis=1)[:,np.newaxis]
         
-pca_nf_HTavg_IAC_JN = np.zeros([pca_sp_Htavg_IAC.shape[0],Anp_IAC_Ht_nf.shape[2]])
-pca_IACnf_comp = np.zeros([32,Anp_IAC_Ht_nf.shape[2]])
-
-pca_nf_HTavg_ITD_JN = np.zeros([pca_sp_Htavg_ITD.shape[0],Anp_ITD_Ht_nf.shape[2]])
-pca_ITDnf_comp = np.zeros([32,Anp_ITD_Ht_nf.shape[2]])
-
-for jn in range(Anp_IAC_Ht_nf.shape[2]):
-    print('On nf JN: ' + str(jn))
-    s_jn = np.delete(np.arange(Anp_IAC_Ht_nf.shape[2]),jn)
-    Htnf_avg_IAC_JN = Anp_IAC_Ht_nf[:,t_1:t_2,s_jn].mean(axis=2)
-    Htnf_avg_ITD_JN = Anp_ITD_Ht_nf[:,t_1:t_2,s_jn].mean(axis=2)
-    
-    pca_IACnf_JN = pca.fit_transform(Htnf_avg_IAC_JN.T)[:,0]
-    pca_IACnf_coeffs = pca.components_
-    
-    pca_ITDnf_JN = pca.fit_transform(Htnf_avg_ITD_JN.T)[:,0]
-    pca_ITDnf_coeffs = pca.components_
-    
-
-    
-    if pca_IACnf_coeffs[0,channels].mean() < pca_IACnf_coeffs[0,:].mean(): 
-        pca_IACnf_coeffs = - pca_IACnf_coeffs
-        pca_IACnf_JN = - pca_IACnf_JN
+        _IACnf = np.matmul(pca_Htavg_IACcoeffs, _IACnf)
+        _ITDnf = np.matmul(pca_Htavg_ITDcoeffs, _ITDnf)
+        All_IACnfs[:,it] = _IACnf
+        All_ITDnfs[:,it] = _ITDnf
+        it+=1
         
-    if pca_IACnf_coeffs[0,channels].mean() < 0:
-        pca_IACnf_coeffs = - pca_IACnf_coeffs
-        pca_IACnf_JN = - pca_IACnf_JN
-    
-    if pca_ITDnf_coeffs[0,channels].mean() < pca_IACnf_coeffs[0,:].mean():
-        pca_ITDnf_coeffs = -pca_ITDnf_coeffs
-        pca_ITDnf_JN = -pca_ITDnf_JN
-        
-    if pca_ITDnf_coeffs[0,channels].mean() < 0:
-        pca_ITDnf_coeffs = - pca_ITDnf_coeffs
-        pca_ITDnf_JN = - pca_ITDnf_JN
-        
-    pca_IACnf_comp[:,jn] = pca_IACnf_coeffs.squeeze()
-    pca_nf_HTavg_IAC_JN[:,jn] = pca_IACnf_JN
-    
-    pca_ITDnf_comp[:,jn] = pca_ITDnf_coeffs.squeeze()
-    pca_nf_HTavg_ITD_JN[:,jn] = pca_ITDnf_JN
 
-IACnf_pcaJN_var = (pca_nf_HTavg_IAC_JN.shape[1]-1) * np.sum( (pca_nf_HTavg_IAC_JN - pca_nf_HTavg_IAC_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1)
-IACnf_pcaJN_se = np.sqrt(IACnf_pcaJN_var / pca_sp_Htavg_IAC_JN.shape[1])
-
-ITDnf_pcaJN_var = (pca_nf_HTavg_ITD_JN.shape[1]-1) * np.sum( (pca_nf_HTavg_ITD_JN - pca_nf_HTavg_ITD_JN.mean(axis=1)[:,np.newaxis]) **2,axis=1)
-ITDnf_pcaJN_se = np.sqrt(ITDnf_pcaJN_var / pca_sp_Htavg_ITD_JN.shape[1])
+IACnf_se = All_IACnfs.std(axis=1) / np.sqrt(len(Subjects))
+ITDnf_se = All_ITDnfs.std(axis=1) / np.sqrt(len(Subjects))
 
 plt.figure()
+plt.plot(t[t_1:t_2],All_IACnfs.mean(axis=1),color='grey')
+plt.fill_between(t[t_1:t_2],All_IACnfs.mean(axis=1) - 2*IACnf_se, All_IACnfs.mean(axis=1) + 2*IACnf_se,color='grey')
 plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
-plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
-plt.plot(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1),color='grey')
-plt.fill_between(t[t_1:t_2],pca_nf_HTavg_IAC_JN.mean(axis=1)-2*IACnf_pcaJN_se,pca_nf_HTavg_IAC_JN.mean(axis=1)+2*IACnf_pcaJN_se,color='grey',alpha=0.3)
-plt.title('IAC')
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se,color='k')
+
 
 plt.figure()
+plt.plot(t[t_1:t_2],All_ITDnfs.mean(axis=1),color='grey')
+plt.fill_between(t[t_1:t_2],All_ITDnfs.mean(axis=1) - 2*ITDnf_se, All_ITDnfs.mean(axis=1) + 2*ITDnf_se,color='grey')
 plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
-plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
-plt.plot(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1),color='grey')
-plt.fill_between(t[t_1:t_2],pca_nf_HTavg_ITD_JN.mean(axis=1)-2*ITDnf_pcaJN_se,pca_nf_HTavg_ITD_JN.mean(axis=1)+2*ITDnf_pcaJN_se,color='grey',alpha=0.3)
-plt.title('ITD')
-
-
-plt.figure()
-mne.viz.plot_topomap(pca_IACnf_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
-plt.title('IAC: Noise PCA coeffs')
-
-plt.figure()
-mne.viz.plot_topomap(pca_ITDnf_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
-plt.title('ITD: Noise PCA coeffs')
-
-
+plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se,color='k')
+    
 
 #%% Behavioral Binaural Unmasking Dynamics
 
@@ -351,6 +308,19 @@ def expFit(x,A,tau):
     Out = A*(1 - np.exp(-x/tau))
     return Out
 
+stDevNeg = 0.1
+stDevPos = 0.3
+tneg = np.arange(-stDevNeg*5,0,.01)
+tpos = np.arange(0,stDevPos*5+.01,.01)
+
+simpGaussNeg = np.exp(-0.5*(tneg/stDevNeg)**2)
+simpGaussPos = np.exp(-0.5*(tpos/stDevPos)**2)
+
+simpGauss = np.concatenate((simpGaussNeg,simpGaussPos))
+t = np.concatenate((tneg,tpos))
+
+plt.figure()
+plt.plot(t,simpGauss)
 
 beh_dataPath = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/'
 beh_IACsq = loadmat(os.path.abspath(beh_dataPath+'IACsquareTone_Processed.mat'))
@@ -360,29 +330,46 @@ f_beh = Window_t[1:]**-1
 SNRs_beh = beh_IACsq['AcrossSubjectsSNR'] - beh_IACsq['AcrossSubjectsSNR'][0]
 AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
 
-plt.figure()
-plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
-
-popt, pcov = sp.optimize.curve_fit(expFit, Window_t,SNRs_beh[:,0],bounds=([0,-np.inf],[np.inf,np.inf]),p0=[10,0.1])
-A = popt[0]
-tau = popt[1]
-fit_t = np.arange(Window_t[0],Window_t[-1],1/fs)
-exp_fit = expFit(fit_t,A,tau)
-
+# SNRs_beh = 10**(SNRs_beh/20)
 
 plt.figure()
 plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
-plt.plot(fit_t,exp_fit)
+
+# popt, pcov = sp.optimize.curve_fit(expFit, Window_t,SNRs_beh[:,0],bounds=([0,-np.inf],[np.inf,np.inf]),p0=[10,0.1])
+# A = popt[0]
+# tau = popt[1]
+# fit_t = np.arange(Window_t[0],Window_t[-1],1/fs)
+# exp_fit = expFit(fit_t,A,tau)
 
 
-w,h_behFit = freqz(exp_fit,a=1,worN=2000,fs=fs)
+Tnu = 10**(-beh_IACsq['AcrossSubjectsSNR'][0]/10)
+Tno = 10**(-beh_IACsq['AcrossSubjectsSNR'][9]/10)
+
+rho = np.arange(0,1.01,.01)
+eq = -10*np.log10(rho + (1-rho)*(Tnu/Tno))
+
+#eq2 = -10*np.log10(0.5*(1+rho) + 0.5*(1-rho) * (Tnu/Tno))
 
 plt.figure()
-plt.plot(w,np.abs(20*np.log10(h_behFit)))
-plt.xlim([0,20])
+plt.plot(rho,eq)
+#plt.plot(rho,eq2)
+
 
 plt.figure()
-plt.errorbar(f_beh,SNRs_beh[1:,0],AcrossSubjectSEM[1:,0])
+plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
+# plt.plot(fit_t,exp_fit)
+
+
+# w,h_behFit = freqz(exp_fit,a=1,worN=2000,fs=fs)
+
+# plt.figure()
+# plt.plot(w,np.abs(20*np.log10(h_behFit)))
+# plt.xlim([0,20])
+
+plt.figure()
+plt.errorbar(f_beh/2,SNRs_beh[1:,0],AcrossSubjectSEM[1:,0])
+
+
 
 
 #%% Frequency domain 
