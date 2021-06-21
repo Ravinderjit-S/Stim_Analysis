@@ -21,7 +21,7 @@ from sklearn.decomposition import FastICA
 
 #data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_2')
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32_refAvg/')
-fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin')
+fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/')
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
@@ -150,8 +150,6 @@ for p1 in range(sbp2[0]):
          
 fig.suptitle('Ht ITD')
 
-    
-
 
 #%% Get response from pca on average response
 
@@ -189,6 +187,7 @@ vmax = pca_Htavg_IACcoeffs.mean() + 2*pca_Htavg_IACcoeffs.std()
 
 plt.figure()
 mne.viz.plot_topomap(pca_Htavg_IACcoeffs.squeeze(), info_obj,vmin=vmin,vmax=vmax)
+plt.savefig(os.path.join(fig_path, 'IACavg_PCA_topomap.svg') , format='svg')
 plt.title('IAC: Avg Subjects then calculate coeffs')
 
 # vmin = pca_Htavg_ITDcoeffs.mean() - 2*pca_Htavg_ITDcoeffs.std()
@@ -197,6 +196,7 @@ plt.title('IAC: Avg Subjects then calculate coeffs')
 
 plt.figure()
 mne.viz.plot_topomap(pca_Htavg_ITDcoeffs.squeeze(), mne.pick_info(info_obj, ch_picks),vmin=vmin,vmax=vmax)
+plt.savefig(os.path.join(fig_path, 'ITDavg_PCA_topomap.svg') , format='svg')
 plt.title('ITD: Avg Subjects then calculate coeffs')
 
 
