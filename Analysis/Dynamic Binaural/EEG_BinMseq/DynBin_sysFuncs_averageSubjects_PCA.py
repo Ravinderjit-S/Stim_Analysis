@@ -12,6 +12,8 @@ import numpy as np
 import scipy as sp
 import mne
 import matplotlib.pyplot as plt
+import matplotlib 
+import matplotlib.ticker as mtick
 from scipy.signal import freqz
 from scipy.io import loadmat
 from scipy.special import erf
@@ -288,39 +290,58 @@ for sub in range(len(Subjects)):
 IACnf_se = All_IACnfs.std(axis=1) / np.sqrt(len(Subjects))
 ITDnf_se = All_ITDnfs.std(axis=1) / np.sqrt(len(Subjects))
 
-plt.figure()
-plt.plot(t[t_1:t_2],All_IACnfs.mean(axis=1),color='grey')
-plt.fill_between(t[t_1:t_2],All_IACnfs.mean(axis=1) - 2*IACnf_se, All_IACnfs.mean(axis=1) + 2*IACnf_se,color='grey')
-plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
-plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se,color='k')
+fontsz = 11
 
+fig, ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+ax.plot(t[t_1:t_2],All_IACnfs.mean(axis=1),color='grey',linewidth=2)
+ax.fill_between(t[t_1:t_2],All_IACnfs.mean(axis=1) - 2*IACnf_se, All_IACnfs.mean(axis=1) + 2*IACnf_se,color='lightgrey')
+ax.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k',linewidth=2)
+ax.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se,color=[0.25,0.25,0.25])
+ax.set_xlim([0,0.5])
+ax.set_yticks([-3e-3,0,3e-3,6e-3])
+ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax.set_xlabel('Time (sec)')
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'IAC_HtAvg_pca.svg') , format='svg')
 
-plt.figure()
-plt.plot(t[t_1:t_2],All_ITDnfs.mean(axis=1),color='grey')
-plt.fill_between(t[t_1:t_2],All_ITDnfs.mean(axis=1) - 2*ITDnf_se, All_ITDnfs.mean(axis=1) + 2*ITDnf_se,color='grey')
-plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
-plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se,color='k')
-    
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+ax.plot(t[t_1:t_2],All_ITDnfs.mean(axis=1),color='grey',linewidth=2)
+ax.fill_between(t[t_1:t_2],All_ITDnfs.mean(axis=1) - 2*ITDnf_se, All_ITDnfs.mean(axis=1) + 2*ITDnf_se,color='lightgrey')
+ax.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k',linewidth=2)
+ax.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se,color=[0.25,0.25,0.25])
+ax.set_xlim([0,0.5])
+ax.set_yticks([-4e-3,-2e-3,0,2e-3,4e-3])
+ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax.set_xlabel('Time (sec)')
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'ITD_HtAvg_pca.svg') , format='svg')
 
 #%% Behavioral Binaural Unmasking Dynamics
 
-def expFit(x,A,tau):
-    Out = A*(1 - np.exp(-x/tau))
-    return Out
-
-stDevNeg = 0.1
-stDevPos = 0.3
-tneg = np.arange(-stDevNeg*5,0,.01)
-tpos = np.arange(0,stDevPos*5+.01,.01)
+#analysis in BinBehSysModel.py
+stDevNeg = .061
+stDevPos = .061
+tneg = np.arange(-stDevNeg*4,0,1/fs)
+tpos = np.arange(0,stDevPos*4+.01,1/fs)
 
 simpGaussNeg = np.exp(-0.5*(tneg/stDevNeg)**2)
 simpGaussPos = np.exp(-0.5*(tpos/stDevPos)**2)
 
 simpGauss = np.concatenate((simpGaussNeg,simpGaussPos))
+simpGauss = simpGauss / np.sum(simpGauss)
+
+simpGauss = np.concatenate((simpGaussNeg,simpGaussPos))
 t = np.concatenate((tneg,tpos))
+
+w_behMod, h_behMod = freqz(simpGauss,a=1,worN=2000,fs=fs)
 
 plt.figure()
 plt.plot(t,simpGauss)
+
+plt.figure()
+plt.plot(w_behMod, np.abs(h_behMod) / np.max(np.abs(h_behMod)))
 
 beh_dataPath = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/'
 beh_IACsq = loadmat(os.path.abspath(beh_dataPath+'IACsquareTone_Processed.mat'))
@@ -330,44 +351,7 @@ f_beh = Window_t[1:]**-1
 SNRs_beh = beh_IACsq['AcrossSubjectsSNR'] - beh_IACsq['AcrossSubjectsSNR'][0]
 AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
 
-# SNRs_beh = 10**(SNRs_beh/20)
 
-plt.figure()
-plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
-
-# popt, pcov = sp.optimize.curve_fit(expFit, Window_t,SNRs_beh[:,0],bounds=([0,-np.inf],[np.inf,np.inf]),p0=[10,0.1])
-# A = popt[0]
-# tau = popt[1]
-# fit_t = np.arange(Window_t[0],Window_t[-1],1/fs)
-# exp_fit = expFit(fit_t,A,tau)
-
-
-Tnu = 10**(-beh_IACsq['AcrossSubjectsSNR'][0]/10)
-Tno = 10**(-beh_IACsq['AcrossSubjectsSNR'][9]/10)
-
-rho = np.arange(0,1.01,.01)
-eq = -10*np.log10(rho + (1-rho)*(Tnu/Tno))
-
-#eq2 = -10*np.log10(0.5*(1+rho) + 0.5*(1-rho) * (Tnu/Tno))
-
-plt.figure()
-plt.plot(rho,eq)
-#plt.plot(rho,eq2)
-
-
-plt.figure()
-plt.errorbar(Window_t,SNRs_beh,AcrossSubjectSEM)
-# plt.plot(fit_t,exp_fit)
-
-
-# w,h_behFit = freqz(exp_fit,a=1,worN=2000,fs=fs)
-
-# plt.figure()
-# plt.plot(w,np.abs(20*np.log10(h_behFit)))
-# plt.xlim([0,20])
-
-plt.figure()
-plt.errorbar(f_beh/2,SNRs_beh[1:,0],AcrossSubjectSEM[1:,0])
 
 
 
@@ -375,69 +359,150 @@ plt.errorbar(f_beh/2,SNRs_beh[1:,0],AcrossSubjectSEM[1:,0])
 #%% Frequency domain 
       
 b_IAC = pca_sp_Htavg_IAC
-#b = b[:int(np.round(.2*fs))]
-
-w,h_IAC = freqz(b_IAC,a=1,worN=2000,fs=fs)
-
+w_IAC,h_IAC = freqz(b_IAC,a=1,worN=2000,fs=fs)
 phase_IAC = np.unwrap(np.angle(h_IAC))
 
+# plt.figure()
+# plt.plot(w_IAC,np.abs(h_IAC))
+# plt.xlim([0,20])
 
-plt.figure()
-plt.plot(w,np.abs(h_IAC))
-plt.xlim([0,20])
+f_2_ind = np.where(w_IAC>=2.5)[0][0]
+f_5_ind = np.where(w_IAC>=6)[0][0]
 
-f_2_ind = np.where(w>=2.5)[0][0]
-f_5_ind = np.where(w>=6)[0][0]
-
-coeff = np.polyfit(w[f_2_ind:f_5_ind],phase_IAC[f_2_ind:f_5_ind],deg=1)
-GD_line = coeff[0] * w[f_2_ind:f_5_ind] + coeff[1]
+coeff = np.polyfit(w_IAC[f_2_ind:f_5_ind],phase_IAC[f_2_ind:f_5_ind],deg=1)
+GD_line_IAC = coeff[0] * w_IAC[f_2_ind:f_5_ind] + coeff[1]
 GD_IAC = -coeff[0] / (2*np.pi)
 
-plt.figure()
-plt.plot(w,phase_IAC)
-plt.plot(w[f_2_ind:f_5_ind],GD_line,color='k')
-plt.xlim([0,20])
-plt.ylim([-30,5])
+# plt.figure()
+# plt.plot(w_IAC,phase_IAC)
+# plt.plot(w_IAC[f_2_ind:f_5_ind],GD_line_IAC,color='k')
+# plt.xlim([0,20])
+# plt.ylim([-30,5])
 
 
 
 b_ITD = pca_sp_Htavg_ITD
-#b_ITD = b_ITD[:int(np.round(.2*fs))]
-
 w_itd,h_itd = freqz(b_ITD,a=1,worN=2000,fs=fs)
 phase_itd = np.unwrap(np.angle(h_itd))
 
-plt.figure()
-plt.plot(w_itd,np.abs(h_itd))
-plt.xlim([0,20])
+# plt.figure()
+# plt.plot(w_itd,np.abs(h_itd))
+# plt.xlim([0,20])
 
-plt.figure()
-plt.plot(w_itd,np.abs(h_itd))
-plt.plot(w,np.abs(h_IAC))
-plt.xlim([0,20])
+# plt.figure()
+# plt.plot(w_itd,np.abs(h_itd))
 
-plt.figure()
-plt.plot(w,20*np.log10(np.abs(h_IAC)),label='IAC')
-plt.plot(w_itd, 20*np.log10(np.abs(h_itd)),label='ITD')
-plt.xlim([0,20])
-plt.ylim([-40,5])
-plt.legend()
+# plt.plot(w_IAC,np.abs(h_IAC))
+# plt.xlim([0,20])
+
+# plt.figure()
+# plt.plot(w_IAC,20*np.log10(np.abs(h_IAC)),label='IAC')
+# plt.plot(w_itd, 20*np.log10(np.abs(h_itd)),label='ITD')
+# plt.xlim([0,20])
+# plt.ylim([-40,5])
+# plt.legend()
 
 f_2_ind = np.where(w_itd>=2.5)[0][0]
 f_8_ind = np.where(w_itd>=6)[0][0]
 
 coeff = np.polyfit(w_itd[f_2_ind:f_8_ind],phase_itd[f_2_ind:f_8_ind],deg=1)
-GD_line = coeff[0] * w_itd[f_2_ind:f_8_ind] + coeff[1]
+GD_line_ITD = coeff[0] * w_itd[f_2_ind:f_8_ind] + coeff[1]
 GD_ITD = -coeff[0] / (2*np.pi)
 
+# plt.figure()
+# plt.plot(w_itd,phase_itd)
+# plt.plot(w_itd[f_2_ind:f_8_ind],GD_line_ITD,color='black')
+# plt.xlim([0,20])
+# plt.ylim([-5,2])
+
+
+h_IAC_noise = np.zeros([2000,All_IACnfs.shape[1]])
+for nf in range(All_IACnfs.shape[1]):
+    w_IAC_noise, h_IAC_noise[:,nf] = np.abs(freqz(All_IACnfs[:,nf],a=1,worN=2000,fs=fs))
+    
+h_ITD_noise = np.zeros([2000,All_ITDnfs.shape[1]])
+for nf in range(All_ITDnfs.shape[1]):
+    w_ITD_noise, h_ITD_noise[:,nf] = np.abs(freqz(All_ITDnfs[:,nf],a=1,worN=2000,fs=fs))
+    
+    
+h_IAC_jn = np.zeros([2000,pca_sp_Htavg_IAC_JN.shape[1]])
+for jn in range(pca_sp_Htavg_IAC_JN.shape[1]):
+    w_IAC_jn, h_IAC_jn[:,jn] = np.abs(freqz(pca_sp_Htavg_IAC_JN[:,jn],a=1,worN=2000,fs=fs))
+    
+h_ITD_jn = np.zeros([2000,pca_sp_Htavg_ITD_JN.shape[1]])
+for jn in range(pca_sp_Htavg_ITD_JN.shape[1]):
+    w_ITD_jn, h_ITD_jn[:,jn] = np.abs(freqz(pca_sp_Htavg_ITD_JN[:,jn],a=1,worN=2000,fs=fs))
+
+h_IAC_pcaJN_se = np.sqrt( (h_IAC_jn.shape[1]-1) * np.sum( (h_IAC_jn - h_IAC_jn.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / h_IAC_jn.shape[1]  )
+h_ITD_pcaJN_se = np.sqrt( (h_ITD_jn.shape[1]-1) * np.sum( (h_ITD_jn - h_ITD_jn.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / h_ITD_jn.shape[1]  )
+    
 plt.figure()
-plt.plot(w_itd,phase_itd)
-plt.plot(w_itd[f_2_ind:f_8_ind],GD_line,color='black')
-plt.xlim([0,20])
-plt.ylim([-5,2])
+plt.plot(w_IAC, np.abs(h_IAC),color='k')
+plt.plot(w_IAC_noise,h_IAC_noise.mean(axis=1),color='grey')
+plt.plot(w_IAC_noise,h_IAC_noise.mean(axis=1)+h_IAC_noise.std(axis=1),color='grey')
+plt.xlim([0,10])
+
+h_IAC_noise_se = h_IAC_noise.std(axis=1) / np.sqrt(len(Subjects))
+h_ITD_noise_se = h_ITD_noise.std(axis=1) / np.sqrt(len(Subjects))
+
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+ax2 = ax.twinx()
+p1, = ax.plot(w_IAC,np.abs(h_IAC),color='k',linewidth=2,label='Magnitude')
+ax.fill_between(w_IAC,np.abs(h_IAC) - 2*h_IAC_pcaJN_se, np.abs(h_IAC) + 2*h_IAC_pcaJN_se,color=[0.25,0.25,0.25] )
+p2, = ax2.plot(w_IAC,phase_IAC,linestyle='--',linewidth=2,color='k',label='Phase')
+p3, = ax.plot(w_IAC_noise,h_IAC_noise.mean(axis=1),color='grey',label='NoiseFloor')
+ax.fill_between(w_IAC_noise,h_IAC_noise.mean(axis=1) - 2 * h_IAC_noise_se, h_IAC_noise.mean(axis=1) + 2*h_IAC_noise_se, color='lightgrey',alpha=0.7)
+ax.set_xlim([0,10])
+ax.set_yticks([0,0.4,0.8,1.2,1.6])
+ax.set_ylim([0,1.8])
+ax2.set_ylim([-10,1])
+ax2.set_yticks([0,-3,-6,-9])
+#ax.set_ylabel('Mag')
+#ax2.set_ylabel('Phase (Rad)')
+ax.set_xlabel('Frequency (Hz)')
+lines = [p1,p3, p2]
+ax.legend(lines,[l.get_label() for l in lines])
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'IAC_HfAvg_pca.svg') , format='svg')
 
 
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+ax2 = ax.twinx()
+p1, = ax.plot(w_itd,np.abs(h_itd),color='k',linewidth=2,label='Magnitude')
+ax.fill_between(w_itd,np.abs(h_itd) - 2*h_ITD_pcaJN_se, np.abs(h_itd) + 2*h_ITD_pcaJN_se,color=[0.25,0.25,0.25] )
+p2, = ax2.plot(w_itd,phase_itd,linestyle='--',linewidth=2,color='k',label='Phase')
+p3, = ax.plot(w_ITD_noise,h_ITD_noise.mean(axis=1),color='grey',label='NoiseFloor')
+ax.fill_between(w_ITD_noise,h_ITD_noise.mean(axis=1) - 2 *h_ITD_noise_se, h_ITD_noise.mean(axis=1) + 2*h_ITD_noise_se, color='lightgrey',alpha=0.7)
+ax.set_xlim([0,10])
+ax.set_ylim([0,0.85])
+ax.set_yticks([0,0.2,0.4,0.6,0.8])
+ax2.set_ylim([-6,2])
+ax2.set_yticks([1,-1,-3,-5])
+#ax.set_ylabel('Mag')
+#ax2.set_ylabel('Phase (Rad)')
+ax.set_xlabel('Frequency (Hz)')
+lines = [p1,p3, p2]
+#ax.legend(lines,[l.get_label() for l in lines])
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'ITD_HfAvg_pca.svg') , format='svg')
 
+
+h_IAC_behPlot = np.abs(h_IAC) / np.max(np.abs(h_IAC))
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+p1, = ax.plot(w_IAC,h_IAC_behPlot,color='k',linewidth=2,label='Physiology')
+ax.fill_between(w_IAC,h_IAC_behPlot - 2*h_IAC_pcaJN_se, h_IAC_behPlot + 2*h_IAC_pcaJN_se,color=[0.25,0.25,0.25] )
+p2, = ax.plot(w_behMod,np.abs(h_behMod)/np.max(np.abs(h_behMod)),color='red', linewidth=3, label ='Behavior')
+ax.set_xlim([0,10])
+ax.set_ylim([0,1.6])
+ax.set_yticks([0,0.5,1.0,1.5])
+ax.set_xlabel('Frequency (Hz)')
+lines = [p1,p2]
+ax.legend(lines,[l.get_label() for l in lines])
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'IAC_physVSbeh.svg') , format='svg')
 
 
 

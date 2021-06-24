@@ -165,8 +165,9 @@ plt.plot(Window_t,BMLDest)
 BMLDest = IACcurveFit(Window_t,.061,.061)
 
 plt.figure()
-plt.plot(Window_t,BMLD)
-plt.plot(Window_t,BMLDest)
+plt.errorbar(Window_t,BMLD,AcrossSubjectSEM)
+plt.plot(Window_t,BMLD,color='k',label='Behavior')
+plt.plot(Window_t,BMLDest,color='red',label='Model Fit')
 
 stDevNeg = .061
 stDevPos = .061
