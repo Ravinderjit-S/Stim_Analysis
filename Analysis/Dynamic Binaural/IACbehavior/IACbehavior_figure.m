@@ -6,6 +6,7 @@ Fig_path = '/media/ravinderjit/Data_Drive/Data/Figures/DynBin/';
 sqtone = load([Data_path 'IACsquareTone_Processed.mat']);
 oscor = load([Data_path 'OSCORfmThresh_processed.mat']);
 oscor_white = load([Data_path 'OSCORwhite_processed.mat']);
+phys_behMod = load('/media/ravinderjit/Data_Drive/Stim_Analysis/Analysis/Dynamic Binaural/Physio_behModel.mat');
 
 sq_f = 1./(sqtone.WindowSizes(2:end));
 SNRs = sqtone.AcrossSubjectsSNR(2:end) - sqtone.AcrossSubjectsSNR(1);
@@ -89,7 +90,57 @@ fig.PaperPosition = [0 0 3.3 3.3];
 print([Fig_path 'IACbehavior_s211'],'-dsvg')
 
 
+%% Just OSCOR figure
 
+fig = figure;
+hold on
+ylabel('OSCOR Accuracy')
+ylim([0.3,1.02])
+os = errorbar(os_FM, os_acc,os_sem,'Marker','square','MarkerSize',10, ...
+    'Color','k','LineWidth',2);
+os_white = plot(os_FM, os_acc_white, 'LineStyle',':','Color', 'k', ...
+    'LineWidth',3);
+plot([os_Limit os_Limit],[0.3 1.1],'--','Linewidth',2,'Color','k')
+xlabel('Frequency (Hz)')
+set(gca,'XScale','log')
+set(gca,'XTick',[1,10,100])
+set(gca,'XTickLabel',{'1','10','100'})
+%set(gca,'fontsize',15)
+xlim([3 350])
+yticks([0.3,0.5,0.75,1])
+legend({'OSCOR', 'OSCOR white', 'OSCOR MOL'},'location','South')
+legend('boxoff')
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 3.3 3.3];
+print([Fig_path 'IACbehavior_oscor'],'-depsc')
+print([Fig_path 'IACbehavior_oscor'],'-dsvg')
+
+%% Just Bin Unmask Figure
+SNRs = sqtone.AcrossSubjectsSNR(1:end) - sqtone.AcrossSubjectsSNR(1);
+sq_SEM = sqtone.AcrossSubjectsSEM(1:end);
+
+fig = figure;
+hold on
+errorbar(sqtone.WindowSizes(1:end), SNRs, sq_SEM,'Marker','o','MarkerSize',10, ...
+    'Color','k','LineWidth',2);
+plot(sqtone.WindowSizes(1:end),phys_behMod.PhysBehMod,'linewidth',2)
+plot(sqtone.WindowSizes(1:end),phys_behMod.PhysBehMod,'o','color',[0, 0.4470, 0.7410],'MarkerSize',10,'LineWidth',2)
+ylim([0 10.4])
+ylabel('Detection Improvement (dB)')
+xlabel('Window Size (Sec)')
+%set(gca,'fontsize',15)
+legend({'Beahvior', 'Physiology Fit'},'location','SouthEast')
+legend('boxoff')
+xlim([0,1.75])
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 3.3 3.3];
+% set(gca,'fontsize',15)
+print([Fig_path 'IACbehavior_BinUm'],'-depsc')
+print([Fig_path 'IACbehavior_BinUm'],'-dsvg')
+
+error = mean(abs(SNRs(2:end-1)' - phys_behMod.PhysBehMod(2:end-1)));
 
 
 

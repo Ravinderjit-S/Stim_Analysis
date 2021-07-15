@@ -30,6 +30,9 @@ figure, plot(t,Mseq_sig,'b',t2,Mseq_sig2,'r')
 
 mm = xcorr(Mseq_sig);
 
+
+
+
 % [f,p]=MagSpec(Mseq_sig,EEG_fs); 
 % figure,plot(f,p), title('MagSpec(Mseq)')
 

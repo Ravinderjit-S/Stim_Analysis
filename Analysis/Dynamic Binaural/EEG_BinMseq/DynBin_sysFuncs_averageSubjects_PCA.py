@@ -210,6 +210,23 @@ plt.figure()
 plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD)
 plt.title('ITD')
 
+fontsz = 11
+fig, ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+dIAC =  np.diff(pca_sp_Htavg_IAC,axis=0)
+ax.plot(t[t_1:t_2], pca_sp_Htavg_ITD/np.max(np.abs(pca_sp_Htavg_ITD)),color='k',linewidth=2)
+ax.plot(t[t_1+1:t_2], dIAC/np.max(np.abs(dIAC)),color='grey',linewidth=2)
+plt.legend(['ITD','dIAC'])
+ax.set_ylabel('Normalized Amplitude')
+ax.set_xlabel('Time (Sec)')
+ax.set_yticks([-1, -0.5, 0, 0.5, 1])
+ax.set_xticks([0, 0.25, 0.5])
+ax.set_xlim([0,0.5])
+ax.set_ylim([-1.1,1.1])
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'ITD_dIAC.svg') , format='svg')
+
+
 #%% Leave one out - jacknife
 
 pca_sp_Htavg_IAC_JN = np.zeros([pca_sp_Htavg_IAC.shape[0],len(Subjects)])
@@ -318,6 +335,9 @@ ax.set_xlabel('Time (sec)')
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'ITD_HtAvg_pca.svg') , format='svg')
 
+#Compute where IAC HT intersects noisefloor
+crossings = np.where(np.diff(np.sign(All_IACnfs.mean(axis=1)-pca_sp_Htavg_IAC)))[0]
+
 #%% Behavioral Binaural Unmasking Dynamics
 
 #analysis in BinBehSysModel.py
@@ -350,10 +370,6 @@ Window_t = beh_IACsq['WindowSizes'][0]
 f_beh = Window_t[1:]**-1
 SNRs_beh = beh_IACsq['AcrossSubjectsSNR'] - beh_IACsq['AcrossSubjectsSNR'][0]
 AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
-
-
-
-
 
 
 #%% Frequency domain 
@@ -455,7 +471,7 @@ p3, = ax.plot(w_IAC_noise,h_IAC_noise.mean(axis=1),color='grey',label='NoiseFloo
 ax.fill_between(w_IAC_noise,h_IAC_noise.mean(axis=1) - 2 * h_IAC_noise_se, h_IAC_noise.mean(axis=1) + 2*h_IAC_noise_se, color='lightgrey',alpha=0.7)
 ax.set_xlim([0,10])
 ax.set_yticks([0,0.4,0.8,1.2,1.6])
-ax.set_ylim([0,1.8])
+ax.set_ylim([0,2.0])
 ax2.set_ylim([-10,1])
 ax2.set_yticks([0,-3,-6,-9])
 #ax.set_ylabel('Mag')
@@ -503,6 +519,16 @@ lines = [p1,p2]
 ax.legend(lines,[l.get_label() for l in lines])
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'IAC_physVSbeh.svg') , format='svg')
+
+
+
+
+with open('_DynBin_SysFunc_PCA_Ht' + '.pickle','wb') as file:     
+    pickle.dump([pca_sp_Htavg_IAC],file)
+
+
+
+
 
 
 
