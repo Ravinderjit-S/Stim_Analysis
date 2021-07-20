@@ -1,4 +1,4 @@
-function [stim_Ref, stimA, stimB1, stimA2, ERBspace, Tones_f, envs_A, envs_B1] = StimBind_noRect_3AFC(Corr_inds, fs,bw)
+function [stim_Ref, stimA, stimB1, stimA2, ERBspace, Tones_f, envs_A, envs_B1] = StimBind_noRect_3AFC(Corr_inds, fs,bw,bp_fo)
 % IF ERB_spacing is given, that will be used instead of Tones_num
 % This version of the binding stimulus will return the A and B parts
 % seperatley for a 3AFC experiment. No half wave rectification is done on
@@ -9,12 +9,14 @@ function [stim_Ref, stimA, stimB1, stimA2, ERBspace, Tones_f, envs_A, envs_B1] =
     T_a = 1.0; %Time of a part of the stimulus
     
     %bw = [4 24]; %bandwidth of envelope
-    %lpf = 40; %low pass filter
+    lpf = 40; %low pass filter
 
     [Tones_f, ERBspace] = Get_Tones(20, [], 200, 8000); %returns tone frequencies 
     T = 0:1/fs:T_a-1/fs;
     
-    [corr_env1] = create_envelope_ifft(bw,T_a,fs); 
+%     [corr_env1] = create_envelope_ifft(bw,T_a,fs); 
+    hRectify = 0;
+    [corr_env1, ~] = create_envelope(bw,bp_fo,lpf,Tlen,fs,hRectify);
     
     % initialize stim variables
     envs_A  = nan(length(Tones_f),length(T));

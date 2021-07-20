@@ -51,7 +51,7 @@ for m in mseq_locs:
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits2/'
 pickle_loc = data_loc + 'Pickles/'
 
-Subjects = ['S211'] #S237 data is crazy noisy
+Subjects = ['S211']
 
 num_nfs = 1
 
