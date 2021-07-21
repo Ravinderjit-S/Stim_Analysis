@@ -172,24 +172,24 @@ for TheDate = 1:numel(Analyze_dates)
                 saveas(gcf,[fig_loc '/Used/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png'])
             end
 %                 
-            if ReallyUsed
-                plv_stim = NOSCOR_i.Stimuli.IACt;
-                plv_stim = resample(plv_stim,1,10); %downsampling stim for memory reasons
-                plv_fs = fs/10;
-                plv_stim(plv_stim<0) = -1; %getting rid of artifacts of resampling
-                plv_stim(plv_stim>0) = 1;  %getting rid of artifacts of resampling
-                plv_spks = NOSCOR_i.MSO.simulated{k};
-                TW =20;
-                noise_spks = Jumble_spikes(plv_spks,length(plv_stim)/plv_fs);
-                [plv, f] = PLV_nerve(plv_spks,plv_stim,plv_fs,TW);
-                [plv_noise, f] = PLV_nerve(noise_spks,plv_stim,plv_fs,TW);
-                figure('visible','off','Position',Screen_pixelLocs), hold on
-                semilogx(f,plv), xlim([1,700])
-                semilogx(f,plv_noise,'r')
-                title(fig_Tit)
-                saveas(gcf, [fig_loc '/RUplv/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png']) 
-                close(gcf)
-            end
+%             if ReallyUsed
+%                 plv_stim = NOSCOR_i.Stimuli.IACt;
+%                 plv_stim = resample(plv_stim,1,10); %downsampling stim for memory reasons
+%                 plv_fs = fs/10;
+%                 plv_stim(plv_stim<0) = -1; %getting rid of artifacts of resampling
+%                 plv_stim(plv_stim>0) = 1;  %getting rid of artifacts of resampling
+%                 plv_spks = NOSCOR_i.MSO.simulated{k};
+%                 TW =20;
+%                 noise_spks = Jumble_spikes(plv_spks,length(plv_stim)/plv_fs);
+%                 [plv, f] = PLV_nerve(plv_spks,plv_stim,plv_fs,TW);
+%                 [plv_noise, f] = PLV_nerve(noise_spks,plv_stim,plv_fs,TW);
+%                 figure('visible','off','Position',Screen_pixelLocs), hold on
+%                 semilogx(f,plv), xlim([1,700])
+%                 semilogx(f,plv_noise,'r')
+%                 title(fig_Tit)
+%                 saveas(gcf, [fig_loc '/RUplv/' Analyze_dates{TheDate} '_Fig' num2str(i) '.' num2str(k) '.png']) 
+%                 close(gcf)
+%             end
             
 %             figure, semilogx(f_H,Z_Hf),title('Z_Hf')
             

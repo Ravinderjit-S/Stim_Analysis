@@ -251,4 +251,27 @@ for p1 in range(sbp[0]):
         axs[p1,p2].set_xlim([0,0.5])
         
 
+for t_c in range(len(t_cuts)):
+    plt.figure()
+    plt.plot(pca_coeff_cuts_pass[t_c][0,:],color='tab:blue')
+    plt.plot(pca_coeff_cuts_act[t_c][0,:],color='tab:orange')
+    
+    
+#%% Individual subject Passive Vs Active
+    
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
