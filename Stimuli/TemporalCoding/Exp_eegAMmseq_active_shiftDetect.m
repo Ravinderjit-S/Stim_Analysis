@@ -89,7 +89,7 @@ for i =1:ntrials*nconds
         genStimTime = 0;
         if j ==3
             tic()
-            stims = AM_mseq_3AFC_shiftDetect(mseq_j.mseqEEG,mseq_j.Point_len,511);
+            stims = AM_mseq_3AFC_shiftDetect(mseq_j.mseqEEG,mseq_j.Point_len,511*Point_len);
             genStimTime = toc();
         end
             

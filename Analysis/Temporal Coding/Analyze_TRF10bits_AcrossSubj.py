@@ -15,6 +15,7 @@ from scipy.signal import freqz
 from sklearn.decomposition import PCA
 from sklearn.metrics import explained_variance_score
 import scipy.io as sio
+from scipy.signal import find_peaks
 
 
 mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat'
@@ -218,11 +219,24 @@ for sub in range(len(Subjects)):
     pca_expVar_cuts_sub.append(pca_expVar_cuts_)
     
     
-for t_c in range(len(t_cuts)):
+# for t_c in range(len(t_cuts)):
+#     plt.figure()
+#     for sub in range(len(Subjects)):
+#         plt.plot(t_cutT[t_c],pca_sp_cuts_sub[sub][t_c]/np.max(pca_sp_cuts_sub[sub][0]))
+
+
+for sub in range(len(Subjects)):
     plt.figure()
-    for sub in range(len(Subjects)):
-        plt.plot(t_cutT[t_c],pca_sp_cuts_sub[sub][t_c]/np.max(pca_sp_cuts_sub[sub][0]))
-    
+    plt.title(Subjects[sub])
+    for t_c in range(len(t_cuts)):
+        plt.plot(t_cutT[t_c],pca_sp_cuts_sub[sub][t_c])
+        
+        
+for sub in range(len(Subjects)):
+    plt.figure()
+    plt.title(Subjects[sub] + ' Cz')
+    plt.plot(t,A_Ht[sub][np.where(A_ch_picks[sub]==31)[0][0],:])
+    plt.xlim([0,0.5])
     
 #%% Load data collected earlier
         
@@ -351,8 +365,120 @@ for sub in range(1,len(Subjects_old)):
     plt.plot(t_cutT[1],pca_sp_cuts_sub[index_new][1]/np.max(pca_sp_cuts_sub[index_new][0]),color='tab:orange')
     
     
-#Plot Cz and frontal electrodes
+#%%Plot Cz and frontal electrodes
+    
+t_1 = np.where(t>=0)[0][0]
+t_2 = np.where(t>=0.010)[0][0]
+for sub in range(len(Subjects)):
+    plt.figure()
+    plt.title(Subjects[sub])
+    ch31 = A_Ht[sub][np.where(A_ch_picks[0]==31)[0][0],:] 
+    ch1 = -A_Ht[sub][np.where(A_ch_picks[0]==0)[0][0],:]
+    ch31 = ch31 - ch31.mean()
+    ch1 = ch1 - ch1.mean()
+    ch31 = ch31 / np.abs(ch31[t_1:t_2].max())
+    ch1 = ch1 / np.abs(ch1[t_1:t_2].max())
+    
+    plt.plot(t,ch31,color='tab:blue')
+    plt.plot(t,ch1,color='tab:orange')
+    plt.xlim([0,0.5])
+    for t_c in range(len(t_cuts)):
+        plt.plot(t_cutT[t_c],pca_sp_cuts_sub[sub][t_c] / np.max(pca_sp_cuts_sub[sub][0]) ,color='k')
 
-#Plot freq responses
+#%% Plot freq responses
+t1 = np.where(t>=0)[0][0]
+t2 = np.where(t>=0.5)[0][0]
+Cz_avg = Avg_Ht[31,t1:t2] - Avg_Ht[31,t1:t2].mean()
+[w,h] = freqz(b=Cz_avg,a=1,worN=np.arange(0,fs/2,2),fs=fs)
+phase_resp = np.unwrap(np.angle(h))
+
+plt.figure()
+plt.plot(w,np.abs(h))
+plt.xlim([0,100])
+
+plt.figure()
+plt.plot(w,phase_resp)
+plt.xlim([0,100])
+
+#%% Seperate Peaks in time domain
+
+t_Cz = t[t1:t2]
+[peaks,properties] = find_peaks(Cz_avg)
+[peaks_neg,properties] = find_peaks(-Cz_avg)
+
+plt.figure()
+plt.plot(t_Cz,Cz_avg)
+plt.scatter(t_Cz[peaks],Cz_avg[peaks],marker='x',color='r')
+plt.scatter(t_Cz[peaks_neg],Cz_avg[peaks_neg],marker='x',color='b')
+
+tpks = []
+pks = []
+pks_Hf = []
+pks_w = []
+pks_phase = []
+pks_phaseLine = []
+pks_phaseLineW = []
+pks_gd = []
+
+f1 = [40, 10, 8, 4]
+f2 = [80, 25, 22, 10]
+
+peak_locs = peaks[0:4]
+peaks_neg = peaks_neg[0:3]
+peaks_neg = np.append(peaks_neg,np.where(t_Cz>=.250)[0][0])
+
+for pk in range(len(peaks_neg)):
+    if pk ==0:
+        t_1 = 0
+    else:
+        t_1 = peaks_neg[pk-1]
+        
+    t_2 = peaks_neg[pk]
+
+    tpks.append(t_Cz[t_1:t_2])
+    pks.append(Cz_avg[t_1:t_2])
+    
+    [w, p_Hf] = freqz(b= Cz_avg[t_1:t_2] - Cz_avg[t_1:t_2].mean() ,a=1,worN=np.arange(0,fs/2,2),fs=fs)
+    
+    f_ind1 = np.where(w>=f1[pk])[0][0]
+    f_ind2 = np.where(w>=f2[pk]+2)[0][0]
+    
+    phase_pkresp = np.unwrap(np.angle(p_Hf))
+    coeffs= np.polyfit(w[f_ind1:f_ind2],phase_pkresp[f_ind1:f_ind2],deg=1)
+    pks_phaseLine.append(coeffs[0] * w[f_ind1:f_ind2] +coeffs[1])
+    pks_phaseLineW.append(w[f_ind1:f_ind2])
+    pks_gd.append(-coeffs[0] / (2*np.pi))
+    
+    
+    pks_w.append(w)
+    pks_Hf.append(p_Hf)
+    pks_phase.append(phase_pkresp)
+
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(tpks[pk],pks[pk])
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(pks_w[pk],np.abs(pks_Hf[pk]))
+plt.xlim([0,150])
+plt.legend([1,2,3,4])
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(pks_w[pk], pks_phase[pk])
+    plt.plot(pks_phaseLineW[pk], pks_phaseLine[pk],color='k')
+plt.xlim([0,150])
+plt.ylim([-20,10])
+plt.legend([1,2,3,4])
+
+
+
+
+
+
+
+
 
 
