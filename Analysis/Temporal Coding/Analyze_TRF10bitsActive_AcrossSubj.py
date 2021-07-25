@@ -231,6 +231,28 @@ for t_c in range(len(t_cuts)):
     plt.plot(t_cutT[t_c],pca_sp_cuts_act[t_c][:,0],color='tab:orange')
 plt.legend(['Passive','Active'])
 
+plt.figure()
+plt.title('Componenet 2')
+for t_c in range(len(t_cuts)):
+    plt.plot(t_cutT[t_c],pca_sp_cuts_pass[t_c][:,1],color='tab:blue')
+    plt.plot(t_cutT[t_c],pca_sp_cuts_act[t_c][:,1],color='tab:orange')
+plt.legend(['Passive','Active'])
+
+plt.figure()
+plt.title('Active second peak')
+plt.plot(t_cutT[1],pca_sp_cuts_act[1][:,0],color='tab:blue')
+plt.plot(t_cutT[1],pca_sp_cuts_act[1][:,1],color='tab:orange')
+plt.xlabel('Time (sec)')
+plt.legend(['Comp1', 'Comp2'])
+
+plt.figure()
+plt.title('Passive second peak')
+plt.plot(t_cutT[1],pca_sp_cuts_pass[1][:,0],color='tab:blue')
+plt.plot(t_cutT[1], - pca_sp_cuts_pass[1][:,1],color='tab:orange')
+plt.xlabel('Time (sec)')
+plt.legend(['Comp1', '- Comp2'])
+
+
 sbp = [4,4]
 
 fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)

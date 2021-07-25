@@ -17,6 +17,10 @@ from sklearn.metrics import explained_variance_score
 import scipy.io as sio
 from scipy.signal import find_peaks
 
+import sys
+sys.path.append(os.path.abspath('../../ACRanalysis/'))
+from ACR_helperFuncs import ACR_sourceHf
+
 
 mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat'
 Mseq_dat = sio.loadmat(mseq_loc)
@@ -163,6 +167,8 @@ for t_c in range(len(t_cuts)):
 plt.figure()
 for t_c in range(len(t_cuts)):
     plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,0])
+plt.plot(t,Avg_Ht[31,:] -Avg_Ht[31,:].mean(),color='k')
+plt.xlim([0,0.5])
     
 plt.figure()
 plt.title('2nd component')
@@ -171,7 +177,10 @@ for t_c in range(len(t_cuts)):
     
 plt.figure()
 plt.plot(t,Avg_Ht[31,:])
+plt.plot(t,-Avg_Ht[0,:])
+plt.title('Ch. Cz and Fp1')
 plt.xlim([0,0.5])
+plt.legend(['Cz','- Fp1'])
 
 plt.figure()
 labels = ['comp1', 'comp2']
@@ -358,11 +367,13 @@ for sub in range(1,len(Subjects_old)):
     
     plt.figure()
     plt.title(Subjects_old[sub])
-    plt.plot(t_cutT[0],pca_sp_cuts_sub_old[sub][0]/np.max(pca_sp_cuts_sub_old[sub][0]),color='tab:blue')
-    plt.plot(t_cutT[1],pca_sp_cuts_sub_old[sub][1]/np.max(pca_sp_cuts_sub_old[sub][0]),color='tab:blue')
-    
-    plt.plot(t_cutT[0],pca_sp_cuts_sub[index_new][0]/np.max(pca_sp_cuts_sub[index_new][0]),color='tab:orange')
-    plt.plot(t_cutT[1],pca_sp_cuts_sub[index_new][1]/np.max(pca_sp_cuts_sub[index_new][0]),color='tab:orange')
+    for t_c in range(len(t_cuts)):
+        l1 = plt.plot(t_cutT[t_c],pca_sp_cuts_sub_old[sub][t_c]/np.max(pca_sp_cuts_sub_old[sub][t_c]),color='tab:blue')
+        plt.plot(t_cutT[t_c],pca_sp_cuts_sub_old[sub][t_c]/np.max(pca_sp_cuts_sub_old[sub][t_c]),color='tab:blue')
+        
+        l2 = plt.plot(t_cutT[t_c],pca_sp_cuts_sub[index_new][t_c]/np.max(pca_sp_cuts_sub[index_new][t_c]),color='tab:orange')
+        plt.plot(t_cutT[t_c],pca_sp_cuts_sub[index_new][t_c]/np.max(pca_sp_cuts_sub[index_new][t_c]),color='tab:orange')
+    plt.legend(handles = (l1[0],l2[0]),labels =('old','new'))
     
     
 #%%Plot Cz and frontal electrodes
@@ -386,8 +397,9 @@ for sub in range(len(Subjects)):
         plt.plot(t_cutT[t_c],pca_sp_cuts_sub[sub][t_c] / np.max(pca_sp_cuts_sub[sub][0]) ,color='k')
 
 #%% Plot freq responses
+        
 t1 = np.where(t>=0)[0][0]
-t2 = np.where(t>=0.5)[0][0]
+t2 = np.where(t>=0.500)[0][0]
 Cz_avg = Avg_Ht[31,t1:t2] - Avg_Ht[31,t1:t2].mean()
 [w,h] = freqz(b=Cz_avg,a=1,worN=np.arange(0,fs/2,2),fs=fs)
 phase_resp = np.unwrap(np.angle(h))
@@ -395,9 +407,13 @@ phase_resp = np.unwrap(np.angle(h))
 plt.figure()
 plt.plot(w,np.abs(h))
 plt.xlim([0,100])
+plt.xlabel('Frequency')
+plt.ylabel('Magnitude')
 
 plt.figure()
 plt.plot(w,phase_resp)
+plt.xlabel('Frequency')
+plt.ylabel('Phase (Radians)')
 plt.xlim([0,100])
 
 #%% Seperate Peaks in time domain
@@ -458,11 +474,13 @@ for pk in range(len(peaks_neg)):
 plt.figure()
 for pk in range(len(tpks)):
     plt.plot(tpks[pk],pks[pk])
+plt.xlabel('Time (sec)')
 
 plt.figure()
 for pk in range(len(tpks)):
     plt.plot(pks_w[pk],np.abs(pks_Hf[pk]))
 plt.xlim([0,150])
+plt.xlabel('Frequency')
 plt.legend([1,2,3,4])
 
 plt.figure()
@@ -470,10 +488,38 @@ for pk in range(len(tpks)):
     plt.plot(pks_w[pk], pks_phase[pk])
     plt.plot(pks_phaseLineW[pk], pks_phaseLine[pk],color='k')
 plt.xlim([0,150])
+plt.xlabel('Frequency')
+plt.ylabel('Phase')
 plt.ylim([-20,10])
 plt.legend([1,2,3,4])
 
 
+#%% Seperate peaks on sACR
+
+sTRF = np.array([])      
+t_s =  np.array([])   
+for t_c in range(len(t_cuts)):
+    sTRF = np.append(sTRF,pca_sp_cuts[t_c][:,0])
+    t_s = np.append(t_s,t_cutT[t_c])
+
+plt.figure()
+plt.plot(t_s,sTRF)
+
+[tpks, pks, pks_Hf, pks_w, pks_phase, 
+ pks_phaseLine, pks_phaseLineW, pks_gd] = ACR_sourceHf(split_locs,ACR,t,fs,f1,f2)
+
+
+#%% Seperate peaks for individuals
+
+
+for sub in range(len(Subjects)):
+    plt.figure()
+    plt.title(Subjects[sub])
+    Ch_ind = np.where(A_ch_picks[sub] == 31)[0][0]
+    Cz_avg = A_Ht[sub][Ch_ind,t1:t2] - A_Ht[sub][Ch_ind,t1:t2].mean()
+    plt.plot(t[t1:t2],Cz_avg)
+    plt.xlim([0,0.5])
+    
 
 
 
