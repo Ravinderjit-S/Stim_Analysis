@@ -18,7 +18,7 @@ import scipy.io as sio
 from scipy.signal import find_peaks
 
 import sys
-sys.path.append(os.path.abspath('../../ACRanalysis/'))
+sys.path.append(os.path.abspath('../ACRanalysis/'))
 from ACR_helperFuncs import ACR_sourceHf
 
 
@@ -506,21 +506,131 @@ plt.figure()
 plt.plot(t_s,sTRF)
 
 [tpks, pks, pks_Hf, pks_w, pks_phase, 
- pks_phaseLine, pks_phaseLineW, pks_gd] = ACR_sourceHf(split_locs,ACR,t,fs,f1,f2)
+pks_phaseLine, pks_phaseLineW, pks_gd] = ACR_sourceHf(peaks_neg,sTRF,t_s,fs,f1,f2)
+
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(tpks[pk],pks[pk])
+plt.xlabel('Time (sec)')
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(pks_w[pk],np.abs(pks_Hf[pk]))
+plt.xlim([0,150])
+plt.xlabel('Frequency')
+plt.legend([1,2,3,4])
+
+plt.figure()
+for pk in range(len(tpks)):
+    plt.plot(pks_w[pk], pks_phase[pk])
+    plt.plot(pks_phaseLineW[pk], pks_phaseLine[pk],color='k')
+plt.xlim([0,150])
+plt.xlabel('Frequency')
+plt.ylabel('Phase')
+plt.ylim([-20,10])
+plt.legend([1,2,3,4])
+
 
 
 #%% Seperate peaks for individuals
 
+peaks_sub = []
+peaks_neg_sub = []
 
+Cz_sub = []
 for sub in range(len(Subjects)):
     plt.figure()
     plt.title(Subjects[sub])
     Ch_ind = np.where(A_ch_picks[sub] == 31)[0][0]
     Cz_avg = A_Ht[sub][Ch_ind,t1:t2] - A_Ht[sub][Ch_ind,t1:t2].mean()
+    Cz_sub.append(Cz_avg)
+    [peaks,properties] = find_peaks(Cz_avg)
+    [peaks_neg,properties] = find_peaks(-Cz_avg)
+    peaks_sub.append(peaks)
+    peaks_neg_sub.append(peaks_neg)
     plt.plot(t[t1:t2],Cz_avg)
+    plt.scatter(t[t1:t2][peaks],Cz_avg[peaks],marker='x',color='r')
+    plt.scatter(t[t1:t2][peaks_neg],Cz_avg[peaks_neg],marker='x',color='b')
     plt.xlim([0,0.5])
     
 
+split_locs_sub = []
+split_locs_sub.append([80,280,559,1024]) #S207
+split_locs_sub.append([66,280,521,1024]) #S228
+split_locs_sub.append([58,271,500,994])  #S236
+split_locs_sub.append([67,270,511,1068]) #S238
+split_locs_sub.append([65,262,487,987])  #S239
+split_locs_sub.append([69,251,536,1054]) #S246
+split_locs_sub.append([75,285,495,816])  #S247
+split_locs_sub.append([79,505,943,1360]) #S250
+
+peak_mag_locs_neg = []
+peak_mag_locs_pos = []
+
+
+peak_mag_locs_neg.append( np.concatenate((np.array([0]), peaks_neg_sub[0][0:4]))   )
+
+peak_mag_locs_pos.append([30, 117, 192, 375, 815]) #S207
+peak_mag_locs_pos.append([30, 152, 235, 373, 773]) #S228
+peak_mag_locs_pos.append([26, 102, 165, 361  ]) #S236 2&3 very merged
+
+Cz_sub[0] = (Cz_sub[0] - np.min(Cz_sub[0][:1024]))
+Cz_sub[0] = Cz_sub[0] / np.max(Cz_sub[0][:1024])
+
+
+
+plt.figure()
+plt.plot(t[t1:t2],Cz_sub[0])
+
+ 
+  
+
+
+
+
+#%% Analyze peaks in individuals 
+
+A_tpks = []
+A_pks = []
+A_pksHf = []
+A_pks_w = []
+A_pks_phase = []
+A_pks_phaseLine = []
+A_pks_phaseLineW = []
+A_pksGD = []
+
+for sub in range(len(Subjects)):
+    Ch_ind = np.where(A_ch_picks[sub] == 31)[0][0]
+    Cz_avg = A_Ht[sub][Ch_ind,t1:t2] - A_Ht[sub][Ch_ind,t1:t2].mean()
+    [tpks, pks, pks_Hf, pks_w, pks_phase, 
+    pks_phaseLine, pks_phaseLineW, pks_gd] = ACR_sourceHf(split_locs_sub[sub],Cz_avg,t[t1:t2],fs,f1,f2)
+    
+    A_tpks.append(tpks)
+    A_pks.append(pks)
+    A_pksHf.append(pks_Hf)
+    A_pks_w.append(pks_w)
+    A_pks_phase.append(pks_phase)
+    A_pks_phaseLine.append(pks_phaseLine)
+    A_pks_phaseLineW.append(pks_phaseLineW)
+    A_pksGD.append(pks_gd)
+    
+    fig,axs = plt.subplots(2,1)
+    fig.suptitle = Subjects[sub]
+    for pk in range(len(tpks)):
+        axs[0].plot(tpks[pk],pks[pk])
+        axs[0].set_xlabel('Time (sec)')
+    axs[0].set_title(Subjects[sub])
+  
+    for pk in range(len(tpks)):
+        axs[1].plot(pks_w[pk],np.abs(pks_Hf[pk]))
+        axs[1].set_xlim([0,150])
+        axs[1].set_xlabel('Frequency')
+        
+    [w,h] = freqz(b=Cz_avg[:split_locs_sub[sub][-1]] - Cz_avg[:split_locs_sub[sub][-1]].mean()  ,a=1,worN=np.arange(0,fs/2,2),fs=fs)
+    axs[1].plot(w,np.abs(h),color='grey',alpha=0.5)
+    
+    
 
 
 

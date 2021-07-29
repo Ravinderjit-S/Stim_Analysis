@@ -337,6 +337,16 @@ for sub in range(len(Subjects)):
         plt.plot(t_cutT[t_c],pca_sp_cuts_sub_pass[sub][t_c],color='tab:blue')
         plt.plot(t_cutT[t_c],pca_sp_cuts_sub_act[sub][t_c],color='tab:orange')
         
+for sub in range(len(Subjects)):
+    plt.figure()
+    plt.title('Ch.Cz: ' + Subjects[sub])
+    ch_ind_pass = np.where(A_ch_picks_pass[sub] == 15)[0][0]
+    ch_ind_act = np.where(A_ch_picks_act[sub] == 15)[0][0]
+    plt.plot(t,A_Ht_pass[sub][ch_ind_pass,:])
+    plt.plot(t, A_Ht_act[sub][ch_ind_act,:])
+    plt.xlim([0,0.5])
+    
+        
         
 #%% Individual Subject, Individual channel
 sbp = [4,4]
@@ -394,7 +404,7 @@ for sub in range(len(Subjects)):
     plt.title(Subjects[sub])      
 
 
-
+#%% Compare passive vs Active 
 
 
 

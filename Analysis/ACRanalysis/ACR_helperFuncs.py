@@ -8,6 +8,7 @@ Created on Sun Jul 25 16:57:46 2021
 
 import numpy as np
 from scipy.signal import freqz
+from scipy.signal.windows import gaussian
 
 def ACR_sourceHf(split_locs,ACR,t,fs,f1,f2):
     tpks = []
@@ -49,3 +50,55 @@ def ACR_sourceHf(split_locs,ACR,t,fs,f1,f2):
         
     return tpks, pks, pks_Hf, pks_w, pks_phase, pks_phaseLine, pks_phaseLineW, pks_gd
     
+
+def ACR_model(latency,width, weights,latency_pad,fs):
+    full_mod = np.array([])
+    stds = width / 4 #SD of the sources in seconds
+    
+    source_mods = []
+    for source in range(stds.size):
+        gauss_source = gaussian(np.round(width[source]*fs),np.round(stds[source]*fs))
+        source_mods.append(gauss_source - np.min(gauss_source))
+        
+    
+    
+    for source in range(len(source_mods)):
+    
+        if source == 2:
+            continue
+        
+        if (source == 1): # do mixed source
+    
+            s2 = np.concatenate((np.zeros( int(np.round( (np.sum(width[:2]) + width[2]/2 - latency[2]) * fs)) ), source_mods[2]  ))
+            s1 = np.concatenate((source_mods[1], np.zeros(s2.size-source_mods[1].size)))
+            mixed_source = weights[1]*s1 + weights[2]*s2
+            
+            full_mod = np.append(full_mod, mixed_source)
+            
+        else:
+            full_mod = np.append(full_mod,np.min(source_mods[source])*np.ones(int(np.round(latency_pad[source]*fs))))
+            full_mod = np.append(full_mod, weights[source] * source_mods[source])
+
+
+    return full_mod
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
