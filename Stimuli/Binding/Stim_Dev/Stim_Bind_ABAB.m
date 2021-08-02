@@ -34,15 +34,14 @@ function [stim, All_envs, ERBspace, Tones_f] = Stim_Bind_ABAB(Corr_inds, fs, f_s
             env_B2 = create_envelope(bw,lpf,T_a,fs);
         end
 
-        env = [env_A1, env_B1, env_A2, env_B2];
-        env = [env_A1, env, env_A1]; %added envA1 to beginning and end to deal with filter transients
+        env = [env_A1; env_B1; env_A2; env_B2];
+        env = filter(Lp_Filt,1,env,[],1);
         
-        env = fftfilt(Lp_Filt,env);
-        env = env(length(env_A1)+1:end-length(env_A1));
         if length(env) ~= length(sig_tone)
             env = env(2:end-1); %works for T_a = 1.0 ... this is essentially due to needing fractional samples and concatenating 4 supposedly 1 second (exactly) signals
         end
-        stim = stim+sig_tone.*env;
+
+        stim = stim+sig_tone.*env';
         All_envs(:,k) = env;
     end
 end
