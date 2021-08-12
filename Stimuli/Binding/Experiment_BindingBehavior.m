@@ -12,27 +12,35 @@ subj = input('Please subject ID:', 's');
 load('s.mat')
 rng(s)
 
-L = 70; %dB SPL
+L = 75; %dB SPL
 respList = []; %vector that will contain the subject's responses 
 correctList = [];
 risetime = 0.050; %made 50 b/c envelope can change at speed of up to 24 Hz which is .041 secs
 TypePhones = 'earphones';
 stim_dur = 1.0; %This is set by Stim_bind function, need to regenerate stimuli to change this
-f_start = 100;
+f_start = 200;
 f_end = 8000;
-Tones_num = 16;
+Tones_num = 20; %old version was 16
 fs = 48828;
+
+% Corr_inds{1} = 1:2;
+% Corr_inds{2} = 1:4;
+% Corr_inds{3} = 1:6;
+% Corr_inds{4} = 1:8;
+% Corr_inds{5} = 15:16;
+% Corr_inds{6} = 13:16;
+% Corr_inds{7} = 11:16;
+% Corr_inds{8} = 9:16;
+% Corr_inds{9} = [1, 6, 11, 16];
+% Corr_inds{10} = [1, 4, 7, 10, 13, 16];
 
 Corr_inds{1} = 1:2;
 Corr_inds{2} = 1:4;
 Corr_inds{3} = 1:6;
 Corr_inds{4} = 1:8;
-Corr_inds{5} = 15:16;
-Corr_inds{6} = 13:16;
-Corr_inds{7} = 11:16;
-Corr_inds{8} = 9:16;
-Corr_inds{9} = [1, 6, 11, 16];
-Corr_inds{10} = [1, 4, 7, 10, 13, 16];
+Corr_inds{5} = [2,8,14,20];
+Corr_inds{6} = [1,4,8,12,16,20];
+Corr_inds{7} = [1,4,6,9,12,15,17,20];
 
 
 nconds = length(Corr_inds);
@@ -61,7 +69,7 @@ invoke(PS.RP,'ZeroTag','datainR');
 pause(3.0);
 
 %% Generate First stimulus
-[stimA, stimB, stimA2, ~, ~, ~, ~, ~] = Stim_Bind_ABA(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
+[~,stimA, stimB, stimA2, ~, ~, ~, ~, ~] = Stim_Bind_ABA(Corr_inds{CorrSet(1)},fs,f_start, f_end, Tones_num, []);
 stims = vertcat(stimA, stimA2, stimB);
 
 
@@ -81,11 +89,11 @@ pause(2.0);
 for i=1:nconds*ntrials
     
     %% Break
-    if mod(i,80) == 0 % optional break every 80 trials
+    if mod(i,60) == 0 % optional break every 60 trials
         
         fprintf(1,'Break ----------- \n')
         
-        info = sprintf('Break! This is break %d out of %d',i/80,floor(nconds*ntrials/80));
+        info = sprintf('Break! You are about to start trial %d/%d ',i,nconds*ntrials);
         info2 = sprintf('Press any button twice to resume');
         Screen('DrawText',PS.window,info,textlocH,textlocV,PS.white);
         Screen('DrawText',PS.window,info2,textlocH,textlocV+100,PS.white);
@@ -127,11 +135,9 @@ for i=1:nconds*ntrials
     
     fprintf(1, ['Response = %d, correct =%d, Corr_inds= [' repmat('%d, ',1,numel(Corr_inds{CorrSet(i)})-1) '%d]\n'], resp,correctList(end), Corr_inds{CorrSet(i)});
     respList = [respList, resp]; %#ok<AGROW>
-
-    WaitSecs(0.3); % jit probably unnecessary b/c of variable response time by subjects but adding just in case
     
 end
-save(strcat(subj, '_BindingBehavior'), 'respList','correctList','Corr_inds','CorrSet');
+save(strcat(subj, '_BindingBehavior20tones'), 'respList','correctList','Corr_inds','CorrSet');
 
 Screen('DrawText',PS.window,'Experiment is Over!',PS.rect(3)/2-150,PS.rect(4)/2-25,PS.white);
 Screen('DrawText',PS.window,'Thank You for Your Participation!',PS.rect(3)/2-150,PS.rect(4)/2+100,PS.white);

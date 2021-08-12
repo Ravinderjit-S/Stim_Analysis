@@ -1,15 +1,15 @@
 fs = 48828;
-f_start = 600;
+f_start = 200;
 f_end = 8000; 
-Tones_num = 8;
-Corr_inds = [1:Tones_num];
-bw = [103 111]; % 4, 24
-bp_fo = 1/2 * 4 * fs; %round(1/lb * 4 *fs)
-lpf = []; %40
+Tones_num = 20;
+Corr_inds = [15:20];
+%Corr_inds = [1,4,7,10,13,16];
 ERB_spacing = []; %if specified, takes precedence over Tones_num
+
 tic()
-[stim_Ref, stimA, stimB, stimA2, envs_A, envs_B, ~, ERBspace, Tones_f] = Stim_Bind_ABA(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing,bw,bp_fo,lpf);
+[stim_Ref, stimA, stimB, stimA2, envs_A, envs_B, ~, ERBspace, Tones_f] = Stim_Bind_ABA(Corr_inds, fs, f_start, f_end, Tones_num, ERB_spacing);
 toc()
+
 stims = vertcat(stim_Ref,stimA,stimA2, stimB);
 order = randperm(3);
 order = [1 order+1];
@@ -38,4 +38,10 @@ spectrogram(stimB,round(fs*.01),round(fs*.01*.9),[1:9000],fs,'yaxis')
 
 
 figure,plot(t,envs_B(1,:),'b')
+
+% figure,plot(t,stimB)
+
+
+
+
 

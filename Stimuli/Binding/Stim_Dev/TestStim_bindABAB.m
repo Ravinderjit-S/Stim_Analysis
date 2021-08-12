@@ -1,5 +1,4 @@
 fs = 48828;
-%Corr_inds = [12:16];
 Corr_inds = [16:20];
 f_start = 200;
 f_end = 8000; 
