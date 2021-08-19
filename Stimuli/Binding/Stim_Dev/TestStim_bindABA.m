@@ -2,7 +2,8 @@ fs = 48828;
 f_start = 200;
 f_end = 8000; 
 Tones_num = 20;
-Corr_inds = [15:20];
+Corr_inds = [19:20];
+%Corr_inds = [2,8,14,20];
 %Corr_inds = [1,4,7,10,13,16];
 ERB_spacing = []; %if specified, takes precedence over Tones_num
 

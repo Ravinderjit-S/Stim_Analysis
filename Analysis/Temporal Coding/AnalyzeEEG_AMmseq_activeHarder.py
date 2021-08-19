@@ -39,9 +39,13 @@ mseq_loc = 'mseqEEG_150_bits10_4096.mat'
 file_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/' + mseq_loc
 Mseq_dat = sio.loadmat(file_loc)
 mseq = Mseq_dat['mseqEEG_4096'].astype(float)
+mseq_shift = np.roll(mseq,int(np.round(mseq.size/2)))
+
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_active_harder/'
 pickle_loc = data_loc + 'Pickles/'
+
+Subjects = ['S211',]
 
 subject = 'S211'
 
@@ -62,17 +66,20 @@ if subject == 'S211':
     ocular_projs = [Projs[0], Projs[1]]
 
 
-
 data_eeg.add_proj(ocular_projs)
 data_eeg.plot_projs_topomap()
 data_eeg.plot(events=blinks,show_options=True)
 
 #%% Plot data
 reject = None
-epochs = mne.Epochs(data_eeg, data_evnt, [1,2,3], tmin=-0.3, 
+epochs = mne.Epochs(data_eeg, data_evnt, [1,2], tmin=-0.3, 
+                                 tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.2, 0.)) 
+
+epochs_3 = mne.Epochs(data_eeg, data_evnt, [3], tmin=-0.3, 
                                  tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.2, 0.)) 
 
 epochs.average().plot(picks=[31])
+epochs_3.average().plot(picks=[31])
 
 #%% Extract part of response when stim is on
 ch_picks = np.arange(32)
@@ -82,7 +89,9 @@ fs = epochs.info['sfreq']
 t = epochs.times
 t1 = np.where(t>=0)[0][0]
 t2 = t1 + mseq.size + int(np.round(0.4*fs))
+
 epdat = epochs.get_data()[:,ch_picks,t1:t2].transpose(1,0,2)
+epdat_3 = epochs_3.get_data()[:,ch_picks,t1:t2].transpose(1,0,2)
 t = t[t1:t2]
 t = np.concatenate((-t[-int(np.round(0.4*fs)):0:-1],t[:-1]))
 info_obj = epochs.info
@@ -91,18 +100,32 @@ info_obj = epochs.info
 Reject_Thresh=150e-6
 
 Peak2Peak = epdat.max(axis=2) - epdat.min(axis=2)
+Peak2Peak_3 = epdat_3.max(axis=2) -epdat_3.min(axis=2)
+
 mask_trials = np.all(Peak2Peak < Reject_Thresh,axis=0)
+mask_trials_3 = np.all(Peak2Peak_3 < Reject_Thresh,axis=0)
+
 print('rejected ' + str(epdat.shape[1] - sum(mask_trials)) + ' trials due to P2P')
+print('rejected_3v ' + str(epdat_3.shape[1] - sum(mask_trials_3)) + ' trials due to P2P')
 epdat = epdat[:,mask_trials,:]
+epdat_3 = epdat_3[:,mask_trials_3,:]
 print('Total Trials Left: ' + str(epdat.shape[1]))
-Tot_trials = epdat.shape[1]
+print('Total Trials Left_3: ' + str(epdat_3.shape[1]))
+
+Tot_trials = epdat.shape[1] + epdat_3.shape[1]
 
 plt.figure()
 plt.plot(Peak2Peak.T)
 
+plt.figure()
+plt.plot(Peak2Peak_3.T)
+
 #%% Correlation Analysis
 
-Ht = mseqXcorr(epdat,mseq[0,:])
+Ht_12 = mseqXcorr(epdat,mseq[0,:])
+Ht_3 = mseqXcorr(epdat_3,mseq_shift[0,:])
+
+Ht = Ht_12 * epdat.shape[1]/Tot_trials + Ht_3 * epdat_3.shape[1]/Tot_trials
 
 
 #%% Plot Ht
@@ -122,6 +145,7 @@ fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
 for p1 in range(sbp[0]):
     for p2 in range(sbp[1]):
         axs[p1,p2].plot(t,Ht[p1*sbp[1]+p2,:],color='k')
+        axs[p1,p2].plot(t,Ht_3[p1*sbp[1]+p2,:],color='tab:orange')
         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
         # for n in range(m*num_nfs,num_nfs*(m+1)):
         #     axs[p1,p2].plot(t,Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
@@ -132,6 +156,7 @@ fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
 for p1 in range(sbp2[0]):
     for p2 in range(sbp2[1]): 
         axs[p1,p2].plot(t,Ht[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
+        axs[p1,p2].plot(t,Ht_3[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='tab:orange')
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
         # for n in range(m*num_nfs,num_nfs*(m+1)):
         #     axs[p1,p2].plot(t,Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)

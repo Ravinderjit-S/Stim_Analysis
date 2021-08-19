@@ -1,4 +1,4 @@
-function [Sig] = CMR_randMod(noise_bands,target_f,SNRdB,n_mod_cuts,target_mod_f,fs,tlen,coh)
+function [Sig] = CMR_randMod_clicky(noise_bands,target_f,SNRdB,n_mod_cuts,target_mod_f,fs,tlen,coh)
 % This function will generate a CMR stimulus with 3 noise bands which have
 % a random moudlation and a modulated tone embedded in the noise 
 %noise_bands = 3 x 2 matrix providing the upper and lower cutoff of each
@@ -30,19 +30,19 @@ end
 %% Generate Noise modulations
 bw = diff(n_mod_cuts);
 fc = mean(n_mod_cuts);
+
 if coh ==1
-    noise_mod = makeNBNoiseFFT(bw,fc,tlen,fs,0,0);
-    noise_mod = noise_mod - min(noise_mod);
-    noise_mod = noise_mod / max(noise_mod);
+    [noise_mod, ~] = create_envelope(n_mod_cuts,40,tlen,fs);
     noise_mod = noise_mod';
 else
     noise_mod = zeros(3,length(t));
     for i = 1:3
-        noise_mod_i = makeNBNoiseFFT(bw,fc,tlen,fs,0,0);
-        noise_mod_i = noise_mod_i - min(noise_mod_i);
-        noise_mod(i,:) = noise_mod_i / max(noise_mod_i);
+        [noise_mod_i, ~] = create_envelope(n_mod_cuts,40,tlen,fs);
+        noise_mod(i,:) = noise_mod_i;
     end
 end
+
+
 noise_bp = noise_bp.*noise_mod;
 noise_on = noise_bp(2,:);
 noise_full = sum(noise_bp,1);
