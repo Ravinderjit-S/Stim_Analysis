@@ -630,6 +630,33 @@ for sub in range(len(Subjects)):
     [w,h] = freqz(b=Cz_avg[:split_locs_sub[sub][-1]] - Cz_avg[:split_locs_sub[sub][-1]].mean()  ,a=1,worN=np.arange(0,fs/2,2),fs=fs)
     axs[1].plot(w,np.abs(h),color='grey',alpha=0.5)
     
+#%% Compare Cz via SAM vs Cz mseq 
+
+pickle_loc_tmtf = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/tmtf/Pickles'
+
+Subjects_tmtf = ['S207','S228','S236','S238','S239','S246']
+A_Trials_cond = []
+A_freqs = []
+A_tmtf_mag = []
+
+for sub in range(len(Subjects_tmtf)):
+    subject = Subjects_tmtf[sub]
+    with open(os.path.join(pickle_loc_tmtf,subject +'_tmtf.pickle'),'rb') as file:
+        [freqs, tmtf_mag, Trials_cond] = pickle.load(file)
+    
+    A_Trials_cond.append(Trials_cond)
+    A_freqs.append(freqs)
+    A_tmtf_mag.append(tmtf_mag)
+    
+    sub_ind = Subjects.index(subject)
+    Ch_ind = np.where(A_ch_picks[sub] == 31)[0][0]
+    Cz_avg = A_Ht[sub][Ch_ind,t1:t2] - A_Ht[sub][Ch_ind,t1:t2].mean()
+    [w,h] = freqz(b=Cz_avg[:split_locs_sub[sub][-1]] - Cz_avg[:split_locs_sub[sub][-1]].mean()  ,a=1,worN=np.arange(0,fs/2,3),fs=fs)
+    plt.figure()
+    plt.title(subject)
+    plt.plot(w,np.abs(h)/np.max(np.abs(h)))
+    plt.scatter(freqs,tmtf_mag/np.max(tmtf_mag),color='tab:orange')
+    plt.xlim([0,70])
     
 
 

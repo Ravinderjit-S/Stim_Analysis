@@ -22,7 +22,7 @@ import pickle
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['SVM']
+Subjects = ['S211']
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
@@ -121,7 +121,7 @@ t_transition = np.arange(0,t_g/fs,1/fs)
 
 plt.figure()
 cond_tt = ['Oneset','AB','BA']
-cnd_tt=2
+cnd_tt=1
 for cnd in range(len(data)):
     plt.plot(t_transition,data_trans_avg[cnd][cnd_tt][31,:]*1e6,label=conds[cnd])
     plt.ylim(-1,4.0)
