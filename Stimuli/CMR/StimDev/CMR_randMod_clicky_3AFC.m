@@ -49,18 +49,24 @@ noise_bp = noise_bp.*noise_mod;
 noise_on = noise_bp(2,:);
 noise_full = sum(noise_bp,1);
 
-target = sin(2*pi*target_f.*t);
-target_mod = 0.5 + 0.5*sin(2*pi*target_mod_f.*t);
+t_target = 0:1/fs:(tlen-0.1)-1/fs; %start and end tone 50 ms after onset and before noise turns off
+target = sin(2*pi*target_f.*t_target);
+target_mod = 0.5 + 0.5*sin(2*pi*target_mod_f.*t_target);
 target = target_mod .*target;
+target = rampsound(target,fs,risetime);
 
-desired_SNR = 10^(SNRdB/20);
-Cur_SNR = rms(target)/rms(noise_on);
-target_adjust = desired_SNR/Cur_SNR;
-target = target_adjust*target;
-Sig_target = noise_full + target;
+tone_start = round(.050*fs);
+tone_end = tone_start + length(target);
 
 noise_full = rampsound(noise_full,fs,risetime);
-Sig_target = rampsound(Sig_target,fs,risetime);
+
+desired_SNR = 10^(SNRdB/20);
+Cur_SNR = rms(target)/rms(noise_on(tone_start:tone_end));
+target_adjust = desired_SNR/Cur_SNR;
+target = target_adjust*target;
+target = horzcat(zeros(1,tone_start), target, zeros(1,length(noise_full) - tone_end));
+Sig_target = noise_full + target;
+
 silence = zeros(1,round(fs*silence_period));
 
 Sigs = {noise_full, noise_full, Sig_target};
