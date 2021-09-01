@@ -408,9 +408,107 @@ for sub in range(len(Subjects)):
 
 
 
-
-
-
-
+#%% Active shift detect task
     
+Subjects_sd = ['S207', 'S211', 'S228', 'S236', 'S238', 'S239']
+
+pickle_loc_sd = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_active_harder/Pickles/'
+A_Tot_trials_sd = []
+A_Ht_sd = []
+A_info_obj_sd = []
+A_ch_picks_sd = []
+
+for sub in range(len(Subjects_sd)):
+    subject = Subjects_sd[sub]
+    with open(os.path.join(pickle_loc_sd,subject +'_AMmseq10bit_Active_harder.pickle'),'rb') as file:
+        [t, Tot_trials, Ht, info_obj, ch_picks] = pickle.load(file)
+    
+    A_Tot_trials_sd.append(Tot_trials)
+    A_Ht_sd.append(Ht)
+    A_info_obj_sd.append(info_obj)
+    A_ch_picks_sd.append(ch_picks)
+
+
+#Get average Ht
+perCh = np.zeros([32,1])
+for s in range(len(Subjects_sd)):
+    for ch in range(32):
+        perCh[ch,0]+= np.sum(A_ch_picks_sd[s]==ch)
+
+Avg_Ht_sd = np.zeros([32,t.size])
+for s in range(len(Subjects_sd)):
+    Avg_Ht_sd[A_ch_picks_sd[s],:] += A_Ht_sd[s]
+    
+Avg_Ht_sd = Avg_Ht_sd / perCh
+
+#PCA on t_cuts
+
+pca_sp_cuts_sd = []
+pca_expVar_cuts_sd = []
+pca_coeff_cuts_sd = []
+
+t_cutT = []
+pca = PCA(n_components=2)
+
+for t_c in range(len(t_cuts)):
+    if t_c ==0:
+        t_1 = np.where(t>=0)[0][0]
+    else:
+        t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        
+    t_2 = np.where(t>=t_cuts[t_c])[0][0]
+    
+    pca_sp = pca.fit_transform(Avg_Ht_sd[:,t_1:t_2].T)
+    pca_expVar = pca.explained_variance_ratio_
+    pca_coeff = pca.components_
+    
+    if pca_coeff[0,31] < 0:  # Expand this too look at mutlitple electrodes
+       pca_coeff = -pca_coeff
+       pca_sp = -pca_sp
+       
+    pca_sp_cuts_sd.append(pca_sp)
+    pca_expVar_cuts_sd.append(pca_expVar)
+    pca_coeff_cuts_sd.append(pca_coeff)
+    t_cutT.append(t[t_1:t_2])
+
+plt.figure()
+for t_c in range(len(t_cuts)):
+    plt.plot(t_cutT[t_c],pca_sp_cuts_act[t_c][:,0])
+
+plt.figure()
+plt.plot(t,Avg_Ht_sd[31,:])
+plt.plot(t,Avg_Ht_act[31,:])
+plt.xlim([0,0.5])
+
+plt.figure()
+labels = ['comp1', 'comp2']
+vmin = pca_coeff_cuts_sd[-1][0,:].mean() - 2 * pca_coeff_cuts_sd[-1][0,:].std()
+vmax = pca_coeff_cuts_sd[-1][0,:].mean() + 2 * pca_coeff_cuts_sd[-1][0,:].std()
+for t_c in range(len(t_cuts)):
+    plt.subplot(2,len(t_cuts),t_c+1)
+    plt.title('ExpVar ' + str(np.round(pca_expVar_cuts_sd[t_c][0]*100)) + '%')
+    mne.viz.plot_topomap(pca_coeff_cuts_sd[t_c][0,:], mne.pick_info(A_info_obj_sd[1],A_ch_picks_sd[1]),vmin=vmin,vmax=vmax)
+    
+    plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
+    plt.title('ExpVar ' + str(np.round(pca_expVar_cuts_sd[t_c][1]*100)) + '%')
+    mne.viz.plot_topomap(pca_coeff_cuts_sd[t_c][1,:], mne.pick_info(A_info_obj_sd[1],A_ch_picks_sd[1]),vmin=vmin,vmax=vmax)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
