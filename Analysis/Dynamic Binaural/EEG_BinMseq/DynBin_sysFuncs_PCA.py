@@ -61,7 +61,8 @@ for subj in range(0,len(Subjects)):
     print(Subject, '.........................')
     with open(os.path.join(data_loc, Subject+'_DynBin.pickle'),'rb') as f:
         IAC_epochs, ITD_epochs = pickle.load(f)
-    
+    IAC_evoked = IAC_epochs.average()
+mne.viz.plot_evoked_topomap(IAC_evoked)
     #%% Extract epochs when stim is on
     t = IAC_epochs.times
     fs = IAC_epochs.info['sfreq']

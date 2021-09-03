@@ -89,6 +89,28 @@ fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 3.3 3.3];
 print([Fig_path 'IACbehavior_s211'],'-dsvg')
 
+%% S211 OSCOR Figure
+
+s211_oscor = oscor.Accuracy(:,1);
+figure, hold on
+ylabel('Oscor Accuracy')
+ylim([0.3 1.02])
+plot(os_FM,s211_oscor,'linewidth',2,'Color','k')
+plot(os_FM,os_acc_white,'LineStyle','--','Color','k', 'linewidth',2)
+xlabel('Frequency (Hz)')
+set(gca,'XScale','log')
+set(gca,'XTick',[10,100,300])
+set(gca,'XTickLabel',{'10','100', '300'})
+set(gca,'YTick',[0.3, 0.5, 0.75, 1.])
+set(gca,'FontSize',14)
+xlim([4 400])
+legend({'OSCOR', 'OSCOR white'},'location','SouthWest')
+legend('boxoff')
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 3.3 3.3];
+print([Fig_path 'IACbehavior_OSCORs211'],'-dsvg')
+print([Fig_path 'IACbehavior_OSCORs211'],'-depsc')
 
 %% Just OSCOR figure
 

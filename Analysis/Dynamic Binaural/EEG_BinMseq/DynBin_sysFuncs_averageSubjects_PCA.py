@@ -155,9 +155,6 @@ fig.suptitle('Ht ITD')
 
 #%% Get response from pca on average response
 
-t_1 = np.where(t>=-1.25)[0][0]
-t_2 = np.where(t>=-0.75)[0][0]
-
 t_1 = np.where(t>=0)[0][0]
 t_2 = np.where(t>=0.5)[0][0]
 
