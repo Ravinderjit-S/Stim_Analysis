@@ -195,6 +195,10 @@ for t_c in range(len(t_cuts)):
     plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][1]*100)) + '%')
     mne.viz.plot_topomap(pca_coeff_cuts[t_c][1,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
     
+  
+with open(os.path.join(pickle_loc,'PCA_passive_template.pickle'),'wb') as file:
+    pickle.dump([pca_coeff_cuts,pca_expVar_cuts,t_cuts],file)
+  
     
 #%% Use PCA template on t_splits for individuals
 
@@ -262,9 +266,6 @@ A_ch_picks_old = []
 for sub in range(len(Subjects_old)):
     subject = Subjects_old[sub]
     with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4.pickle'),'rb') as file:
-        # [tdat, Tot_trials, Ht, Htnf, pca_sp, pca_coeff, pca_expVar, 
-        #  pca_sp_nf, pca_coeff_nf,pca_expVar_nf,ica_sp,
-        #  ica_coeff,ica_sp_nf,ica_coeff_nf, info_obj, ch_picks] = pickle.load(file)
         [tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
     
     A_Tot_trials_old.append(Tot_trials[3])

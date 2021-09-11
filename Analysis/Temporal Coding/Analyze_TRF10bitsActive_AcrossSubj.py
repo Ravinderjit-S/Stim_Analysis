@@ -476,8 +476,10 @@ for t_c in range(len(t_cuts)):
     plt.plot(t_cutT[t_c],pca_sp_cuts_act[t_c][:,0])
 
 plt.figure()
-plt.plot(t,Avg_Ht_sd[31,:])
-plt.plot(t,Avg_Ht_act[31,:])
+plt.plot(t,Avg_Ht_sd[31,:],label='Shift Detect')
+plt.plot(t,Avg_Ht_act[31,:], label='Counting')
+plt.plot(t,Avg_Ht_pass[31,:],label='passive')
+plt.legend()
 plt.xlim([0,0.5])
 
 plt.figure()
@@ -493,7 +495,24 @@ for t_c in range(len(t_cuts)):
     plt.title('ExpVar ' + str(np.round(pca_expVar_cuts_sd[t_c][1]*100)) + '%')
     mne.viz.plot_topomap(pca_coeff_cuts_sd[t_c][1,:], mne.pick_info(A_info_obj_sd[1],A_ch_picks_sd[1]),vmin=vmin,vmax=vmax)
     
+A_Ht_sd
+#%% Active Shift Detect individual subject
+    
+plt.figure()
+sub_sd_ind = 5
+sub_ind = Subjects.index(Subjects_sd[sub_sd_ind])
+ch = 31
+ch_ind_sd = np.where(A_ch_picks_sd[sub_sd_ind]==ch)[0][0]
+ch_ind_pass =  np.where(A_ch_picks_pass[sub_ind]==ch)[0][0]
+ch_ind_act = np.where(A_ch_picks_act[sub_ind]==ch)[0][0]
+plt.plot(t,A_Ht_pass[sub_ind][ch_ind_pass,:],label='Passive')
+plt.plot(t,A_Ht_act[sub_ind][ch_ind_act,:], label='Active')
+plt.plot(t,A_Ht_sd[sub_sd_ind][ch_ind_sd,:], label='Shift Detect')
+plt.xlim([0,0.5])
+plt.title(Subjects_sd[sub_sd_ind])
+plt.legend()
 
+    
 
 
 
