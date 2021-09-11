@@ -7,11 +7,12 @@ Created on Sat Aug 28 13:13:36 2021
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 import scipy.io as sio
 import os
 
 
-data_loc = '/media/ravinderjit/Data_Drive/Data/MTB/BindingBeh20tones/'
+data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/MTB/BindingBeh20tones/'
 
 Subjects = ['S211','S246','SVM']
 
@@ -36,4 +37,21 @@ for sub in range(len(Subjects)):
         
         
   
-    
+
+# 1 = 17-20
+# 2 = 15-20
+# 4 = 1, 8, 14, 20
+# 5 = 1, 4, 8, 12, 16, 20
+
+mean_acc = acc.mean(axis=1)    
+se_acc = acc.std(axis=1) / np.sqrt(acc.shape[1])    
+        
+plt.figure()
+plt.bar([0,0.7],mean_acc[1:3],  width = 0.3, yerr= se_acc[1:3])
+plt.bar([0.3,1],mean_acc[4:6],  width = 0.3, yerr = se_acc[4:6])
+plt.ylim([0,1])
+plt.xticks([0,0.3,0.7,1],labels=['1.5 ERBs', '6.3 ERBs', '1.5 ERBs','3.8 ERBs'])
+plt.ylabel('Accuracy')
+
+
+
