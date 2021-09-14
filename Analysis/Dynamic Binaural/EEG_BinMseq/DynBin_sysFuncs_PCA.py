@@ -52,7 +52,8 @@ Num_noiseFloors = 100
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
-Subjects = ['S204','S205','S206','S207','S208','S211']
+#Something up with S204
+Subjects = ['S204']
 
 for subj in range(0,len(Subjects)):
     Subject = Subjects[subj]
@@ -98,7 +99,7 @@ for subj in range(0,len(Subjects)):
         
     #%% Calculate Ht
     
-    plt.figure()
+    #plt.figure()
     # plt.plot(IAC_ep.mean(axis=1))
     # plt.plot(ITD_ep.mean(axis=1))
     

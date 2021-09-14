@@ -17,6 +17,7 @@ from EEGpp import EEGconcatenateFolder
 from mne.preprocessing.ssp import compute_proj_epochs
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
+Subjects = ['S204']
 nchans = 34;
 
 
