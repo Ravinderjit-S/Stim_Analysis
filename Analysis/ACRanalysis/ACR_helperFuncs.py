@@ -9,6 +9,7 @@ Created on Sun Jul 25 16:57:46 2021
 import numpy as np
 from scipy.signal import freqz
 from scipy.signal.windows import gaussian
+from sklearn.decomposition import PCA
 
 def ACR_sourceHf(split_locs,ACR,t,fs,f1,f2):
     tpks = []
@@ -84,7 +85,35 @@ def ACR_model(latency,width, weights,latency_pad,fs):
 
 
 
-
+def PCA_tcuts(Ht,t,t_cuts,ch_picks,chs_use):
+    pca = PCA(n_components=2)
+    pca_sp_cuts_ = []
+    pca_expVar_cuts_ = []
+    pca_coeff_cuts_ = []
+    t_cuts_ = []
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = np.where(t>=0)[0][0]
+        else:
+            t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        
+        t_2 = np.where(t>=t_cuts[t_c])[0][0]
+        
+        pca_sp = pca.fit_transform(Ht[chs_use,t_1:t_2].T)
+        pca_expVar = pca.explained_variance_ratio_
+        pca_coeff = pca.components_
+        
+        if pca_coeff[0,ch_picks[chs_use]==31] < 0:  #Consider to Expand this too look at mutlitple electrodes
+           pca_coeff = -pca_coeff
+           pca_sp = -pca_sp
+        
+        pca_sp_cuts_.append(pca_sp)
+        pca_expVar_cuts_.append(pca_expVar)
+        pca_coeff_cuts_.append(pca_coeff)
+        t_cuts_.append(t[t_1:t_2])
+        
+    return pca_sp_cuts_, pca_expVar_cuts_, pca_coeff_cuts_, t_cuts_
+    
 
 
 
