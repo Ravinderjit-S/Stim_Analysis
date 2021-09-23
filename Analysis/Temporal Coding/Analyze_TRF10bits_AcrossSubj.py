@@ -254,7 +254,7 @@ for sub in range(len(Subjects)):
 #%% Load data collected earlier
         
 data_loc_old = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-pickle_loc_old = data_loc_old + 'Pickles_full/'
+pickle_loc_old = data_loc_old + 'Pickles/'
 Subjects_old = ['S211','S207','S236','S228','S238'] 
 
 A_Tot_trials_old = []
@@ -557,7 +557,7 @@ for sub in range(len(Subjects)):
     
 
 split_locs_sub = []
-split_locs_sub.append([80,280,559,1024]) #S207
+split_locs_sub.append([80,144,280,559,1024]) #S207
 split_locs_sub.append([66,280,521,1024]) #S228
 split_locs_sub.append([58,271,500,994])  #S236
 split_locs_sub.append([67,270,511,1068]) #S238
@@ -629,7 +629,7 @@ for sub in range(len(Subjects)):
         axs[1].set_xlabel('Frequency')
         
     [w,h] = freqz(b=Cz_avg[:split_locs_sub[sub][-1]] - Cz_avg[:split_locs_sub[sub][-1]].mean()  ,a=1,worN=np.arange(0,fs/2,2),fs=fs)
-    axs[1].plot(w,np.abs(h),color='grey',alpha=0.5)
+    axs[1].plot(w,np.abs(h),color='black',alpha=0.5, linestyle='dashed')
     
 #%% Compare Cz via SAM vs Cz mseq 
 
@@ -658,6 +658,8 @@ for sub in range(len(Subjects_tmtf)):
     plt.plot(w,np.abs(h)/np.max(np.abs(h)))
     plt.scatter(freqs,tmtf_mag/np.max(tmtf_mag),color='tab:orange')
     plt.xlim([0,70])
+    plt.xlabel('Frequency')
+    plt.ylabel('Normalized Magnitude')
     
 
 

@@ -10,6 +10,9 @@ import numpy as np
 from scipy.signal import freqz
 from scipy.signal.windows import gaussian
 from sklearn.decomposition import PCA
+from sklearn.metrics import explained_variance_score
+import matplotlib.pyplot as plt
+import mne
 
 def ACR_sourceHf(split_locs,ACR,t,fs,f1,f2):
     tpks = []
@@ -34,18 +37,18 @@ def ACR_sourceHf(split_locs,ACR,t,fs,f1,f2):
         
         [w, p_Hf] = freqz(b= ACR[t_1:t_2] - ACR[t_1:t_2].mean() ,a=1,worN=np.arange(0,fs/2,2),fs=fs)
         
-        f_ind1 = np.where(w>=f1[pk])[0][0]
-        f_ind2 = np.where(w>=f2[pk]+2)[0][0]
+        # f_ind1 = np.where(w>=f1[pk])[0][0]
+        # f_ind2 = np.where(w>=f2[pk]+2)[0][0]
         
-        phase_pkresp = np.unwrap(np.angle(p_Hf))
-        coeffs= np.polyfit(w[f_ind1:f_ind2],phase_pkresp[f_ind1:f_ind2],deg=1)
-        pks_phaseLine.append(coeffs[0] * w[f_ind1:f_ind2] +coeffs[1])
-        pks_phaseLineW.append(w[f_ind1:f_ind2])
-        pks_gd.append(-coeffs[0] / (2*np.pi))
+        # phase_pkresp = np.unwrap(np.angle(p_Hf))
+        # coeffs= np.polyfit(w[f_ind1:f_ind2],phase_pkresp[f_ind1:f_ind2],deg=1)
+        # pks_phaseLine.append(coeffs[0] * w[f_ind1:f_ind2] +coeffs[1])
+        # pks_phaseLineW.append(w[f_ind1:f_ind2])
+        # pks_gd.append(-coeffs[0] / (2*np.pi))
         
         pks_w.append(w)
         pks_Hf.append(p_Hf)
-        pks_phase.append(phase_pkresp)
+        # pks_phase.append(phase_pkresp)
          
     
         
@@ -115,10 +118,47 @@ def PCA_tcuts(Ht,t,t_cuts,ch_picks,chs_use):
     return pca_sp_cuts_, pca_expVar_cuts_, pca_coeff_cuts_, t_cuts_
     
 
+def Template_tcuts(Ht, t, t_cuts, ch_picks, template):
+    t_tc = []
+    template_tc_sp = []
+    template_tc_expVar = []
+    for t_c in range(len(t_cuts)):
+        if t_c ==0:
+            t_1 = np.where(t>=0)[0][0]
+        else:
+            t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        
+        t_2 = np.where(t>=t_cuts[t_c])[0][0]
+        
+        resp = Ht[:,t_1:t_2] - Ht[:,t_1:t_2].mean(axis=1)[:,np.newaxis]
+        
+        template_sp = np.matmul(resp.T, template[ch_picks])
+
+        template_est = np.matmul(template[ch_picks,np.newaxis],template_sp[np.newaxis,:])
+
+        template_expVar = explained_variance_score(resp, template_est, multioutput='variance_weighted')  
+
+        t_tc.append(t[t_1:t_2])
+        
+        template_tc_sp.append(template_sp)
+        template_tc_expVar.append(template_expVar)
+    
+    return t_tc, template_tc_sp, template_tc_expVar
 
 
-
-
+def PCA_tcuts_topomap(pca_coeffCuts, t_cuts, pca_expVarCuts, infoObj, ch_picks, title_):
+    plt.figure()
+    plt.suptitle(title_)
+    vmin = pca_coeffCuts[-1][0,:].mean() - 2 * pca_coeffCuts[-1][0,:].std()
+    vmax = pca_coeffCuts[-1][0,:].mean() + 2 * pca_coeffCuts[-1][0,:].std()
+    for t_c in range(len(t_cuts)):
+        plt.subplot(2,len(t_cuts),t_c+1)
+        plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][0]*100)) + '%')
+        mne.viz.plot_topomap(pca_coeffCuts[t_c][0,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
+        
+        plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
+        plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][1]*100)) + '%')
+        mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
 
 
 

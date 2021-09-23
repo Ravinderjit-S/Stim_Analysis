@@ -46,8 +46,7 @@ exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra e
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_active_harder/'
 pickle_loc = data_loc + 'Pickles/'
 
-Subjects = ['S207', 'S211', 'S228', 'S236', 'S238', 'S239']
-
+Subjects = ['S207', 'S211', 'S228', 'S236', 'S238', 'S239', 'S250']
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
@@ -72,7 +71,7 @@ for sub in range(len(Subjects)):
     ocular_projs = Projs
     
     if subject == 'S211':
-        ocular_projs = [Projs[0], Projs[1]]
+        ocular_projs = [Projs[0]] #Projs 1
     
     if subject == 'S207':
         ocular_projs = [Projs[0]]
@@ -81,16 +80,19 @@ for sub in range(len(Subjects)):
         ocular_projs = [Projs[0]]
         
     if subject == 'S236':
-        ocular_projs = [Projs[0], Projs[1]]
+        ocular_projs = [Projs[0]] #Projs 1
         
     if subject == 'S238':
-         ocular_projs = [Projs[0], Projs[2]]
+         ocular_projs = [Projs[0]] #Projs 2
          
     if subject == 'S239':
          ocular_projs = [Projs[0]]
+         
+    if subject == 'S250':
+         ocular_projs = [Projs[0]]
     
     data_eeg.add_proj(ocular_projs)
-    # data_eeg.plot_projs_topomap()
+    data_eeg.plot_projs_topomap()
     # data_eeg.plot(events=blinks,show_options=True)
     
     del ocular_projs, blinks, blink_epochs, Projs
@@ -131,13 +133,19 @@ for sub in range(len(Subjects)):
 #%% Remove epochs with large deflections
     Reject_Thresh=150e-6
     
-    if subject == 'S207':
-        Reject_Thresh = 275e-6
+    if subject =='S207':
+        Reject_Thresh = 300e-6
     if subject =='S228':
         Reject_Thresh = 200e-6
     if subject == 'S236':
-        Reject_Thresh = 200e-6
+        Reject_Thresh = 210e-6
     if subject == 'S239':
+        Reject_Thresh = 200e-6
+    if subject == 'S250':
+        Reject_Thresh = 250e-6
+    if subject == 'S232':
+        Reject_Thresh = 200e-6
+    if subject == 'S238':
         Reject_Thresh = 200e-6
     
     Peak2Peak = epdat.max(axis=2) - epdat.min(axis=2)
@@ -155,8 +163,9 @@ for sub in range(len(Subjects)):
     
     Tot_trials = epdat.shape[1] + epdat_3.shape[1]
     
-    # plt.figure()
-    # plt.plot(Peak2Peak.T)
+    plt.figure()
+    plt.plot(Peak2Peak.T)
+    plt.title(subject + ' Tot trials:' + str(Tot_trials))
     
     # plt.figure()
     # plt.plot(Peak2Peak_3.T)
@@ -227,6 +236,9 @@ for sub in range(len(Subjects)):
 #%% save data
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bit_Active_harder.pickle'),'wb') as file:
         pickle.dump([t, Tot_trials, Ht, info_obj, ch_picks],file)
+        
+    with open(os.path.join(pickle_loc,subject+'_AMmseq10bit_Active_harder_epochs.pickle'),'wb') as file:
+        pickle.dump([epdat,epdat_3],file)
     
     
 

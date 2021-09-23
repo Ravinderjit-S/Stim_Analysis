@@ -22,8 +22,12 @@ from ACR_helperFuncs import PCA_tcuts
 
 def PCA_tcutsPlots(t_cuts,pca_spCuts,comp,t,cz, title_):
     plt.figure()
-    for t_c in range(len(t_cuts)):
-        plt.plot(t_cuts[t_c],pca_spCuts[t_c][:,comp])
+    if len(comp)==0:
+        for t_c in range(len(t_cuts)):
+            plt.plot(t_cuts[t_c],pca_spCuts[t_c])
+    else:
+        for t_c in range(len(t_cuts)):
+            plt.plot(t_cuts[t_c],pca_spCuts[t_c][:,comp])
     plt.plot(t,cz,color='k')
     plt.xlim([0,0.3])
     plt.title(title_)
@@ -42,11 +46,6 @@ def PCA_tcuts_topomap(pca_coeffCuts, t_cuts, pca_expVarCuts, infoObj, ch_picks, 
         plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][1]*100)) + '%')
         mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
         
-        
-    
-        
-
-
 
 mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat'
 Mseq_dat = sio.loadmat(mseq_loc)
@@ -68,6 +67,12 @@ with open(template_loc,'rb') as file:
     
 bstemTemplate  = pca_coeffs_cuts[0][0,:]
 cortexTemplate = pca_coeffs_cuts[2][0,:]
+
+# vmin = bstemTemplate.mean() - 2 * bstemTemplate.std()
+# vmax = bstemTemplate.mean() + 2 * bstemTemplate.std()
+# plt.figure()
+# mne.viz.plot_topomap(cortexTemplate, mne.pick_info(info_obj,np.arange(32)),vmin=vmin,vmax=vmax)
+        
 
 
 #%% Load Passive Data
@@ -173,7 +178,7 @@ for sub in range(len(Subjects)):
         plt.scatter(t[peaks_sd],cz_sd[peaks_sd],color='black')
         plt.scatter(t[pk_sd],cz_sd[pk_sd],color='black')
         
-    plt.xlim([0,0.5])
+    plt.xlim([0,0.3])
     plt.title(Subjects[sub])
     plt.legend()
 
@@ -185,7 +190,7 @@ cuts_count = []
 cuts_sd = []
 
 #S207
-cuts_passive.append([.020, .035, .068, .134, .282 ])
+cuts_passive.append([.020, .035, .068, .134, .266 ])
 cuts_count.append([.018, .034, .068,  .130, .262])
 cuts_sd.append([.0124, .034, .063, .118, .237])
 
@@ -223,7 +228,7 @@ for sub in range(len(Subjects)):
     for tt in range(t_var.size):
         tt1 = np.where(t>=t_var[tt] - t_var_step)[0][0]
         tt2 = np.where(t>=t_var[tt])[0][0]
-        
+         
         true_resp = A_Ht_pass[sub][:,tt1:tt2]
 
         bstem_est = np.matmul(bstemTemplate[A_ch_picks_pass[sub],np.newaxis],bstemResp_pass[np.newaxis,tt1:tt2])
@@ -241,7 +246,7 @@ for sub in range(len(Subjects)):
     ax[0].set_xlim([0,0.5])
     ax0 = ax[0].twinx()
     ax0.plot(t_var,bstem_expVar,color='tab:orange')
-    ax0.plot(t_var,cortex_expVar,color='green')
+    # ax0.plot(t_var,cortex_expVar,color='green')
     ax0.set_ylim([0,1])
     
     
@@ -252,6 +257,54 @@ for sub in range(len(Subjects)):
     ax1 = ax[1].twinx()
     ax1.plot(t_var,cortex_expVar, color='tab:orange')
     ax1.set_ylim([0,1])
+
+#%% Templates from manual cutoff
+    
+Sub_ind = 1
+Ht_pass = A_Ht_pass[Sub_ind] 
+t_cuts_pass = cuts_passive[Sub_ind]
+
+template_tcuts_bs = []
+template_tcuts_ctx = []
+tc_passive = []
+
+template_tcuts_bs_expVar = []
+template_tcuts_ctx_expVar = []
+
+for t_c in range(len(t_cuts_pass)):
+    if t_c ==0:
+        t_1 = np.where(t>=0)[0][0]
+    else:
+        t_1 = np.where(t>=t_cuts_pass[t_c-1])[0][0]
+    
+    t_2 = np.where(t>=t_cuts_pass[t_c])[0][0]
+    
+    resp = Ht_pass[:,t_1:t_2]
+    
+    bs_sp = np.matmul(resp.T, bstemTemplate[A_ch_picks_pass[Sub_ind]])
+    ctx_sp = np.matmul(resp.T, cortexTemplate[A_ch_picks_pass[Sub_ind]])
+    
+    bs_est = np.matmul(bstemTemplate[A_ch_picks_pass[Sub_ind],np.newaxis],bs_sp[np.newaxis,:])
+    ctx_est = np.matmul(cortexTemplate[A_ch_picks_pass[Sub_ind],np.newaxis],ctx_sp[np.newaxis,:])
+    
+    bs_expVar = explained_variance_score(resp, bs_est, multioutput='variance_weighted')  
+    ctx_expVar = explained_variance_score(resp, ctx_est,multioutput='variance_weighted')
+    
+    tc_passive.append(t[t_1:t_2])
+    
+    template_tcuts_bs.append(bs_sp)
+    template_tcuts_ctx.append(ctx_sp)
+    
+    template_tcuts_bs_expVar.append(bs_expVar)
+    template_tcuts_ctx_expVar.append(ctx_expVar)
+    
+
+ch_pass_ind = np.where(A_ch_picks_pass[Sub_ind] == 31)[0][0]
+cz_pass = A_Ht_pass[Sub_ind][ch_pass_ind,:]
+PCA_tcutsPlots(tc_passive,template_tcuts_bs,[],t,cz_pass, Subjects[Sub_ind] + ' brainstem')
+PCA_tcutsPlots(tc_passive,template_tcuts_ctx,[],t,cz_pass, Subjects[Sub_ind] + ' cortex')
+    
+
 
 #%% Individual PCA analysis
 Sub_ind = 1
@@ -266,8 +319,6 @@ elif(Sub_ind==1):
         np.where(A_ch_picks_pass[Sub_ind]==16)[0][0],
          np.where(A_ch_picks_pass[Sub_ind]==27)[0][0]
         ]
-    
-
 
 Ht_pass = A_Ht_pass[Sub_ind] 
 t_cuts_pass = cuts_passive[Sub_ind]
@@ -354,8 +405,56 @@ PCA_tcuts_topomap(pca_coeffCuts_sd, t_cuts_sd, pca_expVarCuts_sd, A_info_obj_sd[
                   A_ch_picks_sd[Sub_ind][chs_use_sd], 'Count: ' + Subjects[Sub_ind])
 
 #%% Plot 32 channel with tsplit labelled
+colors = ['tab:blue','tab:orange','green','red','purple']
 
+sbp = [4,4]
+sbp2 = [4,4]
 
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
+ch_picks_s = A_ch_picks_pass[Sub_ind]
+t_cuts = cuts_passive[Sub_ind]
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        cur_ch = p1*sbp[1] + p2
+        if np.any(cur_ch==ch_picks_s):
+            ch_ind = np.where(cur_ch==ch_picks_s)[0][0]
+            for t_c in range(len(t_cuts)):
+                if t_c ==0:
+                    t_1 = np.where(t>=0)[0][0]
+                else:
+                    t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        
+                t_2 = np.where(t>=t_cuts[t_c])[0][0]
+                
+                axs[p1,p2].plot(t[t_1:t_2],Ht_pass[ch_ind,t_1:t_2],color=colors[t_c])
+                axs[p1,p2].plot(t[t_1:t_2],Ht_count[ch_ind,t_1:t_2],linestyle='dashed',color=colors[t_c])
+                axs[p1,p2].plot(t[t_1:t_2],Ht_sd[ch_ind,t_1:t_2],linestyle='dotted',color=colors[t_c])
+                
+            axs[p1,p2].set_title('A' + str(ch_picks[ch_ind]+1))
+            axs[p1,p2].set_xlim([0,0.4])
+                   
+fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
+for p1 in range(sbp[0]):
+    for p2 in range(sbp[1]):
+        cur_ch = p1*sbp2[1]+p2+sbp[0]*sbp[1]
+        if np.any(cur_ch==ch_picks_s):
+            ch_ind = np.where(cur_ch==ch_picks_s)[0][0]
+            for t_c in range(len(t_cuts)):
+                if t_c ==0:
+                    t_1 = np.where(t>=0)[0][0]
+                else:
+                    t_1 = np.where(t>=t_cuts[t_c-1])[0][0]
+        
+                t_2 = np.where(t>=t_cuts[t_c])[0][0]
+                
+                axs[p1,p2].plot(t[t_1:t_2],Ht_pass[ch_ind,t_1:t_2])
+                axs[p1,p2].plot(t[t_1:t_2],Ht_count[ch_ind,t_1:t_2],linestyle='dashed',color=colors[t_c])
+                axs[p1,p2].plot(t[t_1:t_2],Ht_sd[ch_ind,t_1:t_2],linestyle='dotted',color=colors[t_c])
+                
+            axs[p1,p2].set_title('A' + str(ch_picks[ch_ind]+1))
+            axs[p1,p2].set_xlim([0,0.4])
+
+                
 
 
 

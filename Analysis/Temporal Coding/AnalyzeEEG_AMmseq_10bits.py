@@ -33,10 +33,11 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10bits/'
 pickle_loc = data_loc + 'Pickles/'
 
-Subjects = ['S207','S228','S236','S238','S239','S246','S247','S250']
+Subjects = ['S207','S228','S236','S238','S239','S246','S247','S250', 'S250_visit2']
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
-    
-num_nfs = 5
+
+Subjects = ['S207']
+num_nfs = 1
 
 for subject in Subjects:
     print('On Subject ................... ' + subject)
@@ -57,24 +58,26 @@ for subject in Subjects:
     blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
     blink_epochs = mne.Epochs(data_eeg,blinks,998,tmin=-0.25,tmax=0.25,proj=False,
                                   baseline=(-0.25,0),reject=dict(eeg=500e-6))
-    Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8,verbose='DEBUG')
+    Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8)
     
     if subject == 'S207':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] for now
     elif subject == 'S228':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] cause its rotated
     elif subject == 'S236':
         ocular_projs = [Projs[0]]
     elif subject == 'S238':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]]  #not using Projs[2] for now
     elif subject == 'S239':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]]  #not using Projs[2] for now
     elif subject == 'S246':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]]  #not using Projs[2] for now
     elif subject == 'S247':                      #S247 looks sleepy ... lot of alpha 
-        ocular_projs = [Projs[0],Projs[2]] 
+        ocular_projs = [Projs[0]]   #not using Projs[2] for now
     elif subject == 'S250':
-        ocular_projs = [Projs[0],Projs[1]]
+        ocular_projs = [Projs[0]]  #not using Projs[2] for now
+    elif subject == 'S250_visit2':
+        ocular_projs = [Projs[0]]
     
     #ocular_projs = Projs
     
@@ -110,11 +113,11 @@ for subject in Subjects:
     info_obj = epochs[0].info
     #del epochs
     #%% Remove epochs with large deflections
-    Reject_Thresh = 150e-6
+    Reject_Thresh = 250e-6
     if subject == 'S207':
         Reject_Thresh = 300e-6
     elif subject == 'S228':
-        Reject_Thresh = 175e-6
+        Reject_Thresh = 250e-6
     elif subject == 'S236':
         Reject_Thresh = 300e-6
     elif subject == 'S246':
@@ -128,8 +131,9 @@ for subject in Subjects:
     Tot_trials = epdat.shape[1]
     
     ch_maxAmp = Peak2Peak.mean(axis=1).argmax()
-    # plt.figure()
-    # plt.plot(Peak2Peak.T)
+    plt.figure()
+    plt.plot(Peak2Peak.T)
+    plt.title(subject + ' ' + str(Tot_trials))
     
     # plt.figure()
     # plt.plot(Peak2Peak[:,mask_trials].T)
@@ -145,7 +149,7 @@ for subject in Subjects:
     
     for nf in range(num_nfs):
         print('On nf:' + str(nf))
-        resp = epdat
+        resp = epdat.copy()
         inv_inds = np.random.permutation(epdat.shape[1])[:round(epdat.shape[1]/2)]
         resp[:,inv_inds,:] = -resp[:,inv_inds,:]
         Ht_nf = mseqXcorr(resp,mseq[0,:])
@@ -190,6 +194,10 @@ for subject in Subjects:
     #%% Save Data
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bits.pickle'),'wb') as file:
         pickle.dump([t, Tot_trials, Ht, Htnf, info_obj, ch_picks],file)
+    
+    with open(os.path.join(pickle_loc,subject+'_AMmseq10bits_epochs.pickle'),'wb') as file:
+        pickle.dump([epdat],file)
+    
     del data_eeg, data_evnt, epdat, t, Ht, info_obj, Htnf
     
     

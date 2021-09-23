@@ -13,6 +13,7 @@ import os
 
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/MTB/BindingBeh20tones/'
+fig_loc = '/media/ravinderjit/Data_Drive/Data/Figures/MTB/'
 
 Subjects = ['S211','S246','SVM']
 
@@ -47,11 +48,13 @@ mean_acc = acc.mean(axis=1)
 se_acc = acc.std(axis=1) / np.sqrt(acc.shape[1])    
         
 plt.figure()
-plt.bar([0,0.7],mean_acc[1:3],  width = 0.3, yerr= se_acc[1:3])
-plt.bar([0.3,1],mean_acc[4:6],  width = 0.3, yerr = se_acc[4:6])
+plt.bar([0,0.7],mean_acc[1:3],  width = 0.3, yerr= se_acc[1:3],color='k')
+plt.bar([0.3,1],mean_acc[4:6],  width = 0.3, yerr = se_acc[4:6],color='grey')
 plt.ylim([0,1])
 plt.xticks([0,0.3,0.7,1],labels=['1.5 ERBs', '6.3 ERBs', '1.5 ERBs','3.8 ERBs'])
 plt.ylabel('Accuracy')
+plt.savefig(fig_loc + 'BindingAccuracy.svg',format='svg')
+
 
 
 

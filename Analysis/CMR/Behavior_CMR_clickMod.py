@@ -20,13 +20,16 @@ def GaussCDF(x,sigma,mu,lapseRate):
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/CMR/'
 
-Subjects = ['S211','SVM']
-subject = Subjects[1]
+Subjects = ['S211','SVM', 'S211_coh1']
+subject = Subjects[0]
 data = sio.loadmat(data_loc + subject + '_CMRrandModClicky.mat',squeeze_me=True)
 ntrials = 20
 
 SNRs_0 = np.concatenate((np.array([-10]),np.arange(-25,-55,-5)))
 SNRs_1 = np.concatenate((np.array([-15]),np.arange(-35,-65,-5)))
+
+# SNRs_0 = data['SNR_0']
+# SNRs_1 = data['SNR_1']
 
 snrList_unique = np.concatenate((SNRs_0,SNRs_1))
 snrList = matlib.repmat(snrList_unique,1,20).squeeze()
@@ -65,7 +68,7 @@ plt.plot(x_1,psy_curve_1,'--')
 #%% Do fit with psignifit
 
 data_0ps = np.concatenate((SNRs_0[:,np.newaxis], acc_0[:,np.newaxis] * ntrials, 20*np.ones([7,1])),axis=1)
-data_1ps = np.concatenate((SNRs_1[:,np.newaxis], acc_1[:,np.newaxis] * ntrials, 20*np.ones([7,1])),axis=1)
+data_1ps = np.concatenate((SNRs_1[:,np.newaxis], acc_1[:,np.newaxis] * ntrials, 20*np.ones([acc_1.size,1])),axis=1)
 
 options = dict({
     'sigmoidName': 'norm',
@@ -77,7 +80,7 @@ result_1ps = ps.psignifit(data_1ps, options)
 
 plt.figure()
 ps.psigniplot.plotPsych(result_0ps)
-ps.psigniplot.plotPsych(result_1ps)
+ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
 plt.plot(x_0,psy_curve_0,'--')   
 plt.plot(x_1,psy_curve_1,'--')
 

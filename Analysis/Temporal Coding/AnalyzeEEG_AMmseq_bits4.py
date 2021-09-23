@@ -27,37 +27,6 @@ from sklearn.decomposition import FastICA
 
 
 
-
-# def PLV_Coh(X,Y,TW,fs):
-#     """
-#     X is the Mseq
-#     Y is time x trials
-#     TW is half bandwidth product 
-#     """
-#     X = X.squeeze()
-#     ntaps = 2*TW - 1
-#     dpss = sp.signal.windows.dpss(X.size,TW,ntaps)
-#     N = int(2**np.ceil(np.log2(X.size)))
-#     f = np.arange(0,N)*fs/N
-#     PLV_taps = np.zeros([N,ntaps])
-#     Coh_taps = np.zeros([N,ntaps])
-#     Phase_taps = np.zeros([N,ntaps])
-#     for k in range(0,ntaps):
-#         print('tap:',k+1,'/',ntaps)
-#         Xf = sp.fft(X * dpss[k,:],axis=0,n=N)
-#         Yf = sp.fft(Y * dpss[k,:].reshape(dpss.shape[1],1),axis=0,n=N)
-#         XYf = Xf.reshape(Xf.shape[0],1).conj() * Yf
-#         Phase_taps[:,k] = np.unwrap(np.angle(np.mean(XYf/abs(XYf),axis=1)))
-#         PLV_taps[:,k] = abs(np.mean(XYf / abs(XYf),axis=1))
-#         Coh_taps[:,k] = abs(np.mean(XYf,axis=1) / np.mean(abs(XYf),axis=1))
-        
-#     PLV = PLV_taps.mean(axis=1)
-#     Coh = Coh_taps.mean(axis=1)
-#     Phase = Phase_taps #Phase_taps.mean(axis=1)
-#     return PLV, Coh, f, Phase
-
-
-
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
@@ -76,26 +45,26 @@ for m in mseq_locs:
 
 #data_loc = '/media/ravinderjit/Storage2/EEGdata/'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-pickle_loc = data_loc + 'Pickles_full_wholeHead/'
+pickle_loc = data_loc + 'Pickles/'
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
-Subjects = ['S228', 'S238']
 num_nfs = 1
 
 for subject in Subjects:
     print('On Subject ...... ' + subject )
     exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
+    refchans = ['EXG1','EXG2']
     
     if subject == 'S228':
         refchans = ['EXG2']
         
-    exclude = ['EXG1', 'EXG2',
-               'EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
-    refchans = None #average reference
+    # exclude = ['EXG1', 'EXG2',
+    #            'EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
+    #refchans = [[None]] #average reference
     
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=1000)
+    data_eeg.filter(l_freq=1,h_freq=500)
     
     if subject == 'S211':
         data_eeg.info['bads'].append('A10') #Channel A10 bad in S211
@@ -103,7 +72,7 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A15') 
         data_eeg.info['bads'].append('A17') 
     elif subject =='S228':
-        # data_eeg.info['bads'].append('EXG1') 
+        data_eeg.info['bads'].append('EXG1') 
         data_eeg.info['bads'].append('A30')
 
    
@@ -115,21 +84,21 @@ for subject in Subjects:
     
     ocular_projs = Projs
     if subject ==  'S228':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] for now
     elif subject == 'S211':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] for now
     elif subject == 'S207':
         ocular_projs = [Projs[0]]
     elif subject == 'S236':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] for now
     # elif subject == 'S237':
     #     ocular_projs = [Projs[0]]
     elif subject == 'S238':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] #not using Projs[2] for now
     
     
     data_eeg.add_proj(ocular_projs)
-    # data_eeg.plot_projs_topomap()
+    data_eeg.plot_projs_topomap()
     # data_eeg.plot(events=blinks,show_options=True)
     
     del blinks, blink_epochs, Projs,ocular_projs
@@ -174,11 +143,15 @@ for subject in Subjects:
 #%% Remove epochs with large deflections
     Reject_Thresh=150e-6
     if subject =='S211':  # look at this participant again
-        Reject_Thresh = 150e-6
-    elif subject == 'S207':
         Reject_Thresh = 200e-6
+    elif subject == 'S207':
+        Reject_Thresh = 250e-6
     elif subject == 'S228':
-        Reject_Thresh = 150e-6
+        Reject_Thresh = 200e-6
+    elif subject == 'S236':
+        Reject_Thresh = 250e-6
+    elif subject == 'S238':
+        Reject_Thresh = 250e-6
     #may want to reject a channel in S228
     Tot_trials = np.zeros([len(mseq)])
     for m in range(len(mseq)):
@@ -215,7 +188,7 @@ for subject in Subjects:
         Ht.append(Ht_m)
         for nf in range(num_nfs):
             print('On nf: ' + str(nf) )
-            resp = epdat[m]
+            resp = epdat[m].copy()
             inv_inds = np.random.permutation(epdat[m].shape[1])[:round(epdat[m].shape[1]/2)]
             resp[:,inv_inds,:] = -resp[:,inv_inds,:]
             Ht_nf = mseqXcorr(resp,mseq[m][0,:])
@@ -318,7 +291,7 @@ for subject in Subjects:
     #     axs[1].set_xlabel('channel')
     #     for n in range(m*num_nfs,num_nfs*(m+1)):
     #         axs[1].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
-    #     fig.suptitle('PCA ' + labels[m])    
+    #     fig.suptitle('PCA ' + labels[m])    Subjects = ['S238']
         
     # p_ind = 3
     # vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
@@ -387,5 +360,9 @@ for subject in Subjects:
     
     #%% Save Data
     with open(os.path.join(pickle_loc,subject+'_AMmseqbits4.pickle'),'wb') as file:
-        pickle.dump([tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks],file)
+        pickle.dump([tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks,],file)
+        
+    with open(os.path.join(pickle_loc,subject+'_AMmseqbits4_epochs.pickle'),'wb') as file:
+        pickle.dump([epdat[3]],file)    
+        
     del data_eeg, data_evnt, epdat, tdat, Ht, info_obj,Htnf

@@ -77,17 +77,17 @@ for subject in Subjects:
     elif subject == 'S236':
         ocular_projs = [Projs[0]]
     elif subject == 'S238':
-        ocular_projs = [Projs[0],Projs[1]]
+        ocular_projs = [Projs[0]] #Projs[1]
     elif subject == 'S239':
-        ocular_projs = [Projs[0],Projs[2]]
+        ocular_projs = [Projs[0]] # Projs[2]
     elif subject == 'S246':
-        ocular_projs = [Projs[0],Projs[1]]
+        ocular_projs = [Projs[0]] #Projs[1]
     elif subject == 'S247':
-        ocular_projs = [Projs[0],Projs[2]] 
+        ocular_projs = [Projs[0]] #Projs[2]
     elif subject == 'S250':
-        ocular_projs = [Projs[0],Projs[1]]  
+        ocular_projs = [Projs[0]]  #Projs[1]
     elif subject == 'S211':
-        ocular_projs = [Projs[0], Projs[2]]
+        ocular_projs = [Projs[0]] #Projs[2]
     
     #ocular_projs = Projs
     
@@ -136,8 +136,12 @@ for subject in Subjects:
     elif subject == 'S246':
         Reject_Thresh = 250e-6
     elif subject == 'S247':
-        Reject_Thresh = 200e-6
+        Reject_Thresh = 250e-6
     elif subject == 'S250':
+        Reject_Thresh = 200e-6
+    elif subject == 'S246':
+        Reject_Thresh = 250e-6
+    elif subject == 'S238':
         Reject_Thresh = 200e-6
     
     Peak2Peak = epdat.max(axis=2) - epdat.min(axis=2)
@@ -148,8 +152,9 @@ for subject in Subjects:
     Tot_trials = epdat.shape[1]
     
     ch_maxAmp = Peak2Peak.mean(axis=1).argmax()
-    # plt.figure()
-    # plt.plot(Peak2Peak.T)
+    plt.figure()
+    plt.plot(Peak2Peak.T)
+    plt.title(subject + ' Tot_trials: ' + str(Tot_trials))
     
     # plt.figure()
     # plt.plot(Peak2Peak[:,mask_trials].T)
@@ -165,7 +170,7 @@ for subject in Subjects:
     
     for nf in range(num_nfs):
         print('On nf:' + str(nf))
-        resp = epdat
+        resp = epdat.copy()
         inv_inds = np.random.permutation(epdat.shape[1])[:round(epdat.shape[1]/2)]
         resp[:,inv_inds,:] = -resp[:,inv_inds,:]
         Ht_nf = mseqXcorr(resp,mseq[0,:])
@@ -210,6 +215,9 @@ for subject in Subjects:
     #%% Save Data
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bits_Active.pickle'),'wb') as file:
         pickle.dump([t, Tot_trials, Ht, Htnf, info_obj, ch_picks],file)
+        
+    with open(os.path.join(pickle_loc,subject+'_AMmseq10bits_Active_epochs.pickle'),'wb') as file:
+        pickle.dump([epdat],file)
     del data_eeg, data_evnt, epdat, t, Ht, info_obj, Htnf
     
     
