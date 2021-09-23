@@ -228,7 +228,7 @@ colors = ['tab:blue','tab:orange','green','red','purple', 'brown', 'pink']
 axs = []
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
-    ch =  31 #Ch. Cz
+    ch =  0 #Ch. Cz
     
     ch_pass_ind = np.where(A_ch_picks_pass[sub] == ch)[0][0]
     ch_count_ind = np.where(A_ch_picks_count[sub] == ch)[0][0]
@@ -271,10 +271,10 @@ for sub in range(len(Subjects)):
     ax.set_yticks([-.002,.002])
     
     ax.axes.ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
-    # ax.set_xticks([0,0.2,0.35])
-    # plt.xlim([-0.050,0.350])
-    ax.set_xticks([0,0.005,0.010,.020])
-    plt.xlim([-0.002,0.020])
+    ax.set_xticks([0,0.2,0.35])
+    plt.xlim([-0.050,0.350])
+    # ax.set_xticks([0,0.005,0.010,.020])
+    # plt.xlim([-0.002,0.020])
     axs.append(ax)
     
 axs[4].set_xlabel('Time (s)',fontweight='bold')

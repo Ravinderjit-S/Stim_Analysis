@@ -557,7 +557,7 @@ for sub in range(len(Subjects)):
     
 
 split_locs_sub = []
-split_locs_sub.append([80,144,280,559,1024]) #S207
+split_locs_sub.append([80,280,559,1024]) #S207
 split_locs_sub.append([66,280,521,1024]) #S228
 split_locs_sub.append([58,271,500,994])  #S236
 split_locs_sub.append([67,270,511,1068]) #S238

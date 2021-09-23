@@ -22,7 +22,7 @@ from ACR_helperFuncs import PCA_tcuts
 
 def PCA_tcutsPlots(t_cuts,pca_spCuts,comp,t,cz, title_):
     plt.figure()
-    if len(comp)==0:
+    if (type(comp) != int):
         for t_c in range(len(t_cuts)):
             plt.plot(t_cuts[t_c],pca_spCuts[t_c])
     else:
