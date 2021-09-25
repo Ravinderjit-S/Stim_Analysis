@@ -87,25 +87,6 @@ for sub in range(len(Subjects)):
         
         print(sub)
         
-        # [t,IAC_Ht,ITD_Ht,IAC_Htnf,ITD_Htnf,
-        #     pca_space_IAC,pca_coeff_IAC,pca_expVar_IAC,
-        #     pca_space_ITD,pca_coeff_ITD,pca_expVar_ITD, 
-        #     pca_space_IAC_nf,pca_coeffs_IAC_nf,
-        #     pca_expVar_IAC_nf, pca_space_ITD_nf,
-        #     pca_coeffs_ITD_nf,pca_expVar_ITD_nf, ica_space_ITD,
-        #     ica_coeff_ITD, ica_space_IAC, ica_coeff_IAC, 
-        #     ica_space_ITD_nf,ica_f_ITD_nf,ica_coeffs_ITD_nf,
-        #     ica_space_IAC_nf,ica_coeffs_IAC_nf]= pickle.load(file)
-        
-              # [t,f,IAC_Ht,ITD_Ht,IAC_Htnf,ITD_Htnf,IAC_Hf,ITD_Hf,
-              #   pca_space_IAC,pca_f_IAC,pca_coeff_IAC,pca_expVar_IAC,
-              #   pca_space_ITD,pca_f_ITD,pca_coeff_ITD,pca_expVar_ITD, 
-              #   pca_space_IAC_nf,pca_f_IAC_nf,pca_coeffs_IAC_nf,
-              #   pca_expVar_IAC_nf, pca_space_ITD_nf,pca_f_ITD_nf,
-              #   pca_coeffs_ITD_nf,pca_expVar_ITD_nf, ica_space_ITD,
-              #   ica_f_ITD,ica_coeff_ITD, ica_space_IAC, ica_f_IAC, 
-              #   ica_coeff_IAC, ica_space_ITD_nf,ica_f_ITD_nf,ica_coeffs_ITD_nf,
-              #   ica_space_IAC_nf, ica_f_IAC_nf,ica_coeffs_IAC_nf] = pickle.load(file)
 
     A_IAC_Ht.append(IAC_Ht)
 

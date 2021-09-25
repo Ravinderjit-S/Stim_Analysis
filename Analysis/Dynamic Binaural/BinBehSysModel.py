@@ -316,15 +316,14 @@ mse_physFit = np.mean((BMLD[1:9] - out[1:9])**2)
 fig, ax = plt.subplots(1)
 fig.set_size_inches(3.5,4)
 ax.errorbar(Window_t,BMLD, AcrossSubjectSEM, label='behavior',color='k',fmt='o',linewidth=2) #behavior
-ax.plot(Window_t,out, label='physio')
-ax.scatter(Window_t,out)
+ax.plot(Window_t,out, label='physio',linewidth=2)
+ax.scatter(Window_t,out,facecolors='none',edgecolors='tab:blue')
 ax.set_xlabel('Time (sec)')
 ax.set_ylabel('Detection Improvement (dB)')
-#plt.scatter(Window_t,out)
 plt.legend()
 
-#Gonna save varible to make figure in matlab
-#savemat('Physio_behModel.mat',{'PhysBehMod': out})
+#Gonna save varible to make figure in matlab because other behavioral data is analyzed there
+savemat('Physio_behModel.mat',{'PhysBehMod': out})
 
 fontsz = 11
 fig,ax = plt.subplots(1)
@@ -336,7 +335,7 @@ ax.spines['top'].set_visible(False)
 ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 ax.set_xlabel('Time(sec)')
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
-#plt.savefig(os.path.join(fig_path, 'IAC_Ht_behNorm.svg') , format='svg')
+plt.savefig(os.path.join(fig_path, 'IAC_Ht_behNorm.svg') , format='svg')
 
 
 fig,ax = plt.subplots(1)
@@ -347,5 +346,5 @@ ax.set_ylabel('BMLD (dB)')
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
-#plt.savefig(os.path.join(fig_path, 'IAC_BMLD.svg') , format='svg')
+plt.savefig(os.path.join(fig_path, 'IAC_BMLD.svg') , format='svg')
 

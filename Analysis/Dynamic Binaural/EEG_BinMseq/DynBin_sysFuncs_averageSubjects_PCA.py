@@ -9,19 +9,15 @@ Created on Wed Mar  3 20:54:08 2021
 import os
 import pickle
 import numpy as np
-import scipy as sp
 import mne
 import matplotlib.pyplot as plt
 import matplotlib 
-import matplotlib.ticker as mtick
 from scipy.signal import freqz
 from scipy.io import loadmat
-from scipy.special import erf
 from sklearn.decomposition import PCA
-from sklearn.decomposition import FastICA
+from scipy.signal import hilbert
+from scipy.io import savemat
 
-
-#data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/SystemFuncs32_2')
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32_refAvg/')
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/DynBin/')
 
@@ -36,13 +32,11 @@ A_ITD_Ht_nf = []
 
 ch_picks = np.arange(32)
 
-
 A_pca_expVar_IAC = np.zeros([len(Subjects),2])
 A_pca_expVar_ITD = np.zeros([len(Subjects),2])
 
 with open('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32/S211_DynBin.pickle','rb') as f:
     IAC_epochs, ITD_epochs = pickle.load(f)
-    
     
 fs = int(IAC_epochs.info['sfreq'])
 info_obj = mne.pick_info(ITD_epochs.info, ch_picks)
@@ -61,12 +55,9 @@ for sub in range(len(Subjects)):
     A_IAC_Ht_nf.append(IAC_Htnf)
     A_ITD_Ht_nf.append(ITD_Htnf)
     
-             
 
-    
 #%% Plot time domain
 #get Ht into numpy vector
-
     
 Anp_Ht_IAC = np.zeros([A_IAC_Ht[0].shape[0],A_IAC_Ht[0].shape[1],len(Subjects)])
 Anp_Ht_ITD = np.zeros([A_ITD_Ht[0].shape[0],A_ITD_Ht[0].shape[1],len(Subjects)])
@@ -90,6 +81,7 @@ for p1 in range(sbp[0]):
                 axs[p1,p2].plot(t,A_IAC_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
         axs[p1,p2].plot(t,Ht_avg_IAC[p1*sbp[1]+p2,:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
+        axs[p1,p2].set_xlim([-0.1,1])
 
 fig.suptitle('Ht IAC')
 
@@ -102,9 +94,9 @@ for p1 in range(sbp2[0]):
                 axs[p1,p2].plot(t,A_IAC_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
         axs[p1,p2].plot(t,Ht_avg_IAC[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
+        axs[p1,p2].set_xlim([-0.1,1])
          
 fig.suptitle('Ht IAC')
-
 
 fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
 for p1 in range(sbp[0]):
@@ -115,6 +107,7 @@ for p1 in range(sbp[0]):
                 axs[p1,p2].plot(t,A_ITD_Ht_nf[s][n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
         axs[p1,p2].plot(t,Ht_avg_ITD[p1*sbp[1]+p2,:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
+        axs[p1,p2].set_xlim([-0.1,1])
 
 fig.suptitle('Ht ITD')
 
@@ -127,6 +120,7 @@ for p1 in range(sbp2[0]):
                 axs[p1,p2].plot(t,A_ITD_Ht_nf[s][n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
         axs[p1,p2].plot(t,Ht_avg_ITD[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='black',linewidth=2)            
         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
+        axs[p1,p2].set_xlim([-0.1,1])
          
 fig.suptitle('Ht ITD')
 
@@ -135,7 +129,6 @@ fig.suptitle('Ht ITD')
 
 t_1 = np.where(t>=0)[0][0]
 t_2 = np.where(t>=0.5)[0][0]
-
 
 pca = PCA(n_components=1)
 pca_sp_Htavg_IAC = pca.fit_transform(Ht_avg_IAC[:,t_1:t_2].T)
@@ -148,7 +141,6 @@ pca_Htavg_ITDcoeffs = pca.components_
 pca_Htavg_ITDexpVar = pca.explained_variance_ratio_
 
 channels = [30,31,4,25,3,25]
-
 
 if pca_Htavg_IACcoeffs[0,channels].mean() < pca_Htavg_IACcoeffs[0,:].mean():
     pca_Htavg_IACcoeffs = - pca_Htavg_IACcoeffs
@@ -167,15 +159,10 @@ mne.viz.plot_topomap(pca_Htavg_IACcoeffs.squeeze(), info_obj,vmin=vmin,vmax=vmax
 plt.savefig(os.path.join(fig_path, 'IACavg_PCA_topomap.svg') , format='svg')
 plt.title('IAC: Avg Subjects then calculate coeffs')
 
-# vmin = pca_Htavg_ITDcoeffs.mean() - 2*pca_Htavg_ITDcoeffs.std()
-# vmax = pca_Htavg_ITDcoeffs.mean() - 2*pca_Htith open(os.path.join(data_loc, Subject+'_DynBin_SysFunc.pickle'),'rb') as file:     
-
-
 plt.figure()
 mne.viz.plot_topomap(pca_Htavg_ITDcoeffs.squeeze(), mne.pick_info(info_obj, ch_picks),vmin=vmin,vmax=vmax)
 plt.savefig(os.path.join(fig_path, 'ITDavg_PCA_topomap.svg') , format='svg')
 plt.title('ITD: Avg Subjects then calculate coeffs')
-
 
 plt.figure()
 plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC)
@@ -201,7 +188,6 @@ ax.set_ylim([-1.1,1.1])
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'ITD_dIAC.svg') , format='svg')
 
-
 #%% Leave one out - jacknife
 
 pca_sp_Htavg_IAC_JN = np.zeros([pca_sp_Htavg_IAC.shape[0],len(Subjects)])
@@ -218,7 +204,6 @@ for jn in range(len(Subjects)):
     pca_IAC_JN = pca.fit_transform(Ht_avg_IAC_JN.T)[:,0]
     pca_IAC_coeffs = pca.components_
     
-    
     if pca_IAC_coeffs[0,channels].mean() < pca_IAC_coeffs[0,:].mean():
         pca_IAC_coeffs = - pca_IAC_coeffs
         pca_IAC_JN = - pca_IAC_JN
@@ -229,7 +214,6 @@ for jn in range(len(Subjects)):
         
     pca_ITD_JN = pca.fit_transform(Ht_avg_ITD_JN.T)[:,0]
     pca_ITD_coeffs = pca.components_
-    
     
     if pca_ITD_coeffs[0,channels].mean() < pca_ITD_coeffs[0,:].mean():
         pca_ITD_coeffs = - pca_ITD_coeffs
@@ -251,16 +235,9 @@ plt.figure()
 plt.plot(t[t_1:t_2], pca_sp_Htavg_IAC,color='k')
 plt.fill_between(t[t_1:t_2],pca_sp_Htavg_IAC[:,0]-2*IAC_pcaJN_se,pca_sp_Htavg_IAC[:,0]+2*IAC_pcaJN_se)
 
-
 plt.figure()
 plt.plot(t[t_1:t_2], pca_sp_Htavg_ITD,color='k')
 plt.fill_between(t[t_1:t_2],pca_sp_Htavg_ITD[:,0]-2*ITD_pcaJN_se,pca_sp_Htavg_ITD[:,0]+2*ITD_pcaJN_se)
-
-
-plt.figure()
-mne.viz.plot_topomap(pca_IAC_comp.mean(axis=1), info_obj,vmin=vmin,vmax=vmax)
-plt.title('IAC: PCA coeffs mean JN')
-
 
 #%% Compute Noise Floors By applying real topomap coeffs to NFs
 
@@ -277,10 +254,11 @@ for sub in range(len(Subjects)):
         All_IACnfs[:,it] = _IACnf
         All_ITDnfs[:,it] = _ITDnf
         it+=1
-        
 
 IACnf_se = All_IACnfs.std(axis=1) / np.sqrt(len(Subjects))
 ITDnf_se = All_ITDnfs.std(axis=1) / np.sqrt(len(Subjects))
+
+#%% Make Time Domain sBTRF Figures
 
 fontsz = 11
 
@@ -310,52 +288,11 @@ ax.set_xlabel('Time (sec)')
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'ITD_HtAvg_pca.svg') , format='svg')
 
-#Compute where IAC HT intersects noisefloor
-crossings = np.where(np.diff(np.sign(All_IACnfs.mean(axis=1)-pca_sp_Htavg_IAC)))[0]
-
-#%% Behavioral Binaural Unmasking Dynamics
-
-#analysis in BinBehSysModel.py
-stDevNeg = .061
-stDevPos = .061
-tneg = np.arange(-stDevNeg*4,0,1/fs)
-tpos = np.arange(0,stDevPos*4+.01,1/fs)
-
-simpGaussNeg = np.exp(-0.5*(tneg/stDevNeg)**2)
-simpGaussPos = np.exp(-0.5*(tpos/stDevPos)**2)
-
-simpGauss = np.concatenate((simpGaussNeg,simpGaussPos))
-simpGauss = simpGauss / np.sum(simpGauss)
-
-simpGauss = np.concatenate((simpGaussNeg,simpGaussPos))
-t = np.concatenate((tneg,tpos))
-
-w_behMod, h_behMod = freqz(simpGauss,a=1,worN=2000,fs=fs)
-
-plt.figure()
-plt.plot(t,simpGauss)
-
-plt.figure()
-plt.plot(w_behMod, np.abs(h_behMod) / np.max(np.abs(h_behMod)))
-
-beh_dataPath = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/'
-beh_IACsq = loadmat(os.path.abspath(beh_dataPath+'IACsquareTone_Processed.mat'))
-
-Window_t = beh_IACsq['WindowSizes'][0]
-f_beh = Window_t[1:]**-1
-SNRs_beh = beh_IACsq['AcrossSubjectsSNR'] - beh_IACsq['AcrossSubjectsSNR'][0]
-AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
-
-
 #%% Frequency domain 
       
 b_IAC = pca_sp_Htavg_IAC
 w_IAC,h_IAC = freqz(b_IAC,a=1,worN=2000,fs=fs)
 phase_IAC = np.unwrap(np.angle(h_IAC))
-
-# plt.figure()
-# plt.plot(w_IAC,np.abs(h_IAC))
-# plt.xlim([0,20])
 
 f_2_ind = np.where(w_IAC>=2.5)[0][0]
 f_5_ind = np.where(w_IAC>=6)[0][0]
@@ -364,34 +301,9 @@ coeff = np.polyfit(w_IAC[f_2_ind:f_5_ind],phase_IAC[f_2_ind:f_5_ind],deg=1)
 GD_line_IAC = coeff[0] * w_IAC[f_2_ind:f_5_ind] + coeff[1]
 GD_IAC = -coeff[0] / (2*np.pi)
 
-# plt.figure()
-# plt.plot(w_IAC,phase_IAC)
-# plt.plot(w_IAC[f_2_ind:f_5_ind],GD_line_IAC,color='k')
-# plt.xlim([0,20])
-# plt.ylim([-30,5])
-
-
-
 b_ITD = pca_sp_Htavg_ITD
 w_itd,h_itd = freqz(b_ITD,a=1,worN=2000,fs=fs)
 phase_itd = np.unwrap(np.angle(h_itd))
-
-# plt.figure()
-# plt.plot(w_itd,np.abs(h_itd))
-# plt.xlim([0,20])
-
-# plt.figure()
-# plt.plot(w_itd,np.abs(h_itd))
-
-# plt.plot(w_IAC,np.abs(h_IAC))
-# plt.xlim([0,20])
-
-# plt.figure()
-# plt.plot(w_IAC,20*np.log10(np.abs(h_IAC)),label='IAC')
-# plt.plot(w_itd, 20*np.log10(np.abs(h_itd)),label='ITD')
-# plt.xlim([0,20])
-# plt.ylim([-40,5])
-# plt.legend()
 
 f_2_ind = np.where(w_itd>=2.5)[0][0]
 f_8_ind = np.where(w_itd>=6)[0][0]
@@ -400,13 +312,6 @@ coeff = np.polyfit(w_itd[f_2_ind:f_8_ind],phase_itd[f_2_ind:f_8_ind],deg=1)
 GD_line_ITD = coeff[0] * w_itd[f_2_ind:f_8_ind] + coeff[1]
 GD_ITD = -coeff[0] / (2*np.pi)
 
-# plt.figure()
-# plt.plot(w_itd,phase_itd)
-# plt.plot(w_itd[f_2_ind:f_8_ind],GD_line_ITD,color='black')
-# plt.xlim([0,20])
-# plt.ylim([-5,2])
-
-
 h_IAC_noise = np.zeros([2000,All_IACnfs.shape[1]])
 for nf in range(All_IACnfs.shape[1]):
     w_IAC_noise, h_IAC_noise[:,nf] = np.abs(freqz(All_IACnfs[:,nf],a=1,worN=2000,fs=fs))
@@ -414,7 +319,6 @@ for nf in range(All_IACnfs.shape[1]):
 h_ITD_noise = np.zeros([2000,All_ITDnfs.shape[1]])
 for nf in range(All_ITDnfs.shape[1]):
     w_ITD_noise, h_ITD_noise[:,nf] = np.abs(freqz(All_ITDnfs[:,nf],a=1,worN=2000,fs=fs))
-    
     
 h_IAC_jn = np.zeros([2000,pca_sp_Htavg_IAC_JN.shape[1]])
 for jn in range(pca_sp_Htavg_IAC_JN.shape[1]):
@@ -427,11 +331,6 @@ for jn in range(pca_sp_Htavg_ITD_JN.shape[1]):
 h_IAC_pcaJN_se = np.sqrt( (h_IAC_jn.shape[1]-1) * np.sum( (h_IAC_jn - h_IAC_jn.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / h_IAC_jn.shape[1]  )
 h_ITD_pcaJN_se = np.sqrt( (h_ITD_jn.shape[1]-1) * np.sum( (h_ITD_jn - h_ITD_jn.mean(axis=1)[:,np.newaxis]) **2,axis=1 ) / h_ITD_jn.shape[1]  )
     
-plt.figure()
-plt.plot(w_IAC, np.abs(h_IAC),color='k')
-plt.plot(w_IAC_noise,h_IAC_noise.mean(axis=1),color='grey')
-plt.plot(w_IAC_noise,h_IAC_noise.mean(axis=1)+h_IAC_noise.std(axis=1),color='grey')
-plt.xlim([0,10])
 
 h_IAC_noise_se = h_IAC_noise.std(axis=1) / np.sqrt(len(Subjects))
 h_ITD_noise_se = h_ITD_noise.std(axis=1) / np.sqrt(len(Subjects))
@@ -479,31 +378,121 @@ lines = [p1,p3, p2]
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'ITD_HfAvg_pca.svg') , format='svg')
 
-
-h_IAC_behPlot = np.abs(h_IAC) / np.max(np.abs(h_IAC))
-fig,ax = plt.subplots(1)
-fig.set_size_inches(3.5,4)
-p1, = ax.plot(w_IAC,h_IAC_behPlot,color='k',linewidth=2,label='Physiology')
-ax.fill_between(w_IAC,h_IAC_behPlot - 2*h_IAC_pcaJN_se, h_IAC_behPlot + 2*h_IAC_pcaJN_se,color=[0.25,0.25,0.25] )
-p2, = ax.plot(w_behMod,np.abs(h_behMod)/np.max(np.abs(h_behMod)),color='red', linewidth=3, label ='Behavior')
-ax.set_xlim([0,10])
-ax.set_ylim([0,1.6])
-ax.set_yticks([0,0.5,1.0,1.5])
-ax.set_xlabel('Frequency (Hz)')
-lines = [p1,p2]
-ax.legend(lines,[l.get_label() for l in lines])
-matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
-plt.savefig(os.path.join(fig_path, 'IAC_physVSbeh.svg') , format='svg')
-
-
-
-
 with open('_DynBin_SysFunc_PCA_Ht' + '.pickle','wb') as file:     
     pickle.dump([pca_sp_Htavg_IAC],file)
 
 
+#%% Compare Binaural Behavior with Physiology
+beh_dataPath = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/'
+beh_IACsq = loadmat(os.path.abspath(beh_dataPath+'IACsquareTone_Processed.mat'))
 
+Window_t = beh_IACsq['WindowSizes'][0]
+f_beh = Window_t[1:]**-1
+SNRs_beh = beh_IACsq['AcrossSubjectsSNR']
+AcrossSubjectSEM = beh_IACsq['AcrossSubjectsSEM']
 
+physWind = pca_sp_Htavg_IAC
 
+t_phys = np.arange(0,0.5,1/fs)
+physWind = physWind
+physWind = physWind - physWind[0]
+zero_crossings = np.where(np.diff(np.sign(physWind[:,0])))[0]
+t1 = np.where(t_phys>=0.440)[0][0] #mean of response touches mean of NF around 440 ms
+t_phys = t_phys[:t1] 
+physWind = physWind[:t1]
 
+env = np.abs(hilbert(physWind))
+env = env / np.sum(env)
+physWind = physWind - min(physWind)
+physWind = physWind / np.sum(physWind)
+
+plt.figure()
+plt.plot(t_phys,env)
+plt.plot(t_phys,physWind)
+
+#physWind = env
+
+winds = Window_t
+out = np.zeros(winds.size)
+plt.figure()
+
+out_convolves = []
+maxIAC_overlap = np.zeros(winds.size)
+
+Tnu = 10**(-beh_IACsq['AcrossSubjectsSNR'][0]/10)
+Tno = 10**(-beh_IACsq['AcrossSubjectsSNR'][9]/10) 
+rho = np.arange(0,1.01,.01)
+eq = -10*np.log10((1-rho) + (rho)*(Tno/Tnu))   
+
+for j in range(0,winds.size):
+    wind_j = winds[j]
+    
+    IAC_0block = np.ones([int(np.round(fs*0.4))]) * 0
+    IAC_1block = np.ones([int(np.round(fs*wind_j))]) * 1
+    IACnoise = np.concatenate((IAC_0block,IAC_1block,IAC_0block))
+    
+    out_conv = np.convolve(IACnoise,physWind[:,0],mode='full')
+    t_xcorr = np.arange(-(physWind.size-1)/fs,(out_conv.size-physWind.size+1)/fs,1/fs)
+    
+    #where does window overlap with tone
+    t_overlapStart = np.where(t_xcorr+physWind.size/fs > (IACnoise.size/2+ 0.01*fs)/fs)[0][0]
+    t_overlapEnd = np.where(t_xcorr-physWind.size/fs < (IACnoise.size/2 - 0.01*fs)/fs)[0][-1]
+    
+    out_convolves.append(out_conv)
+    
+    maxIAC = np.max(out_conv[t_overlapStart:t_overlapEnd])
+    maxIAC_overlap[j] = maxIAC
+    
+    if(maxIAC >=1):
+        ind_rho = -1
+    elif(maxIAC <= 0):
+        ind_rho = 0
+    else:
+        ind_rho = np.where(rho>=maxIAC)[0][0]
+        
+    out[j] = eq[ind_rho]
+        
+    plt.plot(t_xcorr,out_conv,label=j)
+    plt.scatter((IACnoise.size/2+.01*fs)/fs,0,color='red')
+    plt.scatter(t_xcorr[t_overlapStart],np.zeros(t_overlapStart.size),color='k')
+    plt.legend()
+    
+ 
+BMLD = SNRs_beh[:,0] - SNRs_beh[0]
+mse_physFit = np.mean((BMLD[1:9] - out[1:9])**2)
+    
+fig, ax = plt.subplots(1)
+fig.set_size_inches(3.5,4)
+ax.errorbar(Window_t,BMLD, AcrossSubjectSEM, label='behavior',color='k',fmt='o',linewidth=2) #behavior
+ax.plot(Window_t,out, label='physio')
+ax.scatter(Window_t,out)
+ax.set_xlabel('Time (sec)')
+ax.set_ylabel('Detection Improvement (dB)')
+#plt.scatter(Window_t,out)
+plt.legend()
+
+#Gonna save varible to make figure in matlab since other behavioral data is analyzed there
+savemat('Physio_behModel.mat',{'PhysBehMod': out})
+
+fontsz = 11
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.3,3.3)
+ax.plot(t_phys,physWind,color='k',linewidth=2)
+ax.set_yticks([0,.003])
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax.set_xlabel('Time(sec)')
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'IAC_Ht_behNorm.svg') , format='svg')
+
+fig,ax = plt.subplots(1)
+fig.set_size_inches(3.3,3.3)
+ax.plot(rho,eq,linewidth=2)
+ax.set_xlabel('IAC')
+ax.set_ylabel('BMLD (dB)')
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'IAC_BMLD.svg') , format='svg')
 

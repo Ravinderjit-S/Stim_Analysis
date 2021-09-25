@@ -5,7 +5,9 @@ Created on Mon Feb 10 09:32:34 2020
 
 @author: ravinderjit
 
+Reject trials with large p2p deflections
 Calculate system functions from EEG data for Dynamic Binaural Msequence project
+Also compute noise floors
 """
 
 import matplotlib.pyplot as plt
@@ -48,12 +50,11 @@ Mseq[Mseq<0] = -1
 Mseq[Mseq>0] = 1
 
 
-Num_noiseFloors = 100
+Num_noiseFloors = 1
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
-#Something up with S204
-Subjects = ['S204']
+
 
 for subj in range(0,len(Subjects)):
     Subject = Subjects[subj]
@@ -77,8 +78,7 @@ for subj in range(0,len(Subjects)):
     
     #%% Remove any epochs with large deflections
         
-    reject_thresh = 800e-6
-    
+    reject_thresh = 200e-6
     
     Peak2Peak = IAC_ep.max(axis=2) - IAC_ep.min(axis=2)
     mask_trials = np.all(Peak2Peak < reject_thresh,axis=0)
@@ -88,6 +88,7 @@ for subj in range(0,len(Subjects)):
     
     Tot_trials_IAC = IAC_ep.shape[1]
     
+    
     Peak2Peak = ITD_ep.max(axis=2) - ITD_ep.min(axis=2)
     mask_trials = np.all(Peak2Peak < reject_thresh,axis=0)
     print('rejected ' + str(ITD_ep.shape[1] - sum(mask_trials)) + ' ITD trials due to P2P')
@@ -95,13 +96,9 @@ for subj in range(0,len(Subjects)):
     print('Total ITD trials: ' + str(ITD_ep.shape[1]))
     
     Tot_trials_ITD = ITD_ep.shape[1]
-
+    
         
     #%% Calculate Ht
-    
-    #plt.figure()
-    # plt.plot(IAC_ep.mean(axis=1))
-    # plt.plot(ITD_ep.mean(axis=1))
     
     IAC_Ht = mseqXcorr(IAC_ep,Mseq[:,0])
     ITD_Ht = mseqXcorr(ITD_ep,Mseq[:,0])
@@ -111,8 +108,8 @@ for subj in range(0,len(Subjects)):
     IAC_Htnf = []
     ITD_Htnf = []
     for nf in range(Num_noiseFloors):
-        IAC_nf = IAC_ep
-        ITD_nf = ITD_ep
+        IAC_nf = IAC_ep.copy()
+        ITD_nf = ITD_ep.copy()
         IACrnd_inds = np.random.permutation(IAC_ep.shape[1])[:round(IAC_ep.shape[1]/2)]
         ITDrnd_inds = np.random.permutation(ITD_ep.shape[1])[:round(ITD_ep.shape[1]/2)]
         IAC_nf[:,IACrnd_inds,:] = - IAC_nf[:,IACrnd_inds,:]
@@ -121,76 +118,10 @@ for subj in range(0,len(Subjects)):
         IAC_Htnf_n = mseqXcorr(IAC_nf,Mseq[:,0])
         ITD_Htnf_n = mseqXcorr(ITD_nf,Mseq[:,0])
 
-        # IAC_Htnf_n = np.zeros([resp_IAC_nf.shape[0],resp_IAC_nf.shape[1]*2-1])
-        # ITD_Htnf_n = np.zeros([resp_ITD_nf.shape[0],resp_ITD_nf.shape[1]*2-1])
-        # for ch in ch_picks:
-        #     IAC_Htnf_n[ch,:] = np.correlate(resp_IAC_nf[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
-        #     ITD_Htnf_n[ch,:] = np.correlate(resp_ITD_nf[ch,:],Mseq[:,0],mode='full')#[Mseq.size-1:]
-        # # IAC_Htnf_n = IAC_Htnf_n[:,:tend_ind]
-        # ITD_Htnf_n = ITD_Htnf_n[:,:tend_ind]
+
         IAC_Htnf.append(IAC_Htnf_n)
         ITD_Htnf.append(ITD_Htnf_n)
     
-        
-    
-    #%% Plot Ht
-    # num_nfs = Num_noiseFloors
-        
-    # if ch_picks.size == 31:
-    #     sbp = [5,3]
-    #     sbp2 = [4,4]
-    # elif ch_picks.size == 32:
-    #     sbp = [4,4]
-    #     sbp2 = [4,4]
-    # elif ch_picks.size == 30:
-    #     sbp = [5,3]
-    #     sbp2 = [5,3]
-
-        
-    # fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
-    # for p1 in range(sbp[0]):
-    #     for p2 in range(sbp[1]):
-    #         axs[p1,p2].plot(t,IAC_Ht[p1*sbp[1]+p2,:],color='k')
-    #         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
-    #         for n in range(num_nfs):
-    #             axs[p1,p2].plot(t,IAC_Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-            
-    # fig.suptitle('Ht IAC')
-    
-    
-    # fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-    # for p1 in range(sbp2[0]):
-    #     for p2 in range(sbp2[1]):
-    #         axs[p1,p2].plot(t,IAC_Ht[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
-    #         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
-    #         for n in range(num_nfs):
-    #             axs[p1,p2].plot(t,IAC_Htnf[n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
-             
-    # fig.suptitle('Ht IAC')
-        
-    # fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True)
-    # for p1 in range(sbp[0]):
-    #     for p2 in range(sbp[1]):
-    #         axs[p1,p2].plot(t,ITD_Ht[p1*sbp[1]+p2,:],color='k')
-    #         axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
-    #         for n in range(num_nfs):
-    #             axs[p1,p2].plot(t,ITD_Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-            
-    # fig.suptitle('Ht ITD')
-    
-    
-    # fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-    # for p1 in range(sbp2[0]):
-    #     for p2 in range(sbp2[1]):
-    #         axs[p1,p2].plot(t,ITD_Ht[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
-    #         axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
-    #         for n in range(num_nfs):
-    #             axs[p1,p2].plot(t,ITD_Htnf[n][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='grey',alpha=0.3)
-                
-    # fig.suptitle('Ht ITD')
-        
-
-
         
     #%% Save Analysis for subject 
     with open(os.path.join(data_loc, Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
