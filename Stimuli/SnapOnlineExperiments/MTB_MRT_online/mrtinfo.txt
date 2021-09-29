@@ -1,0 +1,1264 @@
+{
+"trials" : [
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sill","sick","sip","sing","sit","sin"],
+"answer": 3,
+"stimulus": "mrttrial1.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["wick","sick","kick","lick","pick","tick"],
+"answer": 3,
+"stimulus": "mrttrial2.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bean","beach","beat","beak","bead","beam"],
+"answer": 5,
+"stimulus": "mrttrial3.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["not","tot","got","pot","hot","lot"],
+"answer": 3,
+"stimulus": "mrttrial4.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 2,
+"stimulus": "mrttrial5.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 3,
+"stimulus": "mrttrial6.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["peel","reel","feel","eel","keel","heel"],
+"answer": 1,
+"stimulus": "mrttrial7.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["ray","raze","rate","rave","rake","race"],
+"answer": 2,
+"stimulus": "mrttrial8.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heave","hear","heat","heal","heap","heath"],
+"answer": 3,
+"stimulus": "mrttrial9.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["kill","kin","kit","kick","king","kid"],
+"answer": 3,
+"stimulus": "mrttrial10.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["same","name","game","tame","came","fame"],
+"answer": 4,
+"stimulus": "mrttrial11.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["took","cook","look","hook","shook","book"],
+"answer": 5,
+"stimulus": "mrttrial12.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heave","hear","heat","heal","heap","heath"],
+"answer": 2,
+"stimulus": "mrttrial13.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["tan","tang","tap","tack","tam","tab"],
+"answer": 1,
+"stimulus": "mrttrial14.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["way","may","say","pay","day","gay"],
+"answer": 3,
+"stimulus": "mrttrial15.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["lane","lay","late","lake","lace","lame"],
+"answer": 6,
+"stimulus": "mrttrial16.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pig","big","dig","wig","rig","fig"],
+"answer": 1,
+"stimulus": "mrttrial17.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["lane","lay","late","lake","lace","lame"],
+"answer": 1,
+"stimulus": "mrttrial18.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fun","sun","bun","gun","run","nun"],
+"answer": 3,
+"stimulus": "mrttrial19.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pin","sin","tin","fin","din","win"],
+"answer": 1,
+"stimulus": "mrttrial20.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["ray","raze","rate","rave","rake","race"],
+"answer": 3,
+"stimulus": "mrttrial21.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sill","sick","sip","sing","sit","sin"],
+"answer": 6,
+"stimulus": "mrttrial22.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heat","neat","feat","seat","meat","beat"],
+"answer": 2,
+"stimulus": "mrttrial23.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heave","hear","heat","heal","heap","heath"],
+"answer": 4,
+"stimulus": "mrttrial24.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bed","led","fed","red","wed","shed"],
+"answer": 6,
+"stimulus": "mrttrial25.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["tan","tang","tap","tack","tam","tab"],
+"answer": 1,
+"stimulus": "mrttrial26.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["way","may","say","pay","day","gay"],
+"answer": 1,
+"stimulus": "mrttrial27.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sum","sun","sung","sup","sub","sud"],
+"answer": 4,
+"stimulus": "mrttrial28.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["cup","cut","cud","cuff","cuss","cub"],
+"answer": 5,
+"stimulus": "mrttrial29.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pig","pill","pin","pip","pit","pick"],
+"answer": 4,
+"stimulus": "mrttrial30.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["wick","sick","kick","lick","pick","tick"],
+"answer": 5,
+"stimulus": "mrttrial31.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["wick","sick","kick","lick","pick","tick"],
+"answer": 3,
+"stimulus": "mrttrial32.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 1,
+"stimulus": "mrttrial33.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["must","bust","gust","rust","dust","just"],
+"answer": 2,
+"stimulus": "mrttrial34.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pin","sin","tin","fin","din","win"],
+"answer": 1,
+"stimulus": "mrttrial35.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fit","fib","fizz","fill","fig","fin"],
+"answer": 5,
+"stimulus": "mrttrial36.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["kill","kin","kit","kick","king","kid"],
+"answer": 4,
+"stimulus": "mrttrial37.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["dug","dung","duck","dud","dub","dun"],
+"answer": 6,
+"stimulus": "mrttrial38.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 4,
+"stimulus": "mrttrial39.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 6,
+"stimulus": "mrttrial40.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["cane","case","cape","cake","came","cave"],
+"answer": 1,
+"stimulus": "mrttrial41.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["thaw","law","raw","paw","jaw","saw"],
+"answer": 4,
+"stimulus": "mrttrial42.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sum","sun","sung","sup","sub","sud"],
+"answer": 1,
+"stimulus": "mrttrial43.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["must","bust","gust","rust","dust","just"],
+"answer": 1,
+"stimulus": "mrttrial44.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["same","name","game","tame","came","fame"],
+"answer": 6,
+"stimulus": "mrttrial45.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["tan","tang","tap","tack","tam","tab"],
+"answer": 4,
+"stimulus": "mrttrial46.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["din","dill","dim","dig","dip","did"],
+"answer": 5,
+"stimulus": "mrttrial47.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pen","hen","men","then","den","ten"],
+"answer": 6,
+"stimulus": "mrttrial48.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hark","dark","mark","bark","park","lark"],
+"answer": 5,
+"stimulus": "mrttrial49.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["puff","puck","pub","pus","pup","pun"],
+"answer": 2,
+"stimulus": "mrttrial50.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["din","dill","dim","dig","dip","did"],
+"answer": 6,
+"stimulus": "mrttrial51.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hang","sang","bang","rang","fang","gang"],
+"answer": 6,
+"stimulus": "mrttrial52.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sum","sun","sung","sup","sub","sud"],
+"answer": 2,
+"stimulus": "mrttrial53.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["same","name","game","tame","came","fame"],
+"answer": 6,
+"stimulus": "mrttrial54.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["mass","math","map","mat","man","mad"],
+"answer": 3,
+"stimulus": "mrttrial55.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 3,
+"stimulus": "mrttrial56.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["back","bath","bad","bass","bat","ban"],
+"answer": 5,
+"stimulus": "mrttrial57.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sill","sick","sip","sing","sit","sin"],
+"answer": 2,
+"stimulus": "mrttrial58.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 4,
+"stimulus": "mrttrial59.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["peel","reel","feel","eel","keel","heel"],
+"answer": 1,
+"stimulus": "mrttrial60.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sill","sick","sip","sing","sit","sin"],
+"answer": 5,
+"stimulus": "mrttrial61.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bun","bus","but","bug","buck","buff"],
+"answer": 5,
+"stimulus": "mrttrial62.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["save","same","sale","sane","sake","safe"],
+"answer": 2,
+"stimulus": "mrttrial63.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 3,
+"stimulus": "mrttrial64.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["kit","bit","fit","hit","wit","sit"],
+"answer": 4,
+"stimulus": "mrttrial65.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["puff","puck","pub","pus","pup","pun"],
+"answer": 3,
+"stimulus": "mrttrial66.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["dip","sip","hip","tip","lip","rip"],
+"answer": 1,
+"stimulus": "mrttrial67.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["thaw","law","raw","paw","jaw","saw"],
+"answer": 2,
+"stimulus": "mrttrial68.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["mass","math","map","mat","man","mad"],
+"answer": 6,
+"stimulus": "mrttrial69.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 4,
+"stimulus": "mrttrial70.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["took","cook","look","hook","shook","book"],
+"answer": 6,
+"stimulus": "mrttrial71.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["kill","kin","kit","kick","king","kid"],
+"answer": 4,
+"stimulus": "mrttrial72.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 6,
+"stimulus": "mrttrial73.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 1,
+"stimulus": "mrttrial74.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pen","hen","men","then","den","ten"],
+"answer": 6,
+"stimulus": "mrttrial75.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["way","may","say","pay","day","gay"],
+"answer": 1,
+"stimulus": "mrttrial76.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["mass","math","map","mat","man","mad"],
+"answer": 2,
+"stimulus": "mrttrial77.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["coil","oil","soil","toil","boil","foil"],
+"answer": 3,
+"stimulus": "mrttrial78.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["mass","math","map","mat","man","mad"],
+"answer": 4,
+"stimulus": "mrttrial79.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fun","sun","bun","gun","run","nun"],
+"answer": 5,
+"stimulus": "mrttrial80.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pig","pill","pin","pip","pit","pick"],
+"answer": 4,
+"stimulus": "mrttrial81.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["din","dill","dim","dig","dip","did"],
+"answer": 5,
+"stimulus": "mrttrial82.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["wick","sick","kick","lick","pick","tick"],
+"answer": 4,
+"stimulus": "mrttrial83.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hark","dark","mark","bark","park","lark"],
+"answer": 6,
+"stimulus": "mrttrial84.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sag","sat","sass","sack","sad","sap"],
+"answer": 4,
+"stimulus": "mrttrial85.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pen","hen","men","then","den","ten"],
+"answer": 4,
+"stimulus": "mrttrial86.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fun","sun","bun","gun","run","nun"],
+"answer": 5,
+"stimulus": "mrttrial87.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hark","dark","mark","bark","park","lark"],
+"answer": 1,
+"stimulus": "mrttrial88.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["peel","reel","feel","eel","keel","heel"],
+"answer": 4,
+"stimulus": "mrttrial89.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["teak","team","teal","teach","tear","tease"],
+"answer": 4,
+"stimulus": "mrttrial90.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["way","may","say","pay","day","gay"],
+"answer": 6,
+"stimulus": "mrttrial91.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 1,
+"stimulus": "mrttrial92.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bed","led","fed","red","wed","shed"],
+"answer": 1,
+"stimulus": "mrttrial93.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hang","sang","bang","rang","fang","gang"],
+"answer": 5,
+"stimulus": "mrttrial94.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 6,
+"stimulus": "mrttrial95.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pig","big","dig","wig","rig","fig"],
+"answer": 3,
+"stimulus": "mrttrial96.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sill","sick","sip","sing","sit","sin"],
+"answer": 6,
+"stimulus": "mrttrial97.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heat","neat","feat","seat","meat","beat"],
+"answer": 6,
+"stimulus": "mrttrial98.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heat","neat","feat","seat","meat","beat"],
+"answer": 5,
+"stimulus": "mrttrial99.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pin","sin","tin","fin","din","win"],
+"answer": 2,
+"stimulus": "mrttrial100.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["coil","oil","soil","toil","boil","foil"],
+"answer": 2,
+"stimulus": "mrttrial101.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["cup","cut","cud","cuff","cuss","cub"],
+"answer": 2,
+"stimulus": "mrttrial102.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fun","sun","bun","gun","run","nun"],
+"answer": 6,
+"stimulus": "mrttrial103.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["dug","dung","duck","dud","dub","dun"],
+"answer": 4,
+"stimulus": "mrttrial104.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["seep","seen","seethe","seek","seem","seed"],
+"answer": 1,
+"stimulus": "mrttrial105.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["not","tot","got","pot","hot","lot"],
+"answer": 5,
+"stimulus": "mrttrial106.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hang","sang","bang","rang","fang","gang"],
+"answer": 3,
+"stimulus": "mrttrial107.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["coil","oil","soil","toil","boil","foil"],
+"answer": 2,
+"stimulus": "mrttrial108.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pat","pad","pan","path","pack","pass"],
+"answer": 2,
+"stimulus": "mrttrial109.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["same","name","game","tame","came","fame"],
+"answer": 3,
+"stimulus": "mrttrial110.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["dug","dung","duck","dud","dub","dun"],
+"answer": 3,
+"stimulus": "mrttrial111.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["mass","math","map","mat","man","mad"],
+"answer": 5,
+"stimulus": "mrttrial112.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["vest","test","rest","best","west","nest"],
+"answer": 2,
+"stimulus": "mrttrial113.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 2,
+"stimulus": "mrttrial114.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["cup","cut","cud","cuff","cuss","cub"],
+"answer": 2,
+"stimulus": "mrttrial115.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 5,
+"stimulus": "mrttrial116.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pale","pace","page","pane","pay","pave"],
+"answer": 1,
+"stimulus": "mrttrial117.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hang","sang","bang","rang","fang","gang"],
+"answer": 1,
+"stimulus": "mrttrial118.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["same","name","game","tame","came","fame"],
+"answer": 2,
+"stimulus": "mrttrial119.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hark","dark","mark","bark","park","lark"],
+"answer": 6,
+"stimulus": "mrttrial120.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bun","bus","but","bug","buck","buff"],
+"answer": 3,
+"stimulus": "mrttrial121.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["ray","raze","rate","rave","rake","race"],
+"answer": 1,
+"stimulus": "mrttrial122.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["hold","cold","told","fold","sold","gold"],
+"answer": 2,
+"stimulus": "mrttrial123.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["dip","sip","hip","tip","lip","rip"],
+"answer": 2,
+"stimulus": "mrttrial124.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["tan","tang","tap","tack","tam","tab"],
+"answer": 1,
+"stimulus": "mrttrial125.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["bun","bus","but","bug","buck","buff"],
+"answer": 5,
+"stimulus": "mrttrial126.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["sum","sun","sung","sup","sub","sud"],
+"answer": 3,
+"stimulus": "mrttrial127.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["not","tot","got","pot","hot","lot"],
+"answer": 5,
+"stimulus": "mrttrial128.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["kit","bit","fit","hit","wit","sit"],
+"answer": 4,
+"stimulus": "mrttrial129.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["shop","mop","cop","top","hop","pop"],
+"answer": 5,
+"stimulus": "mrttrial130.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["must","bust","gust","rust","dust","just"],
+"answer": 6,
+"stimulus": "mrttrial131.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pen","hen","men","then","den","ten"],
+"answer": 5,
+"stimulus": "mrttrial132.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["ray","raze","rate","rave","rake","race"],
+"answer": 3,
+"stimulus": "mrttrial133.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["heat","neat","feat","seat","meat","beat"],
+"answer": 2,
+"stimulus": "mrttrial134.wav",
+"cond": 1,
+"annot": {"SNR": "8"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["took","cook","look","hook","shook","book"],
+"answer": 3,
+"stimulus": "mrttrial135.wav",
+"cond": 2,
+"annot": {"SNR": "5"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["way","may","say","pay","day","gay"],
+"answer": 4,
+"stimulus": "mrttrial136.wav",
+"cond": 3,
+"annot": {"SNR": "2"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["fill","kill","will","hill","till","bill"],
+"answer": 4,
+"stimulus": "mrttrial137.wav",
+"cond": 4,
+"annot": {"SNR": "-1"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["shop","mop","cop","top","hop","pop"],
+"answer": 6,
+"stimulus": "mrttrial138.wav",
+"cond": 5,
+"annot": {"SNR": "-4"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["save","same","sale","sane","sake","safe"],
+"answer": 5,
+"stimulus": "mrttrial139.wav",
+"cond": 6,
+"annot": {"SNR": "-7"}
+},
+{
+"plugin": "hari-audio-button-response",
+"prompt": "Select the <strong>word</strong> prompted by the voice",
+"choices": ["pen","hen","men","then","den","ten"],
+"answer": 2,
+"stimulus": "mrttrial140.wav",
+"cond": 7,
+"annot": {"SNR": "-10"}
+}
+]
+}
