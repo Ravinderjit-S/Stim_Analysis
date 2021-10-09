@@ -4,6 +4,8 @@
 Created on Wed Mar  3 20:54:08 2021
 
 @author: ravinderjit
+This script averages mcBTRFs across subjects and does a PCA analysis to get a
+sBTRF. Also comparison with behavior
 """
 
 import os
@@ -397,7 +399,7 @@ t_phys = np.arange(0,0.5,1/fs)
 physWind = physWind
 physWind = physWind - physWind[0]
 zero_crossings = np.where(np.diff(np.sign(physWind[:,0])))[0]
-t1 = np.where(t_phys>=0.440)[0][0] #mean of response touches mean of NF around 440 ms
+t1 = np.where(t_phys>=0.450)[0][0] #mean of response touches mean of NF around 440 ms
 t_phys = t_phys[:t1] 
 physWind = physWind[:t1]
 

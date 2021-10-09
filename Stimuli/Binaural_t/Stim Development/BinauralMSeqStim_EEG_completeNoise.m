@@ -18,7 +18,7 @@ Trials = 300;
 t_windw = 0:1/fs:M_samps/fs-1/fs;
 windw = 0.5*(1+sin(2*pi*(1/M_dur)*t_windw-pi/2));% windw = [windw;windw];
 
-for j = 1:1
+for j = 1:Trials
     stimL = [];
     stimR = [];
     nbn_whole = makeNBNfft_binaural_V2(flow,fhigh,Stim_dur,fs,-1,0);
