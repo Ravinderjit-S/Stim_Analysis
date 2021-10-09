@@ -81,8 +81,6 @@ result_1ps = ps.psignifit(data_1ps, options)
 plt.figure()
 ps.psigniplot.plotPsych(result_0ps)
 ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
-plt.plot(x_0,psy_curve_0,'--')   
-plt.plot(x_1,psy_curve_1,'--')
 
 
 

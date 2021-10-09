@@ -50,7 +50,7 @@ data_eeg.plot(events=blinks,show_options=True)
 
 #%% Plot Data
 
-conds = ['12','20'] #14,18 for S211
+conds = ['12','20'] #14,18 for S211 from earlier date
 reject = dict(eeg=100e-6)
 epochs = []
 evkd = []
@@ -90,6 +90,13 @@ for p1 in range(sbp2[0]):
         axs[p1,p2].set_title(p1*sbp2[1]+p2+sbp[0]*sbp[1])   
 
 
+plt.figure()
+plt.plot(t,data[0][31,:]*1e6)
+plt.plot(t,data[1][31,:]*1e6)
+plt.xlabel('Time (sec)')
+plt.ylabel('$\mu$V')
+plt.legend(['12','20'])
+plt.xlim([-0.1,5.4])
 
 #%% Look at just transitions
 fs = evkd[0].info['sfreq']
@@ -121,10 +128,11 @@ t_transition = np.arange(0,t_g/fs,1/fs)
 
 plt.figure()
 cond_tt = ['Oneset','AB','BA']
-cnd_tt=1
+cond_tt = ['Onset','Incoherent to Coherent', 'Coherent to Incoherent']
+cnd_tt=2
 for cnd in range(len(data)):
     plt.plot(t_transition,data_trans_avg[cnd][cnd_tt][31,:]*1e6,label=conds[cnd])
-    plt.ylim(-1,4.0)
+    plt.ylim(-1,3.0)
 plt.legend()
 plt.ylabel('uV')
 plt.xlabel('sec')
