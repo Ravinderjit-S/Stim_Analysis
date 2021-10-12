@@ -48,32 +48,6 @@ for j = 1:numel(Subjects)
 end
 
 
-% figure,plot(WindowSizes,MedianSNR,'x'), xlim([0,1.8])
-% legend(Subjects)
-
-
-% ft = fittype('Integrator(x,A,tau)');
-% 
-% for j = 1:numel(Subjects)
-%     FitInt = MedianSNR(:,j) - MedianSNR(1,j); %subtract windowsize = 0 for values to be amount benefit
-% 
-%     if strcmp(Subjects{j}, 'S132')
-%         WindowSizes2 = WindowSizes; WindowSizes2(WindowSizes==0.8) = []; FitInt(WindowSizes==0.8) = [];A_FitInt{j} =FitInt;
-%         A_FitInt{j} = FitInt;
-%         [f{j},gf{j},o{j}] = fit(WindowSizes2',FitInt,ft,'StartPoint',[1,0.1]);
-%     else
-%         A_FitInt{j} = FitInt;
-%         [f{j},gf{j},o{j}] = fit(WindowSizes',FitInt,ft,'StartPoint',[1,0.1]);
-%     end
-%     A(j) = f{j}.A;
-%     Taus(j) = f{j}.tau;
-% end
-% 
-% figure,plot(f{1},WindowSizes,A_FitInt{1})
-% figure,plot(f{2},WindowSizes2,A_FitInt{2})
-% figure,plot(f{3},WindowSizes,A_FitInt{3})
-% figure,plot(f{4},WindowSizes,A_FitInt{4})
-
 S211_SNR = MedianSNR(:,end);
 AcrossSubjectsSNR = mean(MedianSNR,2);
 AcrossSubjectsSEM = std(MedianSNR,[],2) ./ sqrt(numel(Subjects)); 
@@ -82,26 +56,6 @@ AcrossSubjectsSEM = std(MedianSNR,[],2) ./ sqrt(numel(Subjects));
 Outlier = isoutlier(MedianSNR(9,:),'grubbs'); %S132 was tired and gave up on this trial 
 AcrossSubjectsSNR(9) = mean(MedianSNR(9,~strcmp(Subjects,'S132'))); %ignoring one data point from a subject
 AcrossSubjectsSEM(9) = std(MedianSNR(9,~strcmp(Subjects,'S132'))) ./ sqrt(numel(Subjects)-1);
-
-
-% FitAcrossSubjects = AcrossSubjectsSNR - AcrossSubjectsSNR(1);
-% 
-% [f_all, gf_all, o_all] = fit(WindowSizes',FitAcrossSubjects,ft,'StartPoint', [FitAcrossSubjects(end),0.1]);
-
-
-% figure,plot(f_all,WindowSizes,FitAcrossSubjects), title('Across Subjects'), hold on
-% errorbar(WindowSizes, AcrossSubjectsSNR - AcrossSubjectsSNR(1), AcrossSubjectsSEM,'b.'), xlim([0,1.63])
-% legend('Data','Exp Fit')
-
-
-% ft2 = fittype('BMLDFunc(x,TnuTno,T)');
-% ft3 = fittype('Integrator2(x,A,B,C,tau1,tau2)');
-% 
-% TnuTno = db2pow(AcrossSubjectsSNR(end)-AcrossSubjectsSNR(1));
-% [f_all, gf_all, o_all] = fit(WindowSizes', FitAcrossSubjects,ft2,'lower',[0.01,TnuTno],'upper',[1,TnuTno],'StartPoint', [TnuTno,0.1]);
-% 
-% fs = 4096;
-% FittedCurve = BMLDFunc(0:1/fs:1.6,f_all.TnuTno,f_all.T);
 
 
 figure, hold on,%plot((0:1/fs:1.6)*1000,FittedCurve,'r','linewidth',2), hold on
@@ -131,8 +85,6 @@ fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 9 6];
 % print([Fig_path 'IACtsquareToneFigfreq'],'-dpng','-r0')
 
-% [f_all2, gf_all2, o_all2] = fit(WindowSizes',FitAcrossSubjects,ft3,'lower',[0.1,0,0,0,0],'upper',[20,1,1,1,1],'StartPoint',[FitAcrossSubjects(end),0.5,0.5,0.1,0.1]);
-
 % figure,plot(f_all2,WindowSizes,FitAcrossSubjects)
 
 % figure, hold on
@@ -148,7 +100,6 @@ fig.PaperPosition = [0 0 9 6];
 
 
 %save([Data_path 'IACsquareTone_Processed.mat'],'WindowSizes','AcrossSubjectsSNR','AcrossSubjectsSEM','S211_SNR')
-% 
 
 
 

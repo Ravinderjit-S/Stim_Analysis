@@ -111,7 +111,6 @@ for s in range(0,len(Subjects)):
     channels = [31]
     ylim_vals = [-7,7]
     
-    
     StimIAC_epochs = mne.Epochs(IAC_eeg,IAC_evnt,1,tmin=-0.5,tmax=14,proj=True,baseline=(-0.2, 0.),reject=None)
     StimIAC_epochs.average().plot(picks=channels,titles ='IACt_evoked')
     

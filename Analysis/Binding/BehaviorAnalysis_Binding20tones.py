@@ -10,12 +10,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import os
-
+from matplotlib import rcParams
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/BehaviorData/MTB/BindingBeh20tones/'
 fig_loc = '/media/ravinderjit/Data_Drive/Data/Figures/MTB/'
 
-Subjects = ['S211','S246','SVM']
+Subjects = ['S211','S246','SVM','S268','S269','S273']
 
 acc = np.zeros((7,len(Subjects)))
 for sub in range(len(Subjects)):
@@ -43,6 +43,8 @@ for sub in range(len(Subjects)):
 # 2 = 15-20
 # 4 = 1, 8, 14, 20
 # 5 = 1, 4, 8, 12, 16, 20
+        
+rcParams.update({'font.size': 15})
 
 mean_acc = acc.mean(axis=1)    
 se_acc = acc.std(axis=1) / np.sqrt(acc.shape[1])    
@@ -51,7 +53,7 @@ plt.figure()
 plt.bar([0,0.7],mean_acc[1:3],  width = 0.3, yerr= se_acc[1:3],color='k')
 plt.bar([0.3,1],mean_acc[4:6],  width = 0.3, yerr = se_acc[4:6],color='grey')
 plt.ylim([0,1])
-plt.xticks([0,0.3,0.7,1],labels=['1.5 ERBs', '6.3 ERBs', '1.5 ERBs','3.8 ERBs'])
+plt.xticks([0,0.3,0.7,1],labels=['1.5 ERBs', '6.3 ERBs', '1.5 ERBs','5.7 ERBs'])
 plt.ylabel('Accuracy')
 plt.savefig(fig_loc + 'BindingAccuracy.svg',format='svg')
 

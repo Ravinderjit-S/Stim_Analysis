@@ -50,7 +50,7 @@ Mseq[Mseq<0] = -1
 Mseq[Mseq>0] = 1
 
 
-Num_noiseFloors = 1
+Num_noiseFloors = 10
 
 
 Subjects = ['S001','S132','S203','S204','S205','S206','S207','S208','S211']
