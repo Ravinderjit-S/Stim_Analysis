@@ -56,14 +56,14 @@ plt.figure()
 plt.scatter(cmr,acc_bind[1])
 plt.xlabel('CMR (dB)')
 plt.ylabel('Accurary')
-plt.ylim([0.3,1])
+plt.ylim([0,1.2])
 plt.title('Binding 4 cont')
 
 plt.figure()
 plt.scatter(cmr,acc_bind[2])
 plt.xlabel('CMR (dB)')
 plt.ylabel('Accurary')
-plt.ylim([0.3,1])
+plt.ylim([0,1.2])
 plt.title('Binding 6 cont')
 
 
@@ -71,8 +71,15 @@ plt.figure()
 plt.scatter(cmr,acc_bind[5])
 plt.xlabel('CMR (dB)')
 plt.ylabel('Accurary')
-plt.ylim([0.3,1])
+plt.ylim([0,1.2])
 plt.title('Binding 6 spaced')
+
+plt.figure()
+plt.scatter(cmr,acc_bind[6])
+plt.xlabel('CMR (dB)')
+plt.ylabel('Accurary')
+plt.ylim([0,1.2])
+plt.title('Binding 8 spaced')
 
 
 
