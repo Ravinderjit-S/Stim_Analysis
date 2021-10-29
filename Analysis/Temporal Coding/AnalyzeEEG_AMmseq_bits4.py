@@ -19,6 +19,7 @@ import pickle
 import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
+from mseqHelper import mseqXcorrEpochs_fft
 
 # from anlffr.spectral import mtspecraw
 # from anlffr.spectral import mtplv
@@ -64,7 +65,7 @@ for subject in Subjects:
     
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=500)
+    data_eeg.filter(l_freq=1,h_freq=200)
     
     if subject == 'S211':
         data_eeg.info['bads'].append('A10') #Channel A10 bad in S211
@@ -106,11 +107,11 @@ for subject in Subjects:
 #%% Plot data
 
     labels = ['7bits', '8bits','9bits','10bits']
-    reject = None
+    reject = dict(eeg=1000e-6)
     epochs = []
     for j in range(len(mseq)):
         epochs.append(mne.Epochs(data_eeg, data_evnt, [j+1], tmin=-0.3, 
-                                 tmax=np.ceil(mseq[j].size/4096)+0.4,reject=reject, baseline=(-0.2, 0.)) )
+                                 tmax=np.ceil(mseq[j].size/4096)+0.4,reject=reject, baseline=(-0.1, 0.)) )
         epochs[j].average().plot(picks=[31],titles = labels[j])
     
     print('On Subject ...... ' + subject )
@@ -162,48 +163,37 @@ for subject in Subjects:
         print('Total Trials Left: ' + str(epdat[m].shape[1]))
         Tot_trials[m] = epdat[m].shape[1]
         
-    # plt.figure()
-    # plt.plot(Peak2Peak.T)
+        plt.figure()
+        plt.plot(Peak2Peak.T)
+        plt.title(subject + ' ' + str(m))
     
     
 
 #%% Correlation Analysis
     
-    # tend = 0.5 #time of Ht to keep
-    # tend_ind = round(tend*fs) - 1
-    
-    
     Ht = []
     Htnf = []
+    Ht_epochs = []
+    t_epochs = []
     # do cross corr
     for m in range(len(epdat)): 
         print('On mseq # ' + str(m+1))
         
         Ht_m = mseqXcorr(epdat[m],mseq[m][0,:])
         
-        # resp_m = epdat[m].mean(axis=1)
-        # Ht_m = np.zeros([resp_m.shape[0],resp_m.shape[1]*2-1])
-        # for ch in range(resp_m.shape[0]):
-        #     Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq[m][0,:],mode='full') #[mseq[m].size-1:]
+        Ht_epochs_m, t_epochs_m = mseqXcorrEpochs_fft(epdat[m],mseq[m][0,:],fs)
+        
         Ht.append(Ht_m)
+        Ht_epochs.append(Ht_epochs_m)
+        t_epochs.append(t_epochs_m)
+        
         for nf in range(num_nfs):
             print('On nf: ' + str(nf) )
             resp = epdat[m].copy()
             inv_inds = np.random.permutation(epdat[m].shape[1])[:round(epdat[m].shape[1]/2)]
             resp[:,inv_inds,:] = -resp[:,inv_inds,:]
             Ht_nf = mseqXcorr(resp,mseq[m][0,:])
-            # resp_nf = resp.mean(axis=1)
-            # Ht_nf = np.zeros([resp_nf.shape[0],resp_nf.shape[1]*2-1])
-            # for ch in range(resp_nf.shape[0]):
-            #     Ht_nf[ch,:] = np.correlate(resp_nf[ch,:],mseq[m][0,:],mode='full') #[mseq[m].size-1:]
             Htnf.append(Ht_nf)
-        
-    #only keep Ht up to tend 
-    # for h in range(len(Ht)):
-    #     Ht[h] = Ht[h][:,:tend_ind]
-    #     tdat[h] = tdat[h][:tend_ind]
-    
-
 
 #%% Plot Ht
     
@@ -217,8 +207,6 @@ for subject in Subjects:
     #     sbp = [5,3]
     #     sbp2 = [5,3]
         
-
-
     # for m in range(len(Ht)):
     #     Ht_1 = Ht[m]
     #     t = tdat[m]
@@ -244,118 +232,6 @@ for subject in Subjects:
     #                 axs[p1,p2].plot(t,Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
                 
     #     fig.suptitle('Ht ' + labels[m])    
-        
-    
-        
-
-
-#%% PCA decomposition of Ht
-    pca_sp = []
-    pca_coeff = []
-    pca_expVar = []
-    
-    pca_sp_nf = []
-    pca_coeff_nf = []
-    pca_expVar_nf = []
-    
-    # n_comp = 2
-    
-    # for m in range(len(Ht)):
-    #     pca = PCA(n_components=n_comp)
-    #     pca.fit(Ht[m])
-    #     pca_space = pca.fit_transform(Ht[m].T)
-        
-       
-        
-    #     pca_sp.append(pca_space)
-    #     pca_coeff.append(pca.components_)
-    #     pca_expVar.append(pca.explained_variance_ratio_)
-        
-    # for n in range(len(Htnf)):
-    #     pca = PCA(n_components=n_comp)
-    #     pca.fit(Htnf[n])
-    #     pca_space = pca.fit_transform(Htnf[n].T)
-    
-    #     pca_sp_nf.append(pca_space)
-    #     pca_coeff_nf.append(pca.components_)
-    #     pca_expVar_nf.append(pca.explained_variance_ratio_)
-        
-    # for m in range(len(pca_sp)):
-    #     fig,axs = plt.subplots(2,1)
-    #     axs[0].plot(tdat[m],pca_sp[m])
-    #     for n in range(m*num_nfs,num_nfs*(m+1)):
-    #         axs[0].plot(tdat[m],pca_sp_nf[n],color='grey',alpha=0.3)
-        
-        
-    #     axs[1].plot(ch_picks,pca_coeff[m].T)
-    #     axs[1].set_xlabel('channel')
-    #     for n in range(m*num_nfs,num_nfs*(m+1)):
-    #         axs[1].plot(ch_picks,pca_coeff_nf[n].T,color='grey',alpha=0.1)
-    #     fig.suptitle('PCA ' + labels[m])    Subjects = ['S238']
-        
-    # p_ind = 3
-    # vmin = pca_coeff[p_ind].mean() - 2 * pca_coeff[p_ind].std()
-    # vmax = pca_coeff[p_ind].mean() + 2 * pca_coeff[p_ind].std()
-    # plt.figure()
-    # mne.viz.plot_topomap(pca_coeff[p_ind][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
-    # plt.figure()
-    # mne.viz.plot_topomap(pca_coeff[p_ind][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
-    
-    
-        
-
-#%% ICA decomposition of Ht
-    # ica_sp = []
-    # ica_coeff = []
-    # #ica_expVar = []
-    
-    # ica_sp_nf = []
-    # ica_coeff_nf = []
-    # #ica_expVar_nf = []
-    
-    # n_comp = 2
-    
-    # for m in range(len(Ht)):
-    #     ica = FastICA(n_components=n_comp)
-    #     ica.fit(Ht[m])
-    #     ica_space = ica.fit_transform(Ht[m].T)
-    #     ica_sp.append(ica_space)
-    #     ica_coeff.append(ica.components_)
-        
-    # for n in range(len(Htnf)):
-        
-    #     ica = FastICA(n_components=n_comp)
-    #     ica.fit(Ht[m])
-    #     ica_space = ica.fit_transform(Htnf[m].T)
-        
-    #     ica_sp_nf.append(ica_space)
-    #     ica_coeff_nf.append(ica.components_)
-        #ica_expVar_nf.append(ica.explained_variance_ratio_)
-        
-    
-            
-        
-    # for m in range(len(ica_sp)):
-    #     fig,axs = plt.subplots(2,1)
-    #     axs[0].plot(tdat[m],ica_sp[m])
-    #     for n in range(m*num_nfs,num_nfs*(m+1)):
-    #         axs[0].plot(tdat[m],ica_sp_nf[n],color='grey',alpha=0.3)
-    
-    #     axs[1].plot(ch_picks,ica_coeff[m].T)
-    #     axs[1].set_xlabel('channel')
-    #     # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #     #     axs[3].plot(ch_picks,ica_coeff_nf[n].T,color='grey',alpha=0.1)
-    #     fig.suptitle('ICA ' + labels[m])    
-        
-        
-    # p_ind = 3
-    # vmin = ica_coeff[p_ind].mean() - 2 * ica_coeff[p_ind].std()
-    # vmax = ica_coeff[p_ind].mean() + 2 * ica_coeff[p_ind].std()
-    # plt.figure()
-    # mne.viz.plot_topomap(ica_coeff[p_ind][0,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
-    # plt.figure()
-    # mne.viz.plot_topomap(ica_coeff[p_ind][1,:], mne.pick_info(epochs[3].info, ch_picks),vmin=vmin,vmax=vmax)
-        
 
     
     #%% Save Data
@@ -363,6 +239,6 @@ for subject in Subjects:
         pickle.dump([tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks,],file)
         
     with open(os.path.join(pickle_loc,subject+'_AMmseqbits4_epochs.pickle'),'wb') as file:
-        pickle.dump([epdat[3]],file)    
+        pickle.dump([Ht_epochs,t_epochs],file)    
         
-    del data_eeg, data_evnt, epdat, tdat, Ht, info_obj,Htnf
+    del data_eeg, data_evnt, epdat, tdat, Ht, info_obj,Htnf, Ht_epochs,t_epochs

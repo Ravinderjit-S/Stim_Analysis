@@ -104,7 +104,7 @@ for subject in Subjects:
         fs = data_eeg.info['sfreq']
         for j in range(len(mseq)):
             epochs.append(mne.Epochs(data_eeg, data_evnt, [j+1], tmin=-0.3, 
-                                     tmax=np.ceil(mseq[j].size/fs),reject=reject, baseline=(-0.2, 0.)) )
+                                     tmax=np.ceil(mseq[j].size/fs),reject=reject, baseline=(-0.1, 0.)) )
             #epochs[j].average().plot(picks=[31],titles = labels[j])
         info_obj = epochs[0].info
         print('On Subject ...... ' + subject )
@@ -129,26 +129,23 @@ for subject in Subjects:
         del epochs
   
 #%% Remove epochs with large deflections
-    # Reject_Thresh=150e-6
+    Reject_Thresh=150e-6
    
-    # Tot_trials = np.zeros([len(mseq)])
-    # for m in range(len(mseq)):
-    #     Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
-    #     mask_trials = np.all(Peak2Peak <Reject_Thresh,axis=0)
-    #     print('rejected ' + str(epdat[m].shape[1] - sum(mask_trials)) + ' trials due to P2P')
-    #     epdat[m] = epdat[m][:,mask_trials,:]
-    #     print('Total Trials Left: ' + str(epdat[m].shape[1]))
-    #     Tot_trials[m] = epdat[m].shape[1]
+    Tot_trials = np.zeros([len(mseq)])
+    for m in range(len(mseq)):
+        Peak2Peak = epdat[m].max(axis=2) - epdat[m].min(axis=2)
+        mask_trials = np.all(Peak2Peak <Reject_Thresh,axis=0)
+        print('rejected ' + str(epdat[m].shape[1] - sum(mask_trials)) + ' trials due to P2P')
+        epdat[m] = epdat[m][:,mask_trials,:]
+        print('Total Trials Left: ' + str(epdat[m].shape[1]))
+        Tot_trials[m] = epdat[m].shape[1]
         
-    # plt.figure()
-    # plt.plot(Peak2Peak.T)
+    plt.figure()
+    plt.plot(Peak2Peak.T)
     
     
 
 #%% Correlation Analysis
-    
-    # tend =  0.5#time of Ht to keep
-    # tend_ind = round(tend*fs) - 1
     
     Ht = []
     Htnf = []
@@ -167,15 +164,6 @@ for subject in Subjects:
             Ht_nf = mseqXcorr(resp,mseq[m][0,:])
                 
                 
-        
-        
-    #only keep Ht up to tend 
-    # for h in range(len(Ht)):
-    #     Ht[h] = Ht[h][:,:tend_ind]
-    #     tdat[h] = tdat[h][:tend_ind]
-    
-
-
 
 #%% Plot Ht
     

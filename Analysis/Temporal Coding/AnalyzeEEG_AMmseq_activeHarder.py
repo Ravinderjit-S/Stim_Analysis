@@ -20,6 +20,8 @@ import pickle
 import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
+from mseqHelper import mseqXcorrEpochs_fft
+
 
 # from anlffr.spectral import mtspecraw
 # from anlffr.spectral import mtplv
@@ -53,7 +55,7 @@ for sub in range(len(Subjects)):
 
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=1000)
+    data_eeg.filter(l_freq=1,h_freq=200)
     
     if subject == 'S207':
         data_eeg.info['bads'].append('A15')
@@ -98,12 +100,12 @@ for sub in range(len(Subjects)):
     del ocular_projs, blinks, blink_epochs, Projs
 
 #%% Plot data
-    reject = None
+    reject = dict(eeg=1000e-6)
     epochs = mne.Epochs(data_eeg, data_evnt, [1,2], tmin=-0.3, 
-                                     tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.2, 0.)) 
+                                     tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.1, 0.)) 
     
     epochs_3 = mne.Epochs(data_eeg, data_evnt, [3], tmin=-0.3, 
-                                     tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.2, 0.)) 
+                                     tmax=np.ceil(mseq.size/4096)+0.5,reject=reject, baseline=(-0.1, 0.)) 
     
     # epochs.average().plot(picks=[31])
     # epochs_3.average().plot(picks=[31])
@@ -175,6 +177,11 @@ for sub in range(len(Subjects)):
     Ht_12 = mseqXcorr(epdat,mseq[0,:])
     Ht_3 = mseqXcorr(epdat_3,mseq_shift[0,:])
     
+    Ht_epochs_12, t_epochs = mseqXcorrEpochs_fft(epdat,mseq[0,:],fs)
+    Ht_epochs_3, t_epochs = mseqXcorrEpochs_fft(epdat_3,mseq_shift[0,:],fs)
+    
+    Ht_epochs = np.concatenate([Ht_epochs_12,Ht_epochs_3],axis=1)
+    
     Ht = Ht_12 * epdat.shape[1]/Tot_trials + Ht_3 * epdat_3.shape[1]/Tot_trials
 
 
@@ -238,7 +245,7 @@ for sub in range(len(Subjects)):
         pickle.dump([t, Tot_trials, Ht, info_obj, ch_picks],file)
         
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bit_Active_harder_epochs.pickle'),'wb') as file:
-        pickle.dump([epdat,epdat_3],file)
+        pickle.dump([Ht_epochs,t_epochs],file)
     
     
 

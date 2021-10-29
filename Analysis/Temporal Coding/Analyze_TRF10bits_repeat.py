@@ -25,9 +25,6 @@ from ACR_helperFuncs import Template_tcuts
 from ACR_helperFuncs import PCA_tcuts
 from ACR_helperFuncs import PCA_tcuts_topomap
 
-sys.path.append(os.path.abspath('../mseqAnalysis/'))
-from mseqHelper import mseqXcorr
-from mseqHelper import mseqXcorrEpochs
 
 #%% Load mseq
 mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat'
@@ -64,6 +61,8 @@ A_Htnf_old = []
 A_info_obj_old = []
 A_ch_picks_old = []
 
+A_Ht_old_epochs = []
+
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
     with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4.pickle'),'rb') as file:
@@ -75,6 +74,10 @@ for sub in range(len(Subjects)):
     
     A_info_obj_old.append(info_obj)
     A_ch_picks_old.append(ch_picks)
+    
+    with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4_epochs.pickle'),'rb') as file:
+        [Ht_epochs, t_epochs] = pickle.load(file)
+        A_Ht_old_epochs.append(Ht_epochs[3])
     
 t = tdat[3]
 
@@ -94,6 +97,10 @@ with open(os.path.join(pickle_loc,subject +'_AMmseq10bits.pickle'),'rb') as file
     
     A_info_obj_old.append(info_obj)
     A_ch_picks_old.append(ch_picks)
+    
+with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
+    [Ht_epochs, t_epochs] = pickle.load(file)
+    A_Ht_old_epochs.append(Ht_epochs)
 
 
 print('Done loading 1st visit ...')
@@ -106,6 +113,8 @@ A_Ht = []
 A_Htnf = []
 A_info_obj = []
 A_ch_picks = []
+
+A_Ht_epochs = []
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
@@ -120,71 +129,14 @@ for sub in range(len(Subjects)):
     A_info_obj.append(info_obj)
     A_ch_picks.append(ch_picks)
     
+    with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
+        [Ht_epochs, t_epochs] = pickle.load(file)
+    
+    A_Ht_epochs.append(Ht_epochs)
+    
 
 print('Done loading 2nd visit ...')
 
-#%% Equalize Trials
-
-# for sub in range(len(Subjects)):
-#     subject = Subjects[sub]
-#     if A_Tot_trials_old[sub] > A_Tot_trials[sub]:
-#         trials_use = int(A_Tot_trials[sub])
-        
-#         if subject == 'S250':
-#             with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
-#                 [epochs] = pickle.load(file)
-                
-#         else:
-#             with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4_epochs.pickle'),'rb') as file:
-#                 [epochs] = pickle.load(file)
-                
-#         A_Ht_old[sub] = mseqXcorr(epochs[:,:trials_use,:],mseq[0,:])
-        
-#     else:
-#         trials_use = int(A_Tot_trials_old[sub])
-#         if subject == 'S250':
-#             subject = 'S250_visit2'
-#         with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
-#             [epochs] = pickle.load(file)
-#         A_Ht[sub] =  mseqXcorr(epochs[:,:trials_use,:],mseq[0,:])
-    
-    
-#     print('Done Equalizing trials for ' + Subjects[sub])
-
-#%%
-# import time
-
-# subject = 'S207'
-# with open (os.path.join(pickle_loc,subject + '_AMmseq10bits_epochs.pickle'), 'rb') as file:
-#     epochs = pickle.load(file)
-    
-# mseq = mseq.squeeze()
-# epochs = epochs[0]
-
-# t1 = time.perf_counter()
-# Ht_epochs = mseqXcorrEpochs(epochs,mseq)
-# t2 = time.perf_counter()
-
-# print('It took ' + str(t2-t1) + ' seconds')
-
-# resp_m = epochs.mean(axis=1)
-# resp_m = resp_m - resp_m.mean(axis=1)[:,np.newaxis]
-# Ht_m = np.zeros([resp_m.shape[0],resp_m.shape[1]+mseq.size-1])
-# mseq_f = np.fft.fft(mseq,n=2**15)
-
-# Ht_mt = np.correlate(resp_m[30,:],mseq,mode='full')
-
-
-# resp_ch_f = np.fft.fft(resp_m[30,:],n=2**15) 
-# Ht_m = np.fft.ifft(resp_ch_f * np.conj(mseq_f))
-# plt.figure()
-# plt.plot(Ht_m.T)
-# plt.plot(Ht_mt,color='tab:orange')
-
-
-# for ch in range(resp_m.shape[0]):
-#     resp_ch_f = np.fft.fft(resp_m[31,:]) 
-#     Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq,mode='full')#[mseq[m].size-1:]
 
 
 #%% Example CZ
@@ -200,7 +152,8 @@ plt.xlabel('Time (msec)', fontsize=12)
 plt.ylabel('Amplitude',fontsize=12)
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
-plt.title('S207 mTRF Ch. Cz',fontsize=14)
+plt.title('mod-TRF Ch. Cz',fontsize=14)
+plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 #plt.xscale('log')
 
 #%% Plot Ch. Cz & FP1
@@ -227,8 +180,8 @@ for sub in range(len(Subjects)):
     
     plt.plot(t,cz_1, label='Visit 1', color='tab:blue')
     plt.plot(t,cz_2, label='Visit 2', color='tab:orange')
-    plt.plot(t,fp_1, label='Visit 1', color='tab:blue',linestyle='dashed')
-    plt.plot(t,fp_2, label='Visit 2', color='tab:orange',linestyle='dashed')
+    # plt.plot(t,fp_1, label='Visit 1', color='tab:blue',linestyle='dashed')
+    # plt.plot(t,fp_2, label='Visit 2', color='tab:orange',linestyle='dashed')
     
     # plt.scatter(t[troughs_cz1],cz_1[troughs_cz1],color='blue')
     # plt.scatter(t[peaks_cz1],cz_1[peaks_cz1],color='blue')
@@ -261,7 +214,7 @@ for sub in range(len(Subjects)):
                 ch_ind = np.where(cur_ch == ch_picks_s)[0][0]
                 axs[p1,p2].plot(t,A_Ht[sub][ch_ind,:])
             
-            #axs[p1,p2].set_xlim([0,0.4])
+            axs[p1,p2].set_xlim([-0.1,0.5])
             axs[p1,p2].set_title('A' + str(ch_picks[ch_ind]+1))
             
     fig.suptitle(Subjects[sub])
@@ -281,7 +234,7 @@ for sub in range(len(Subjects)):
                 ch_ind = np.where(cur_ch == ch_picks_s)[0][0]
                 axs[p1,p2].plot(t,A_Ht[sub][ch_ind,:])
             
-            #axs[p1,p2].set_xlim([0,0.4])
+            axs[p1,p2].set_xlim([-0.1,0.5])
             axs[p1,p2].set_title('A' + str(ch_picks[ch_ind]+1))
             
     fig.suptitle(Subjects[sub])
@@ -330,7 +283,7 @@ cuts_tms.append([.0155, .045, .062, .124, .287])
 cuts_tms.append([.016, .049, .123, .220, .334])
 
 #%% Compute Response from tcuts templates
-colors = ['tab:blue','tab:orange','green','red','purple']
+colors = ['tab:blue','tab:orange','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
 bs_sub_expVar = []
 ctx_sub_expVar = []
 
@@ -365,7 +318,6 @@ for sub in range(len(Subjects)):
         ax[1].set_title('Cortex')
         ax[1].set_xlim([0,0.5])
     
-
 
 #%% Compute response from individual templates
 
@@ -443,5 +395,137 @@ for sub in range(len(Subjects)):
     
 axs[3].set_xlabel('Time (s)',fontweight='bold')
 axs[3].set_ylabel('Amplitdue',fontweight='bold')    
+
+#%% Look at epochs: 1st visit and 2nd Visit
+
+fig = plt.figure()
+ax = [None] *5
+ax[0] = plt.subplot2grid(shape=(2,6), loc=(0,0), colspan=2)
+ax[1] = plt.subplot2grid((2,6), (0,2), colspan=2)
+ax[2] = plt.subplot2grid((2,6), (0,4), colspan=2)
+ax[3] = plt.subplot2grid((2,6), (1,1), colspan=2)
+ax[4] = plt.subplot2grid((2,6), (1,3), colspan=2)
+
+for sub in np.arange(len(Subjects)):
+    #Plot Cz
+    
+    if sub > 0:
+        ax[sub].axes.yaxis.set_visible(False)
+
+        
+    Ht_mean_old = A_Ht_old_epochs[sub].mean(axis=1) 
+    Ht_mean = A_Ht_epochs[sub].mean(axis=1)
+    
+    Ht_sem_old = A_Ht_old_epochs[sub].std(axis=1) / np.sqrt(A_Ht_old_epochs[sub].shape[1])
+    Ht_sem = A_Ht_epochs[sub].std(axis=1) / np.sqrt(A_Ht_epochs[sub].shape[1])
+    
+    ax[sub].plot(t_epochs, Ht_mean[-1,:],color='grey', label='2nd Visit')
+    ax[sub].fill_between(t_epochs,Ht_mean[-1,:] -Ht_sem[-1,:],Ht_mean[-1,:] + Ht_sem[-1,:], color='grey',alpha=0.5)
+    
+    ax[sub].plot(t_epochs, Ht_mean_old[-1,:],color='k',label='1st Visit')
+    ax[sub].fill_between(t_epochs,Ht_mean_old[-1,:] -Ht_sem_old[-1,:],Ht_mean_old[-1,:] + Ht_sem_old[-1,:], color='k',alpha=0.5)
+    
+    t_cuts = cuts_tms[sub]
+    
+    # for t_c in range(len(t_cuts)):
+    #     if t_c ==0:
+    #         t_1 = np.where(t_epochs>=0)[0][0]
+    #     else:
+    #         t_1 = np.where(t_epochs>=t_cuts[t_c-1])[0][0]
+        
+    #     t_2 = np.where(t_epochs>=t_cuts[t_c])[0][0]
+        
+    #     ax[sub].plot(t_epochs[t_1:t_2], Ht_mean_old[-1,t_1:t_2],color=colors[t_c],label='Source ' + str(t_c))
+    #     ax[sub].fill_between(t_epochs[t_1:t_2],Ht_mean_old[-1,t_1:t_2] -Ht_sem_old[-1,t_1:t_2],Ht_mean_old[-1,t_1:t_2] + Ht_sem_old[-1,t_1:t_2], color=colors[t_c],alpha=0.5)
+        
+
+    ax[sub].set_xlim([-0.1,0.5])
+    ax[sub].set_title('Subject ' + str(sub+1),fontweight='bold')
+    ax[sub].set_xticks([0,0.1,0.2,0.3,0.4])
+
+
+ax[0].set_xlabel('Time (sec)')
+ax[0].set_ylabel('Amplitude')
+ax[0].set_yticks([-.002,0,.002,.004])
+ax[0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax[0].legend(fontsize=9)
+fig.suptitle('Ch. Cz',fontweight='bold')
+
+#%% Look at epochs with t cuts and in freq domain
+
+fs = 4096
+fig = plt.figure()
+ax = [None] *5
+ax[0] = plt.subplot2grid(shape=(2,6), loc=(0,0), colspan=2)
+ax[1] = plt.subplot2grid((2,6), (0,2), colspan=2)
+ax[2] = plt.subplot2grid((2,6), (0,4), colspan=2)
+ax[3] = plt.subplot2grid((2,6), (1,1), colspan=2)
+ax[4] = plt.subplot2grid((2,6), (1,3), colspan=2)
+
+fig_f = plt.figure()
+axf = [None] *5
+axf[0] = plt.subplot2grid(shape=(2,6), loc=(0,0), colspan=2)
+axf[1] = plt.subplot2grid((2,6), (0,2), colspan=2)
+axf[2] = plt.subplot2grid((2,6), (0,4), colspan=2)
+axf[3] = plt.subplot2grid((2,6), (1,1), colspan=2)
+axf[4] = plt.subplot2grid((2,6), (1,3), colspan=2)
+
+for sub in np.arange(len(Subjects)):
+    #Plot Cz
+    
+    if sub > 0:
+        ax[sub].axes.yaxis.set_visible(False)
+        axf[sub].axes.yaxis.set_visible(False)
+        
+    Ht_mean = A_Ht_epochs[sub].mean(axis=1)
+    Ht_sem = A_Ht_epochs[sub].std(axis=1) / np.sqrt(A_Ht_epochs[sub].shape[1])
+    
+
+    t_cuts = cuts_tms[sub]
+    for t_c in range(len(t_tc)):
+        if t_c ==0:
+            t_1 = np.where(t_epochs>=0)[0][0]
+        else:
+            t_1 = np.where(t_epochs>=t_cuts[t_c-1])[0][0]
+        
+        t_2 = np.where(t_epochs>=t_cuts[t_c])[0][0]
+        
+        t_ep = t_epochs[t_1:t_2]
+        Ht_mean_tc = Ht_mean[-1,t_1:t_2] #- Ht_mean[-1,t_1:t_2].mean()
+        
+        Ht_freq = np.abs(np.fft.fft(A_Ht_epochs[sub][-1,:,t_1:t_2] - A_Ht_epochs[sub][-1,:,t_1:t_2].mean(axis=-1)[:,np.newaxis]))
+        Ht_freq_mean = Ht_freq.mean(axis=0)
+        Ht_freq_sem = Ht_freq.std(axis=0) / np.sqrt(Ht_freq.shape[0])     
+                   
+        f = np.fft.fftfreq(Ht_freq_mean.size,d=1/fs)
+
+        ax[sub].plot(t_ep, Ht_mean_tc, color=colors[t_c])
+        ax[sub].fill_between(t_ep,Ht_mean_tc -Ht_sem[-1,t_1:t_2],Ht_mean_tc + Ht_sem[-1,t_1:t_2], color=colors[t_c],alpha=0.5)
+        ax[sub].set_title('Subject ' + str(sub+1))
+        ax[sub].set_xticks([0,0.1,0.2,0.3,0.4])
+        
+        axf[sub].plot(f,Ht_freq_mean,color=colors[t_c])
+        axf[sub].fill_between(f,Ht_freq_mean-Ht_freq_sem,Ht_freq_mean+Ht_freq_sem,color=colors[t_c],alpha=0.5)
+        axf[sub].set_title('Subject ' + str(sub+1))
+        axf[sub].set_xlim([0,75])
+        axf[sub].set_xticks([10,25,50])
+        
+
+
+ax[0].set_xlabel('Time (sec)')
+ax[0].set_ylabel('Amplitude')
+ax[0].set_yticks([-.002,0,.002,.004])
+ax[0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+#ax[0].legend(fontsize=9)
+#fig.suptitle('Ch. Cz',fontweight='bold')
+
+axf[0].set_xlabel('Frequency (Hz)')
+axf[0].set_ylabel('Magnitude')
+axf[0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+
+#%% 
+colors = ['tab:blue','tab:orange','tab:green','tab:purple','tab:brown']
+
+
 
 
