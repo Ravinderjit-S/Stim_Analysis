@@ -17,12 +17,14 @@ import os
 import pickle
 
 
+
+
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['S211', 'S268', 'S269', 'S270', 'S273', 'S277','S279','S282']
+Subjects = ['S211']
 
-data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Binding'
+data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
    
 subject = Subjects[0]
@@ -30,6 +32,7 @@ datapath = os.path.join(data_loc,subject)
 
 data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
 data_eeg.filter(l_freq=1,h_freq=40)
+
 
 
 #%% Remove Blinks
