@@ -24,7 +24,7 @@ exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']
 
 sentEEG, sent_evnt = EEGconcatenateFolder(data_loc+subject+'/',nchans,refchans,exclude)
 
-sentEEG.filter(1,200)
+sentEEG.filter(1,75)
 
 blinks = find_blinks(sentEEG, ch_name = ['A1'], thresh = 100e-6,  l_trans_bandwidth=0.5, l_freq = 1.0) 
    
