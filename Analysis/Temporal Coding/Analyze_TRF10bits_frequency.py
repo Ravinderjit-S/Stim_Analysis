@@ -175,10 +175,12 @@ for sub in range(len(Subjects)):
     
     
 f_blocks = [5,10,15,20,30,40,50,60]  
+f_blocks = [5,10,15,20,30,40,50,60] 
 
 A_freqs = np.array(A_freqs)
 A_tmtf_mag_norm = np.array(A_tmtf_mag_norm)
-tmtf_magAvg = np.zeros(A_freqs.shape[1])
+tmtf_magAvg = np.zeros(len(f_blocks))
+tmtf_magSEM = np.zeros(len(f_blocks))
 for fb in range(len(f_blocks)):
     if fb == 0:
         f1 = 0
@@ -188,24 +190,26 @@ for fb in range(len(f_blocks)):
     f2 = f_blocks[fb]
     mask = (A_freqs > f1) & (A_freqs < f2)
     tmtf_magAvg[fb] = A_tmtf_mag_norm[mask].mean()    
+    tmtf_magSEM[fb] = A_tmtf_mag_norm[mask].std() / np.sqrt(np.sum(mask))
 
     
 plt.figure()
-plt.title('Average tMTFs')
-plt.plot(w,A_Hf_norm.mean(axis=1))
-plt.xlabel('Freqeuncy')
+#plt.title('Average tMTFs')
+plt.plot(w,A_Hf_norm.mean(axis=1),label='mod-TRF tMTF')
+plt.xlabel('Modulation Freqeuncy')
 plt.ylabel('Normalized Magnitude')
 plt.xlim([0,75])
-sem = A_Hf_norm.std(axis=1) / np.sqrt(len(Subjects))
-plt.fill_between(w,A_Hf_norm.mean(axis=1) - sem, A_Hf_norm.mean(axis=1) + sem, color='tab:blue',alpha=0.4)
-for sub in range(len(Subjects)):
-    freqs=A_freqs[sub]
-    tmtf_mag = A_tmtf_mag[sub]
-    tmtf_mag_norm = tmtf_mag/np.max(tmtf_mag)
-    plt.scatter(A_freqs[sub],tmtf_mag_norm,color='grey')
-plt.plot(f_blocks,tmtf_magAvg,color='black',linewidth=2)
-    
-    
+sem = A_Hf_norm.std(axis=1)# / np.sqrt(len(Subjects))
+plt.fill_between(w,A_Hf_norm.mean(axis=1) - sem, A_Hf_norm.mean(axis=1) + sem, color='tab:blue',alpha=0.5)
+plt.legend()
+# for sub in range(len(Subjects)):
+#     freqs=A_freqs[sub]
+#     tmtf_mag = A_tmtf_mag[sub]
+#     tmtf_mag_norm = tmtf_mag/np.max(tmtf_mag)
+#     plt.scatter(A_freqs[sub],tmtf_mag_norm,color='grey')
+# plt.plot(f_blocks,tmtf_magAvg,color='black',linewidth=2,label='Average single freqency EFRs')
+# plt.fill_between(f_blocks,tmtf_magAvg-tmtf_magSEM,tmtf_magAvg+tmtf_magSEM,color='k',alpha=0.5)
+# plt.legend()
 
 
 plt.figure()
@@ -218,7 +222,7 @@ sem = A_Hf_norm.std(axis=1) / np.sqrt(len(Subjects))
 plt.fill_between(w,A_Hf_norm.mean(axis=1) - sem, A_Hf_norm.mean(axis=1) + sem, color='tab:blue',alpha=0.4)
 for sub in range(len(Subjects)):
     freqs=A_freqs[sub]
-    tmtf_mag = A_tmtf_mag[sub]    plt.legend()
+    tmtf_mag = A_tmtf_mag[sub]    
     tmtf_mag_norm = tmtf_mag/np.max(tmtf_mag)
     plt.scatter(A_freqs[sub],tmtf_mag_norm,color='k')
 plt.plot(f_blocks,tmtf_magAvg,color='black',linewidth=2)

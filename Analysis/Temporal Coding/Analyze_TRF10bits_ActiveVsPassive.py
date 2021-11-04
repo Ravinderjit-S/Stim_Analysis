@@ -20,10 +20,7 @@ from scipy.signal import find_peaks
 
 import sys
 sys.path.append(os.path.abspath('../ACRanalysis/'))
-from ACR_helperFuncs import ACR_sourceHf
-from ACR_helperFuncs import Template_tcuts
-from ACR_helperFuncs import PCA_tcuts
-from ACR_helperFuncs import PCA_tcuts_topomap
+import ACR_helperFuncs
 
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
@@ -302,8 +299,10 @@ cuts_count.append([.0145, .049, .123, .220, .320, 0.5, 0.75 ])
 cuts_sd.append([.0135, .047, .124, .240, .320, 0.5, 0.75 ])
 
 #%% Plot panel of Subjects Ch. Cz with t_cuts
-colors = ['tab:blue','tab:orange','green','red','purple', 'brown', 'pink']
+colors = ['tab:blue','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
 axs = []
+
+plt.figure()
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
     ch =  31 #Ch. Cz
@@ -373,9 +372,10 @@ axs[5].legend(['Passive', 'Easy'])
 
 #%% Plot freq spectrum
 
-colors = ['tab:blue','tab:orange','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
+colors = ['tab:blue','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
 fs =4096
 axs = []
+plt.figure()
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
     ch =  31 #Ch. Cz
@@ -413,8 +413,8 @@ for sub in range(len(Subjects)):
         cz_count_f = np.fft.fftfreq(cz_count_tc_f.size,d=1/fs)
         
         
-        ax.plot(cz_pass_f,np.abs(cz_pass_tc_f) , label='Passive', color=colors[tc],linestyle='--')
-        ax.plot(cz_count_f,np.abs(cz_count_tc_f), label='Active',color=colors[tc])
+        ax.plot(cz_pass_f,np.abs(cz_pass_tc_f) , label='Passive', color=colors[tc])
+        ax.plot(cz_count_f,np.abs(cz_count_tc_f), label='Active',color=colors[tc],linestyle='--')
 
         
     
@@ -451,7 +451,6 @@ for sub in range(len(Subjects)):
 axs[4].set_xlabel('Time (s)',fontweight='bold')
 axs[4].set_ylabel('Amplitude',fontweight='bold')
 
-    
 
 #%% Get responses from templates
 colors = ['tab:blue','tab:orange','green','red','purple', 'brown', 'pink']
@@ -589,7 +588,6 @@ colors = ['tab:blue','tab:orange','green','red','purple', 'brown', 'pink']
 
 #%% Compute Latency, Peak Mag, Peak area from channel Cz
 
-
 latency_pass = np.zeros((5,len(Subjects))) #5 sources
 p2p_pass = np.zeros((5,len(Subjects)))
 pkArea_pass = np.zeros((5,len(Subjects)))
@@ -711,13 +709,163 @@ p2p_sd_change = p2p_sd - p2p_pass[:,Sub_sdInds]
 
 #%% Compute features through frequency domain
 
+latency_pass_f = np.zeros((5,len(Subjects))) #5 sources
+pkWidth_pass_f = np.zeros((5,len(Subjects)))
 
+latency_count_f = np.zeros((5,len(Subjects))) #5 sources
+pkWidth_count_f = np.zeros((5,len(Subjects)))
 
+latency_sd_f = np.zeros((5,len(Subjects_sd))) #5 sources
+pkWidth_sd_f = np.zeros((5,len(Subjects_sd)))
 
+fs = 4096
 
+for sub in range(len(Subjects)):
+    subject = Subjects[sub]
+    ch =  31 #Ch. Cz
+    
+    ch_pass_ind = np.where(A_ch_picks_pass[sub] == ch)[0][0]
+    ch_count_ind = np.where(A_ch_picks_count[sub] == ch)[0][0]
+    
+    cz_pass = A_Ht_pass[sub][ch_pass_ind,:]
+    cz_count = A_Ht_count[sub][ch_count_ind,:]
 
+    for tc in range(len(cuts_passive[sub]) - 2):
+        if tc ==0:
+            t1_pass = np.where(t>=0)[0][0]
+            t1_count =  np.where(t>=0)[0][0]
+        else:
+            t1_pass = np.where(t>=cuts_passive[sub][tc-1])[0][0]
+            t1_count = np.where(t>=cuts_count[sub][tc-1])[0][0]
+            
+        t2_pass = np.where(t>=cuts_passive[sub][tc])[0][0]
+        t2_count = np.where(t>=cuts_count[sub][tc])[0][0]
+        
+        cz_pass_tc = cz_pass[t1_pass:t2_pass] -cz_pass[t1_pass:t2_pass].mean()
+        cz_count_tc = cz_count[t1_count:t2_count] - cz_count[t1_count:t2_count].mean()
+        
+        cz_pass_tc_f = np.fft.fft(cz_pass_tc)
+        cz_count_tc_f = np.fft.fft(cz_count_tc)
+        f = np.ff
+
+   
+    if (subject in Subjects_sd):
+        sub_sd = Subjects_sd.index(subject)
+        ch_sd_ind = np.where(A_ch_picks_sd[sub_sd] == ch)[0][0]
+        cz_sd = A_Ht_sd[sub_sd][ch_sd_ind,:]
+        
+        for tc in range(len(cuts_sd[sub_sd]) - 2):
+            if tc ==0:
+                t1_sd =  np.where(t>=0)[0][0]
+            else:
+                t1_sd = np.where(t>=cuts_sd[sub_sd][tc-1])[0][0]
+                
+            t2_sd = np.where(t>=cuts_sd[sub_sd][tc])[0][0]
+            
+            cz_sd_tc = cz_sd[t1_sd:t2_sd] - cz_sd[t1_sd:t2_sd].mean()
+            
 
 #%% Non Parametric statistics
 
 
 
+
+
+#%% Average Passive vs Average Active
+
+t_cuts_pass = [.016, .028, .066, .123, .250 ]
+t_cuts_sd = [.013, .035, .066, .123, .250 ]
+
+colors = ['tab:blue','green','red','purple', 'brown', 'pink']
+
+
+cz_pass_subs = np.zeros([A_Ht_pass[0].shape[1], len(Subjects)])
+for sub in range(len(Subjects)):
+    cz_pass_subs[:,sub] = A_Ht_pass[sub][-1,:]
+    
+cz_sd_subs = np.zeros([A_Ht_sd[0].shape[1],len(Subjects)])
+for sub in range(len(Subjects_sd)):
+    cz_sd_subs[:,sub] = A_Ht_sd[sub][-1,:]
+    
+    
+cz_pass_sem = cz_pass_subs.std(axis=1) / np.sqrt(cz_pass_subs.shape[1])
+cz_pass_mean = cz_pass_subs.mean(axis=1)
+
+cz_sd_sem = cz_sd_subs.std(axis=1) / np.sqrt(cz_sd_subs.shape[1])
+cz_sd_mean = cz_sd_subs.mean(axis=1)
+
+plt.figure()
+plt.plot(t,cz_pass_mean,label='Passive',color='k')
+
+for t_c in range(len(t_cuts_pass)):
+    if t_c ==0:
+        t_1 = np.where(t>=0)[0][0]
+    else:
+        t_1 = np.where(t>=t_cuts_pass[t_c-1])[0][0]
+    t_2 = np.where(t>=t_cuts_pass[t_c])[0][0]
+        
+    plt.fill_between(t[t_1:t_2],cz_pass_mean[t_1:t_2] - cz_pass_sem[t_1:t_2], cz_pass_mean[t_1:t_2] + cz_pass_sem[t_1:t_2],alpha=0.5,color=colors[t_c])
+
+plt.plot(t,cz_sd_mean,color='tab:orange', label='Shift Detection')
+
+for t_c in range(len(t_cuts_sd)):
+    if t_c ==0:
+        t_1 = np.where(t>=0)[0][0]
+    else:
+        t_1 = np.where(t>=t_cuts_sd[t_c-1])[0][0]
+    t_2 = np.where(t>=t_cuts_sd[t_c])[0][0]
+        
+    plt.fill_between(t[t_1:t_2],cz_sd_mean[t_1:t_2] - cz_sd_sem[t_1:t_2], cz_sd_mean[t_1:t_2] + cz_sd_sem[t_1:t_2],alpha=0.5,color=colors[t_c])
+
+#plt.fill_between(t,cz_sd_mean-cz_sd_sem,cz_sd_mean+cz_sd_sem,alpha=0.5,color='tab:orange')
+    
+plt.xlim((-0.050,0.3))
+plt.xticks([0,0.05,0.1,0.15,0.2])
+plt.yticks([-.002,0,.002])
+plt.ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
+plt.xlabel('Time (sec)')
+plt.ylabel('Amplitude')
+plt.legend()
+
+#%% PCA topomaps for Passive and Active
+
+Ht_pass_avg = ACR_helperFuncs.Average_Subjects(A_Ht_pass,A_ch_picks_pass,32)
+Ht_sd_avg = ACR_helperFuncs.Average_Subjects(A_Ht_sd,A_ch_picks_sd,32)
+
+
+pca_sp_cuts_pass, pca_expVar_cuts_pass, pca_coeff_cuts_pass, t_cuts_pass = \
+    ACR_helperFuncs.PCA_tcuts(Ht_pass_avg,t,t_cuts_pass,np.arange(32),np.arange(32))
+
+pca_sp_cuts_sd, pca_expVar_cuts_sd, pca_coeff_cuts_sd, t_cuts_sd = \
+    ACR_helperFuncs.PCA_tcuts(Ht_sd_avg,t,t_cuts_sd,np.arange(32),np.arange(32))
+
+
+ACR_helperFuncs.PCA_tcuts_topomap(pca_coeff_cuts_pass, t_cuts_pass,
+                                  pca_expVar_cuts_pass, 
+                                  mne.pick_info(info_obj,np.arange(32)), 
+                                  np.arange(32), 'Passive')
+
+          
+ACR_helperFuncs.PCA_tcuts_topomap(pca_coeff_cuts_sd, t_cuts_sd,
+                                  pca_expVar_cuts_sd, 
+                                  mne.pick_info(info_obj,np.arange(32)), 
+                                  np.arange(32), 'Shift Detection')
+          
+          
+          
+  
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          

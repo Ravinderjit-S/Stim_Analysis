@@ -159,7 +159,32 @@ def PCA_tcuts_topomap(pca_coeffCuts, t_cuts, pca_expVarCuts, infoObj, ch_picks, 
         plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][1]*100)) + '%')
         mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
 
-
+def Average_Subjects(A_Ht, A_ch_picks, nchannels):
+    #A_Ht: is list of system fucntions with shape channel x time
+    #A_ch_picks: is a list with each component being a 1D array of which channels 
+    #   indexed 0-31 (for 32 channel measure) correspond to each row in a system function.
+    #   This is needed b/c some channels get rejected so Ht does not always have 32 chanels
+    #nchannels: expected number of channels if none rejected
+    
+    if (len(A_Ht) != len(A_ch_picks)):
+        raise ValueError('A_Ht and A_ch_picks should be the same length') 
+    
+    perCh = np.zeros([nchannels,1])
+    for s in range(len(A_ch_picks)):
+        for ch in range(nchannels):
+            perCh[ch,0] += np.sum(A_ch_picks[s]==ch)
+        
+    Avg_Ht = np.zeros([nchannels,A_Ht[0].shape[1]])
+    for s in range(len(A_ch_picks)):
+        Avg_Ht[A_ch_picks[s],:] += A_Ht[s]
+        
+    Avg_Ht = Avg_Ht / perCh
+    
+    return Avg_Ht
+    
+    
+    
+    
 
 
 
