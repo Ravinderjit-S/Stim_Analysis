@@ -131,10 +131,10 @@ for cnd in range(len(combos_comp)):
     cz_sem_20 = cz_ep_20.std(axis=0) / np.sqrt(cz_ep_20.shape[0])
     
     ax[cnd].plot(t,cz_mean_12,label='12')
-    ax[cnd].fill_between(t,cz_mean_12 - cz_sem_12, cz_mean_12 + cz_sem_12)
+    ax[cnd].fill_between(t,cz_mean_12 - cz_sem_12, cz_mean_12 + cz_sem_12,alpha=0.5)
     
     ax[cnd].plot(t,cz_mean_20,label='20')
-    ax[cnd].fill_between(t,cz_mean_20 - cz_sem_20, cz_mean_20 + cz_sem_20)
+    ax[cnd].fill_between(t,cz_mean_20 - cz_sem_20, cz_mean_20 + cz_sem_20,alpha=0.5)
     
     ax[cnd].set_title(comp_labels[cnd])
     ax[cnd].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
@@ -144,6 +144,16 @@ ax[2].set_xlabel('Time(sec)')
 ax[2].set_ylabel('Amplitude \$uV')
 
 plt.savefig(os.path.join(fig_loc,subject + '_12vs20.png'),format='png')
+
+
+#%% Look at 32-channel response 
+
+
+
+
+
+
+
 
 #%% Compute induced activity
 
