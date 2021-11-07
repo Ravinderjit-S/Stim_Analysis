@@ -10,7 +10,10 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
+import psignifit as ps
 
+
+#%% Load Data
 
 Results_fname = 'MRT_MTB_Rav_results.json'
 with open(Results_fname) as f:
@@ -22,6 +25,8 @@ subjects = []
 accuracy = np.zeros((len(SNRs),len(results)))
 
 pilots = []
+
+#%% Extract Data from Json file
 
 sub_ind = 0
 for k in range(0,len(results)):
@@ -56,8 +61,27 @@ for k in range(0,len(results)):
 
 accuracy = np.delete(accuracy,pilots,axis=1)
 
+#%% Fit psychometric curves with psignifit
+
+options = dict({
+    'sigmoidName': 'norm',
+    'expType': '3AFC'
+    })
 
 
+result_ps = []
+plt.figure()
+for sub in range(len(subjects)):
+    data_sub = np.concatenate((SNRs[:,np.newaxis], accuracy[:,sub][:,np.newaxis] *cond_trials[:,np.newaxis] , cond_trials[:,np.newaxis] ),axis=1)
+    result_sub = ps.psignifit(data_sub,options)
+    
+    result_ps.append(result_sub)
+    ps.psigniplot.plotPsych(result_sub)
+
+#%% Plot data
+
+plt.figure()
+plt.plot(SNRs,accuracy)
 
 
 
