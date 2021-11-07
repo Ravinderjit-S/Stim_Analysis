@@ -193,11 +193,11 @@ for ph in range(len(phi_conds)):
 plt.legend(fontsize=fontsize)
 plt.xticks(range(len(AM)),labels=AM,fontsize=fontsize)
 plt.ylabel('Accuracy',fontsize=fontsize)
-plt.xlabel('Modulation Freq',fontsize=fontsize)
+plt.xlabel('FM Frequency',fontsize=fontsize)
 #plt.title('FM Incoherence Detection',fontsize=fontsize)
 plt.ylim([0.2,1])
 plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-fig.savefig(os.path.join(fig_path, 'FM_phi_all_median'  +'.png'),format='png')
+fig.savefig(os.path.join(fig_path, 'FM_phi_all_median'  +'.svg'),format='svg')
 
 
 
