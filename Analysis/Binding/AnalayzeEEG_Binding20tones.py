@@ -55,7 +55,7 @@ for subject in Subjects:
     data_eeg.add_proj(ocular_projs)
     data_eeg.plot_projs_topomap()
     plt.savefig(os.path.join(fig_loc,'OcularProjs',subject + '_OcularProjs.png'),format='png')
-    data_eeg.plot(events=blinks,show_options=True)
+    #data_eeg.plot(events=blinks,show_options=True)
     
     #%% Add events for AB transitions at t = 1,2,3,4
     
@@ -81,7 +81,7 @@ for subject in Subjects:
         ep_cnd = mne.Epochs(data_eeg,data_evnt,cnd+1,tmin=-0.3,tmax=5.3,reject = reject, baseline = (-0.1,0.))
         epochs_whole.append(ep_cnd)
         evkd_whole.append(ep_cnd.average())
-        evkd_whole[cnd].plot(titles=conds[cnd])
+        #evkd_whole[cnd].plot(titles=conds[cnd])
         
     #%% Extract Different Conditions
         
@@ -108,7 +108,7 @@ for subject in Subjects:
     
     for it, c in enumerate(ev_combos):
         evkds = [evkd[c[0]], evkd[c[1]]]
-        mne.viz.plot_compare_evokeds(evkds,picks=31,title = conds[it + 10])
+        #mne.viz.plot_compare_evokeds(evkds,picks=31,title = conds[it + 10])
     
     
     #%% Plot Comparisons 
@@ -118,7 +118,7 @@ for subject in Subjects:
     
     for it,c in enumerate(combos_comp):    
         evkds = [evkd[c[0]], evkd[c[1]]]
-        mne.viz.plot_compare_evokeds(evkds,title=comp_labels[it])
+        #mne.viz.plot_compare_evokeds(evkds,title=comp_labels[it])
     
     
     #%% Make Plots outside of MNE
