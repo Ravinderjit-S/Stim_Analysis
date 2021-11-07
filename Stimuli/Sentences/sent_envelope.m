@@ -1,8 +1,10 @@
 clear
 load('Sentences_48828.mat')
 
-lpf = fir1(round(4/150 * fs),150/(fs/2));
-
+fc = 75;
+lpf = fir1(round(4/fc * fs),fc/(fs/2));
+figure,
+plot(lpf)
 
 for j=1:length(sentences)
     x = hilbert(sentences{j});
@@ -17,6 +19,10 @@ t2 = 0:1/4096:length(envs_4096{1})/4096-1/4096;
 figure, hold on
 plot(t,envs{1})
 plot(t2,envs_4096{1})
+
+figure, hold on
+plot(t2,envs_4096{1},'k','linewidth',2)
+plot(t,sentences{1})
 
 save('sentEnv.mat','envs_4096')
 

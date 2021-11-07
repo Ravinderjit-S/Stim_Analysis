@@ -8,150 +8,225 @@ Created on Fri Aug 20 15:49:37 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.io as sio
 import mne
 from anlffr.preproc import find_blinks
 from EEGpp import EEGconcatenateFolder
 from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
-
-
+#from sklearn.decomposition import PCA
 
 
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['S211']
+Subjects = ['S211', 'S259', 'S268', 'S269', 'S270', 'S273',
+            'S274','S277','S279','S282', 'S288']
 
-data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/'
+fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/Binding/'
+data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Binding'
+pickle_loc = data_loc + '/Pickles/'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
    
-subject = Subjects[0]
-datapath = os.path.join(data_loc,subject)
+#subject = Subjects[7]
 
-data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-data_eeg.filter(l_freq=1,h_freq=40)
-
-
-
-#%% Remove Blinks
-
-blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
-blink_epochs = mne.Epochs(data_eeg,blinks,998,tmin=-0.25,tmax=0.25,proj=False,
-                              baseline=(-0.25,0),reject=dict(eeg=500e-6))
-Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8,verbose='DEBUG')
-
-ocular_projs = [Projs[0]]
-
-data_eeg.add_proj(ocular_projs)
-data_eeg.plot_projs_topomap()
-data_eeg.plot(events=blinks,show_options=True)
-
-#%% Plot Data
-
-conds = ['12','20'] #14,18 for S211 from earlier date
-reject = dict(eeg=100e-6)
-epochs = []
-evkd = []
-
-for cnd in range(len(conds)):
-    ep_cnd = mne.Epochs(data_eeg,data_evnt,cnd+1,tmin=-0.4,tmax=5.4,reject = reject, baseline = (-0.2,0.))
-    epochs.append(ep_cnd)
-    evkd.append(ep_cnd.average())
-    evkd[cnd].plot(picks=[31],titles=conds[cnd])
-
-#%% Get Data and plot
-
-t = evkd[0].times
-data = []
-for cnd in range(len(evkd)):
-    data.append(evkd[cnd].data[np.arange(32),:])
+for subject in Subjects:
     
-
-sbp = [4,4]
-sbp2 = sbp
-colors = ['tab:blue','tab:orange']
-
-fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp[0]):
-    for p2 in range(sbp[1]):
-        for cnd in range(len(data)):
-            axs[p1,p2].plot(t,data[cnd][p1*sbp[1]+p2,:],color=colors[cnd])
-        axs[p1,p2].set_title(p1*sbp[1]+p2)    
-
-
-
-fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp2[0]):
-    for p2 in range(sbp2[1]):
-        for cnd in range(len(data)):
-            axs[p1,p2].plot(t,data[cnd][p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color=colors[cnd])
-        axs[p1,p2].set_title(p1*sbp2[1]+p2+sbp[0]*sbp[1])   
-
-
-plt.figure()
-plt.plot(t,data[0][31,:]*1e6)
-plt.plot(t,data[1][31,:]*1e6)
-plt.xlabel('Time (sec)')
-plt.ylabel('$\mu$V')
-plt.legend(['12','20'])
-plt.xlim([-0.1,5.4])
-
-#%% Look at just transitions
-fs = evkd[0].info['sfreq']
-
-t_trans=np.zeros(5,dtype=int)
-for tt in range(5):
-    t_trans[tt] = np.where(t>=tt)[0][0] 
-
-t_g = int(np.round(fs*0.6))
-
-data_trans = []
-
-for cnd in range(len(data)):
-    data_cnd = data[cnd]
-    data_tt = np.zeros([32,t_g,t_trans.size])
-    for tt in range(t_trans.size):
-        data_tt[:,:,tt] = data_cnd[:,t_trans[tt]:t_trans[tt]+t_g]
-    data_trans.append(data_tt)
-        
-data_trans_avg = []
-for cnd in range(len(data)):
-    onset = data_trans[cnd][:,:,0]
-    AB = (data_trans[cnd][:,:,1] + data_trans[cnd][:,:,3]) / 2
-    BA = (data_trans[cnd][:,:,2] + data_trans[cnd][:,:,4]) / 2
-    data_trans_avg.append([onset,AB,BA])
+    datapath = os.path.join(data_loc,subject + '_Binding')
     
-
-t_transition = np.arange(0,t_g/fs,1/fs)
-
-plt.figure()
-cond_tt = ['Oneset','AB','BA']
-cond_tt = ['Onset','Incoherent to Coherent', 'Coherent to Incoherent']
-cnd_tt=2
-for cnd in range(len(data)):
-    plt.plot(t_transition,data_trans_avg[cnd][cnd_tt][31,:]*1e6,label=conds[cnd])
-    plt.ylim(-1,3.0)
-plt.legend()
-plt.ylabel('uV')
-plt.xlabel('sec')
-plt.title(cond_tt[cnd_tt])
+    data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
+    data_eeg.filter(l_freq=1,h_freq=40)
+    
+    if subject == 'S273':
+        data_eeg.info['bads'].append('A1')
+        data_eeg.info['bads'].append('A30')
+        data_eeg.info['bads'].append('A24')
+    
+    
+    #%% Remove Blinks
+    
+    blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
+    blink_epochs = mne.Epochs(data_eeg,blinks,998,tmin=-0.25,tmax=0.25,proj=False,
+                                  baseline=(-0.25,0),reject=dict(eeg=500e-6))
+    Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8,verbose='DEBUG')
+    
+    ocular_projs = [Projs[0]]
+    
+    data_eeg.add_proj(ocular_projs)
+    data_eeg.plot_projs_topomap()
+    plt.savefig(os.path.join(fig_loc,'OcularProjs',subject + '_OcularProjs.png'),format='png')
+    #data_eeg.plot(events=blinks,show_options=True)
+    
+    #%% Add events for AB transitions at t = 1,2,3,4
+    
+    data_evnt_AB = data_evnt.copy()
+    fs = data_eeg.info['sfreq']
+    
+    for cnd in range(2):
+        for e in range(4):
+            evnt_num = 3 + e + cnd*4
+            events_add = data_evnt[data_evnt[:,2] == int(cnd+1),:] + [int(fs*(e+1)),int(0),evnt_num - (cnd+1)]
+            data_evnt_AB = np.concatenate((data_evnt_AB,events_add),axis=0)
+    
+    
+    
+    #%% Plot Data
+    
+    conds = ['12','20'] #14,18 for S211 from earlier date
+    reject = dict(eeg=150e-6)
+    epochs_whole = []
+    evkd_whole = []
+    
+    for cnd in range(len(conds)):
+        ep_cnd = mne.Epochs(data_eeg,data_evnt,cnd+1,tmin=-0.3,tmax=5.3,reject = reject, baseline = (-0.1,0.))
+        epochs_whole.append(ep_cnd)
+        evkd_whole.append(ep_cnd.average())
+        #evkd_whole[cnd].plot(titles=conds[cnd])
         
-fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp[0]):
-    for p2 in range(sbp[1]):
-        axs[p1,p2].plot(t_transition,AB[p1*sbp[1]+p2,:],color='tab:blue')
-        axs[p1,p2].plot(t_transition,BA[p1*sbp[1]+p2,:],color='tab:orange')
-        axs[p1,p2].set_title(p1*sbp[1]+p2)    
-
-
-
-fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-for p1 in range(sbp2[0]):
-    for p2 in range(sbp2[1]):
-        axs[p1,p2].plot(t_transition,AB[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='tab:blue')
-        axs[p1,p2].plot(t_transition,BA[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='tab:orange')
-        axs[p1,p2].set_title(p1*sbp2[1]+p2+sbp[0]*sbp[1])   
-
+    #%% Extract Different Conditions
+        
+    conds = ['12_0', '20_0', '12_AB1', '12_BA1', '12_AB2', '12_BA2', '20_AB1','20_BA1','20_AB2','20_BA2']
+        
+    epochs = []
+    evkd = []    
+    for cnd in range(10):
+        ep_cnd = mne.Epochs(data_eeg,data_evnt_AB,cnd+1,tmin=-0.2,tmax=1.1, reject = reject, baseline = (-0.1,0.))
+        epochs.append(ep_cnd)
+        evkd.append(ep_cnd.average())
+        #evkd[cnd].plot(picks=31,titles=conds[cnd])
+            
+    conds.extend(['12AB', '12BA','20AB','20BA'])
+    ev_combos = [[2,4],[3,5],[6,8],[7,9]]
+    
+    for it, cnd in enumerate(range(10,14)):
+        ep_cnd = mne.Epochs(data_eeg,data_evnt_AB,list(np.array(ev_combos[it])+1),tmin=-0.2,tmax=1.1, reject = reject, baseline = (-0.1,0.))
+        epochs.append(ep_cnd)
+        evkd.append(ep_cnd.average())
+        #evkd[cnd].plot(picks=31,titles=conds[cnd])
+        
+    #%% Plot 1st and second interval
+    
+    for it, c in enumerate(ev_combos):
+        evkds = [evkd[c[0]], evkd[c[1]]]
+        #mne.viz.plot_compare_evokeds(evkds,picks=31,title = conds[it + 10])
+    
+    
+    #%% Plot Comparisons 
+    
+    combos_comp = [[0,1], [10,12], [11,13]] 
+    comp_labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
+    
+    for it,c in enumerate(combos_comp):    
+        evkds = [evkd[c[0]], evkd[c[1]]]
+        #mne.viz.plot_compare_evokeds(evkds,title=comp_labels[it])
+    
+    
+    #%% Make Plots outside of MNE
+    
+    fig, ax = plt.subplots(3,1,sharex=True)
+    
+    t = epochs[0].times
+    for cnd in range(len(combos_comp)):
+        cz_ep_12 = epochs[combos_comp[cnd][0]].get_data()[:,31,:]
+        cz_mean_12 = cz_ep_12.mean(axis=0)
+        cz_sem_12 = cz_ep_12.std(axis=0) / np.sqrt(cz_ep_12.shape[0])
+        
+        cz_ep_20 = epochs[combos_comp[cnd][1]].get_data()[:,31,:]
+        cz_mean_20 = cz_ep_20.mean(axis=0)
+        cz_sem_20 = cz_ep_20.std(axis=0) / np.sqrt(cz_ep_20.shape[0])
+        
+        ax[cnd].plot(t,cz_mean_12,label='12')
+        ax[cnd].fill_between(t,cz_mean_12 - cz_sem_12, cz_mean_12 + cz_sem_12,alpha=0.5)
+        
+        ax[cnd].plot(t,cz_mean_20,label='20')
+        ax[cnd].fill_between(t,cz_mean_20 - cz_sem_20, cz_mean_20 + cz_sem_20,alpha=0.5)
+        
+        ax[cnd].set_title(comp_labels[cnd])
+        ax[cnd].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+        
+    ax[0].legend()
+    ax[2].set_xlabel('Time(sec)')
+    ax[2].set_ylabel('Amplitude \$uV')
+    
+    plt.savefig(os.path.join(fig_loc,subject + '_12vs20.png'),format='png')
+    
+    
+    #%% Look at 32-channel response 
+    
+    
+    # pca = PCA(n_components = 2)
+    
+    # t0 = np.where(t>=0)[0][0]
+    # t1 = np.where(t>=0.4)[0][0]
+    
+    # dat = epochs[12].get_data().mean(axis=0)[:32,t0:t1]
+    # pca_sp = pca.fit_transform(dat.T)
+    # pca_expVar = pca.explained_variance_ratio_
+    # pca_coeff = pca.components_
+    
+    # plt.figure()
+    # plt.plot(t[t0:t1],pca_sp)
+    # plt.plot(t[t0:t1], dat[31,:] * 2.5, color='k')
+    
+    # plt.figure()
+    # vmin = pca_coeff.mean() - 2 * pca_coeff.std()
+    # vmax = pca_coeff.mean() + 2 * pca_coeff.std()
+    
+    # plt.subplot(1,2,1)
+    # mne.viz.plot_topomap(pca_coeff[0,:], mne.pick_info(data_eeg.info,np.arange(32)),vmin=vmin,vmax=vmax)
+    # plt.title('ExpVar ' + str(np.round(pca_expVar[0]*100)))    
+    
+    # plt.subplot(1,2,2)
+    # mne.viz.plot_topomap(pca_coeff[1,:], mne.pick_info(data_eeg.info,np.arange(32)),vmin=vmin,vmax=vmax)
+    # plt.title('ExpVar ' + str(np.round(pca_expVar[1]*100)))    
+    
+    
+    
+    
+    #%% Compute induced activity
+    
+    # freqs = np.arange(1.,90.,1.)
+    # T = 1./5
+    # n_cycles = freqs*T
+    # time_bandwidth = 2
+    # vmin = -.15
+    # vmax = abs(vmin)
+    # bline = (-0.1,0)
+    
+    # channels = np.arange(32)
+    
+    # tfr_12 = mne.time_frequency.tfr_multitaper(epochs_whole[0].subtract_evoked(),
+    #                                            freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth,
+    #                                            return_itc = False,picks = channels,decim=4)#,average=False)
+    
+    # tfr_20 = mne.time_frequency.tfr_multitaper(epochs_whole[1].subtract_evoked(),
+    #                                            freqs=freqs, n_cycles = n_cycles, time_bandwidth = time_bandwidth,
+    #                                            return_itc = False,picks = channels,decim=4)#,average=False)
+    
+    # tfr_12.plot_topo(baseline =bline,mode= 'logratio', title = '12', vmin=vmin,vmax=vmax)
+    
+    # tfr_20.plot_topo(baseline =bline,mode= 'logratio', title = '20', vmin=vmin,vmax=vmax)
+    
+    
+    #%% Save Epochs
+    
+    save_indexes = [0,1,10,11,12,13]
+    conds_save = []
+    epochs_save = []
+    
+    for si in save_indexes:
+        conds_save.append(conds[si])
+        epochs_save.append(epochs[si].get_data()[:,31,:]) # Only save epochs for channel 31 
+    
+    with open(os.path.join(pickle_loc,subject+'_Binding.pickle'),'wb') as file:
+        pickle.dump([t, conds_save, epochs_save],file)
+        
+    del epochs, evkd
+    
+    
+    
+    
+    
+    
+    
     

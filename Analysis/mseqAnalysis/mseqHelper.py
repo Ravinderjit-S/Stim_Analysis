@@ -34,6 +34,28 @@ def mseqXcorrEpochs(epochs,mseq):
 
 
     
-def mseqXcorrEpochs_fft(epochs,mseq):
-    mseq = fft(mseq)    
+def mseqXcorrEpochs_fft(epochs,mseq,fs):
+    nfft = int(2**np.ceil(np.log2(mseq.size)))
+    if mseq.size < fs:
+        t_keep = np.arange(-mseq.size/fs,mseq.size/fs,1/fs)
+    else:       
+        t_keep = np.arange(-1,1,1/fs)
+        
+    half_keep = int(np.round(t_keep.size / 2))
+    
+    Ht_epochs = np.zeros([epochs.shape[0],epochs.shape[1],t_keep.size])
+    
+    mseq_f = np.fft.fft(mseq,n=nfft)
+    mseq_f = mseq_f[np.newaxis,:]
+    for ep in range(epochs.shape[1]):
+        epoch_fft = np.fft.fft(epochs[:,ep,:],n=nfft)
+        Ht_ep = np.fft.ifft(epoch_fft * np.conj(mseq_f))
+        Ht_ep = np.concatenate([Ht_ep[:,-half_keep:],Ht_ep[:,:half_keep]],axis=1)
+        Ht_epochs[:,ep,:] = Ht_ep
+        
+    return Ht_epochs, t_keep
+        
+    
+    
+    
     

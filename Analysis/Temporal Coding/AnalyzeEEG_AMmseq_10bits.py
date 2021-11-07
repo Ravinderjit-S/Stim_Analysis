@@ -18,6 +18,7 @@ import pickle
 import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
+from mseqHelper import mseqXcorrEpochs_fft
 
 
 from sklearn.decomposition import PCA
@@ -36,8 +37,7 @@ pickle_loc = data_loc + 'Pickles/'
 Subjects = ['S207','S228','S236','S238','S239','S246','S247','S250', 'S250_visit2']
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
-Subjects = ['S207']
-num_nfs = 1
+num_nfs = 20
 
 for subject in Subjects:
     print('On Subject ................... ' + subject)
@@ -46,7 +46,7 @@ for subject in Subjects:
     
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=500)
+    data_eeg.filter(l_freq=1,h_freq=200)
     
     #%% Remove bad channels
     
@@ -90,7 +90,7 @@ for subject in Subjects:
     #%% Plot data
     fs = data_eeg.info['sfreq']
     reject = dict(eeg=1000e-6)
-    epochs = mne.Epochs(data_eeg,data_evnt,1,tmin=-0.3,tmax=np.ceil(mseq.size/fs)+0.4, reject = reject, baseline=(-0.3,0.))     
+    epochs = mne.Epochs(data_eeg,data_evnt,1,tmin=-0.3,tmax=np.ceil(mseq.size/fs)+0.4, reject = reject, baseline=(-0.1,0.))     
     epochs.average().plot(picks=[31],titles='10 bit AMmseq')
     
     #%% Extract part of response when stim is on
@@ -146,6 +146,7 @@ for subject in Subjects:
     Htnf = []
     
     Ht = mseqXcorr(epdat,mseq[0,:])
+    Ht_epochs, t_epochs = mseqXcorrEpochs_fft(epdat,mseq[0,:],fs)
     
     for nf in range(num_nfs):
         print('On nf:' + str(nf))
@@ -196,9 +197,9 @@ for subject in Subjects:
         pickle.dump([t, Tot_trials, Ht, Htnf, info_obj, ch_picks],file)
     
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bits_epochs.pickle'),'wb') as file:
-        pickle.dump([epdat],file)
+        pickle.dump([Ht_epochs,t_epochs],file)
     
-    del data_eeg, data_evnt, epdat, t, Ht, info_obj, Htnf
+    del data_eeg, data_evnt, epdat, t, Ht, info_obj, Htnf, Ht_epochs,t_epochs
     
     
     
