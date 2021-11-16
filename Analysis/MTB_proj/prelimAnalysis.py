@@ -52,37 +52,42 @@ acc_bind = acc_bind[:,bind_sort]
 # 5 = 1, 4, 8, 12, 16, 20
 # 6 = 1, 4, 6, 9, 12, 15, 17, 20
 
-plt.figure()
-plt.scatter(cmr,acc_bind[1])
-plt.xlabel('CMR (dB)')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 4 cont')
+beh_conds = ['2','4','6','8', '4 spaced','6 spaced','8 spaced']
+
+fig,ax = plt.subplots(4,2,sharey=True)
+ax = np.reshape(ax,8)
+
+bad_subjects = acc_bind[1,:] < 0.9
+
+for cnd in range(len(beh_conds)):
+    ax[cnd].scatter(cmr[~bad_subjects],acc_bind[cnd,~bad_subjects],color='tab:blue')
+    ax[cnd].scatter(cmr[bad_subjects],acc_bind[cnd,bad_subjects],color='tab:orange')
+    ax[cnd].set_title(beh_conds[cnd])
+    
+ 
+
+
+binding_combined = acc_bind[1:2,:].mean(axis=0)
 
 plt.figure()
-plt.scatter(cmr,acc_bind[2])
-plt.xlabel('CMR (dB)')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 6 cont')
+plt.scatter(cmr,binding_combined)
+plt.ylabel('Consecutive Coherence Detection')
+plt.xlabel('CMR')
+plt.ylim([0,1.1])
 
-
-plt.figure()
-plt.scatter(cmr,acc_bind[5])
-plt.xlabel('CMR (dB)')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 6 spaced')
+binding_combined2 = acc_bind[5:6,:].mean(axis=0)
 
 plt.figure()
-plt.scatter(cmr,acc_bind[6])
-plt.xlabel('CMR (dB)')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 8 spaced')
+plt.scatter(cmr,binding_combined2)
+plt.ylabel('Spaced Coherence Detection')
+plt.xlabel('CMR')
+plt.ylim([0,1.1])
 
-
-
+plt.figure()
+plt.scatter(binding_combined,binding_combined2)
+plt.xlabel('Consecutive Coherence Detection')
+plt.ylabel('Spaced Coherence Detection')
+plt.ylim([0,1.1])
 
 
 

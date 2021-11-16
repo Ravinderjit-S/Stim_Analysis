@@ -20,16 +20,15 @@ import pickle
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['S211', 'S259', 'S268', 'S269', 'S270', 'S273',
-            'S274','S277','S279','S282', 'S288']
+Subjects = ['S211', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', 'S273',
+            'S274','S277','S279','S282', 'S284', 'S285', 'S288', 'S290']
+
 
 fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/Binding/'
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Binding'
 pickle_loc = data_loc + '/Pickles/'
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
    
-#subject = Subjects[7]
-
 for subject in Subjects:
     
     datapath = os.path.join(data_loc,subject + '_Binding')
@@ -41,6 +40,20 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A1')
         data_eeg.info['bads'].append('A30')
         data_eeg.info['bads'].append('A24')
+        
+    if subject == 'S271':
+        data_eeg.info['bads'].append('A3')
+        data_eeg.info['bads'].append('A6')
+        data_eeg.info['bads'].append('A16')
+        data_eeg.info['bads'].append('A1')
+        data_eeg.info['bads'].append('A30')
+        
+    if subject == 'S284':
+        data_eeg.info['bads'].append('A6')
+        data_eeg.info['bads'].append('A24')
+        data_eeg.info['bads'].append('A25')
+        data_eeg.info['bads'].append('A28')
+        data_eeg.info['bads'].append('A3')
     
     
     #%% Remove Blinks

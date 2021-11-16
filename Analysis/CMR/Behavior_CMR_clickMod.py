@@ -17,8 +17,9 @@ import psignifit as ps
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/CMR_beh/'
 
-Subjects = [ 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', #Add S211, S246 later
- 'S273', 'S274', 'S277', 'S279', 'S280', 'S282', 'S284', 'S285'] 
+Subjects = [ 'S246', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', #Add S211, S246 later
+ 'S273', 'S274', 'S277', 'S279', 'S280', 'S281', 'S282',
+ 'S284', 'S285', 'S288', 'S290'] 
 
 CMR = np.zeros((len(Subjects)))
 
