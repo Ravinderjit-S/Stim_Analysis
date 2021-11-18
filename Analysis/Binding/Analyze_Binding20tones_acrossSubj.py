@@ -83,7 +83,7 @@ for jj in range(3):
 
 ax[0].legend()
 ax[2].set_xlabel('Time')
-ax[2].set_ylabel('$\mu$V')
+#ax[2].set_ylabel('$\mu$V')
 fig.suptitle('Average Across Participants')
 
 
@@ -102,7 +102,7 @@ for sub in range(len(Subjects)):
 fig,ax = plt.subplots(int(np.ceil(len(Subjects)/2)),2,sharex=True,sharey=True,figsize=(14,12))
 ax = np.reshape(ax,[int(len(Subjects))])
 
-cnd_plot = 0
+cnd_plot = 1
 labels = ['Onset', 'AtoB', 'BtoA']
    
 fig.suptitle(labels[cnd_plot])
@@ -126,6 +126,8 @@ for sub in range(len(Subjects)):
     
     ax[sub].plot(t,onset20_mean, label='20')
     ax[sub].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)
+    
+    ax[sub].plot(t,onset20_mean-onset12_mean,label='diff',color='k')
     
     #ax[sub].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
     
@@ -167,14 +169,18 @@ B_present = np.array([1,1,0,1,1,0,0,0,0,0,1,0,0,0,0,1],dtype=bool)
 
 #%% Use PCA to condense temporal Features from full time waveform
 
-Evkd_all = np.zeros((t.size*6,len(Subjects)))
-Evkd_conds = np.zeros((t.size,len(Subjects),len(conds_save)))
+t1 = np.where(t>=0.4)[0][0]
+t2 = np.where(t>=1)[0][0]
+tp = t[t1:t2]
 
-t1 = np.where(t>=0)[0][0]
+Evkd_all = np.zeros((tp.size*6,len(Subjects)))
+Evkd_conds = np.zeros((tp.size,len(Subjects),len(conds_save)))
+
+
 for sub in range(len(Subjects)):
     A_evkd = np.array([])
     for cond in range(len(conds_save)):
-        evkd = A_epochs[sub][cond].mean(axis=0)
+        evkd = A_epochs[sub][cond].mean(axis=0)[t1:t2]
         #evkd = signal.decimate(evkd,16) --- computer can handle but okay to do this if want to
         A_evkd = np.concatenate((A_evkd,evkd))
         Evkd_conds[:,sub,cond] = evkd
@@ -193,30 +199,53 @@ X_pca.append(X)
 X_expVar.append(pca.explained_variance_ratio_)
 X_comp.append(pca.components_)
 
-X = pca.fit_transform(Evkd_all[:len(t)*2,:].T)
+X = pca.fit_transform(Evkd_all[:len(tp)*2,:].T)
 X_pca.append(X)
 X_expVar.append(pca.explained_variance_ratio_)
 X_comp.append(pca.components_)
 
-X = pca.fit_transform(Evkd_all[len(t)*2:,:].T)
+X = pca.fit_transform(Evkd_all[len(tp)*2:,:].T)
 X_pca.append(X)
 X_expVar.append(pca.explained_variance_ratio_)
 X_comp.append(pca.components_)
 
+
+for cond in range(len(conds_save)):
+    X = pca.fit_transform(Evkd_conds[:,:,cond].T)
+    X_pca.append(X)
+    X_expVar.append(pca.explained_variance_ratio_)
+    X_comp.append(pca.components_)
 
 
 #X
 #0: All 6 conds
 #1: Onset conds (first 2 conds)
 #2: Other 4 conds (4 binding conditions)
+#3-8 : Individual conds
+#9: 20AB - 12 AB
+#10: 20BA - 12BA
 
+tend = tp[-1]
 
-big_t = np.concatenate([t, t+ 1.2, t + 1.2*2, t+ 1.2*3, t+1.2*4, t+ 1.2*5])
+big_t = np.concatenate([tp, tp+ tend, tp + tend*2, tp + tend*3, tp + tend*4, tp + tend*5])
 plt.figure()
 plt.plot(big_t,X_comp[0][0:3,:].T)
 
 plt.figure()
-plt.plot(big_t[:len(t)*2],X_comp[1][0:3,:].T)
+plt.plot(big_t[:len(tp)*2],X_comp[1][0:2,:].T)
+plt.plot(big_t[:len(tp)*2],np.sum(X_comp[1][0:4],axis=0),color='k')
+
+plt.figure()
+plt.plot(big_t[len(tp)*2:],X_comp[2][0:2,:].T)
+plt.plot(big_t[len(tp)*2:],np.sum(X_comp[2][0:4],axis=0),color='k')
+
+fix,ax = plt.subplots(3,2)
+ax = np.reshape(ax,len(conds_save))
+for cond in range(len(conds_save)):
+    ax[cond].plot(tp,X_comp[cond+3][0:2,:].T)
+    ax[cond].plot(tp,np.mean(X_comp[cond+3][0:2,:],axis=0),color='k')
+    
+    
 
 plt.figure()
 plt.scatter(X_pca[1][:,0], X_pca[2][:,0])
@@ -226,9 +255,8 @@ fig = plt.figure()
 ax = Axes3D(fig)
 ax.scatter(X_pca[1][:,0], X_pca[1][:,1], X_pca[1][:,2])
 
-X2 = pca.fit_transform(Evkd_conds[:,:,].T)
 plt.figure()
-plt.plot(t,pca.components_[0:3,:].T)
+plt.scatter(np.mean(X_pca[1][:,0:3],axis=1), np.mean(X_pca[2][:,0:3],axis=1))
 
 
 #%% Load Binding Behavior
@@ -295,6 +323,11 @@ ax[3].set_xlabel('EEG Feat')
 ax[3].set_ylabel('Beh Accuracy')
 fig.suptitle('Spaced Coherence')
   
+plt.figure()
+plt.scatter(spaced_coh,consec_coh)
+plt.xlabel('Spaced Coh')
+plt.ylabel('Consec Coh')
+
 
 plt.figure()
 plt.scatter(features[B_present,10],consec_coh[B_present])
