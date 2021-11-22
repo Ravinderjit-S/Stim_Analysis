@@ -102,7 +102,7 @@ for sub in range(len(Subjects)):
 fig,ax = plt.subplots(int(np.ceil(len(Subjects)/2)),2,sharex=True,sharey=True,figsize=(14,12))
 ax = np.reshape(ax,[int(len(Subjects))])
 
-cnd_plot = 1
+cnd_plot = 2
 labels = ['Onset', 'AtoB', 'BtoA']
    
 fig.suptitle(labels[cnd_plot])
@@ -144,9 +144,8 @@ n_feats = len(cond_bind) *2
 features = np.zeros([len(Subjects), n_feats]) # Subjects x conditions x features for each condition
                      
 #Feature List
- #0-5: cond_bind means 
- #6: cond_bind max of abs
-
+  #0-5: cond_bind means 
+  #6: cond_bind max of abs
 
 
 for sub in range(len(Subjects)):
@@ -158,105 +157,124 @@ for sub in range(len(Subjects)):
         features[sub,feat] = mean
         
         
-    t1 = np.where(t>=.150)[0][0]
-    t2 = np.where(t>=0.3)[0][0]
-    for feat in range(len(cond_bind),2*len(cond_bind)): # Next 6 are max
-        mx = np.max(np.abs(A_epochs[sub][feat - 6].mean(axis=0)[t1:t2]))
-        features[sub,feat] = mx
+    # t1 = np.where(t>=.150)[0][0]
+    # t2 = np.where(t>=0.3)[0][0]
+    # for feat in range(len(cond_bind),2*len(cond_bind)): # Next 6 are max
+    #     mx = np.max(np.abs(A_epochs[sub][feat - 6].mean(axis=0)[t1:t2]))
+    #     features[sub,feat] = mx
     
     
 B_present = np.array([1,1,0,1,1,0,0,0,0,0,1,0,0,0,0,1],dtype=bool)
 
 #%% Use PCA to condense temporal Features from full time waveform
 
-t1 = np.where(t>=0.4)[0][0]
+t1 = np.where(t>=0)[0][0]
 t2 = np.where(t>=1)[0][0]
 tp = t[t1:t2]
 
-Evkd_all = np.zeros((tp.size*6,len(Subjects)))
+#Evkd_all = np.zeros((tp.size*6,len(Subjects)))
 Evkd_conds = np.zeros((tp.size,len(Subjects),len(conds_save)))
 
-
 for sub in range(len(Subjects)):
-    A_evkd = np.array([])
+    A_evkd_ = np.array([])
     for cond in range(len(conds_save)):
         evkd = A_epochs[sub][cond].mean(axis=0)[t1:t2]
         #evkd = signal.decimate(evkd,16) --- computer can handle but okay to do this if want to
-        A_evkd = np.concatenate((A_evkd,evkd))
+        A_evkd_ = np.concatenate((A_evkd_,evkd))
         Evkd_conds[:,sub,cond] = evkd
     
-    Evkd_all[:,sub] = A_evkd
+    #Evkd_all[:,sub] = A_evkd_
     
+#Condense two onset conditions into 1    
+Evkd_conds[:,:,0] = (Evkd_conds[:,:,0] + Evkd_conds[:,:,1]) / 2
+Evkd_conds = np.delete(Evkd_conds,1,axis=2)
 
+conds_s = ['Onset', '12AB', '12BA', '20AB', '20BA']
+
+fix,ax = plt.subplots(3,2)
+ax = np.reshape(ax,len(conds_save))
+for cond in range(len(conds_s)):
+    ax[cond].plot(tp,Evkd_conds[:,:,cond].mean(axis=1))
+
+
+t1 = np.where(tp>=0)[0][0]
+t2 = np.where(tp>=0.4)[0][0]
+
+pca = PCA(n_components=10)
 X_pca = []
 X_expVar = []
 X_comp = []
 
-pca = PCA(n_components=10)
-X = pca.fit_transform(Evkd_all.T)
-
-X_pca.append(X)
-X_expVar.append(pca.explained_variance_ratio_)
-X_comp.append(pca.components_)
-
-X = pca.fit_transform(Evkd_all[:len(tp)*2,:].T)
-X_pca.append(X)
-X_expVar.append(pca.explained_variance_ratio_)
-X_comp.append(pca.components_)
-
-X = pca.fit_transform(Evkd_all[len(tp)*2:,:].T)
-X_pca.append(X)
-X_expVar.append(pca.explained_variance_ratio_)
-X_comp.append(pca.components_)
-
-
-for cond in range(len(conds_save)):
-    X = pca.fit_transform(Evkd_conds[:,:,cond].T)
+for cond in range(len(conds_s)):
+    X = pca.fit_transform(Evkd_conds[t1:t2,:,cond].T)
     X_pca.append(X)
     X_expVar.append(pca.explained_variance_ratio_)
     X_comp.append(pca.components_)
-
-
-#X
-#0: All 6 conds
-#1: Onset conds (first 2 conds)
-#2: Other 4 conds (4 binding conditions)
-#3-8 : Individual conds
-#9: 20AB - 12 AB
-#10: 20BA - 12BA
-
-tend = tp[-1]
-
-big_t = np.concatenate([tp, tp+ tend, tp + tend*2, tp + tend*3, tp + tend*4, tp + tend*5])
-plt.figure()
-plt.plot(big_t,X_comp[0][0:3,:].T)
-
-plt.figure()
-plt.plot(big_t[:len(tp)*2],X_comp[1][0:2,:].T)
-plt.plot(big_t[:len(tp)*2],np.sum(X_comp[1][0:4],axis=0),color='k')
-
-plt.figure()
-plt.plot(big_t[len(tp)*2:],X_comp[2][0:2,:].T)
-plt.plot(big_t[len(tp)*2:],np.sum(X_comp[2][0:4],axis=0),color='k')
+    
+    
+for cond in range(len(conds_s)):
+    print("Varaince explained in cond " + str(cond) + ": " + str(X_expVar[cond][0:3].sum()))
+    
 
 fix,ax = plt.subplots(3,2)
-ax = np.reshape(ax,len(conds_save))
-for cond in range(len(conds_save)):
-    ax[cond].plot(tp,X_comp[cond+3][0:2,:].T)
-    ax[cond].plot(tp,np.mean(X_comp[cond+3][0:2,:],axis=0),color='k')
+ax = np.reshape(ax,6)
+for cond in range(len(conds_s)):
+    ax[cond].plot(tp[t1:t2],X_comp[cond][0:3,:].T)
+    ax[cond].plot(tp[t1:t2],np.sum(X_comp[cond][0:3,:],axis=0),color='k')
     
     
-
-plt.figure()
-plt.scatter(X_pca[1][:,0], X_pca[2][:,0])
+        
+fix,ax = plt.subplots(3,2)
+ax = np.reshape(ax,6)
+for cond in range(len(conds_s)):
+    ax[cond].scatter(X_pca[0][:,0:3].sum(axis=1), X_pca[cond][:,0:3].sum(axis=1))
 
 
 fig = plt.figure()
 ax = Axes3D(fig)
-ax.scatter(X_pca[1][:,0], X_pca[1][:,1], X_pca[1][:,2])
+ax.scatter(X_pca[0][:,0], X_pca[0][:,1], X_pca[0][:,2])
 
-plt.figure()
-plt.scatter(np.mean(X_pca[1][:,0:3],axis=1), np.mean(X_pca[2][:,0:3],axis=1))
+#%% Extract Mean of conds as a feature
+
+t1_ = np.where(tp>=0.4)[0][0]
+t2_ = tp.size
+
+ss_mean = np.zeros((16,4))
+for sub in range(len(Subjects)):
+    for cond in range(4):
+        ss_mean[sub,cond] = Evkd_conds[t1_:t2_,sub,cond+1].mean()
+
+
+fig,ax = plt.subplots(2,2)
+ax = np.reshape(ax,4)
+for cond in range(4):
+    ax[cond].scatter(X_pca[cond+1][:,0:3].sum(axis=1), ss_mean[:,cond])
+    
+    
+#%% Make Feautre Array
+
+#0 = Onset
+#1 = 12AB
+#2 = 12BA
+#3 = 20AB
+#4 = 20BA
+#5 = 12AB sus
+#6 = 12BA sus
+#7 = 20AB sus
+#8 = 20BA sus
+
+feat_names = ['Onset', '12AB on', '12BA on', '20AB on', '20BA on', '12AB sus',
+              '12BA sus', '20AB sus', '20BA sus']
+
+features = np.zeros((9,16))
+
+for sub in range(len(Subjects)):
+    for cond in range(len(conds_s)):
+        features[cond,sub] = X_pca[cond][sub,0:3].sum()
+    
+    for ss in range(4):
+        features[ss+5,sub] = ss_mean[sub,ss]
+
 
 
 #%% Load Binding Behavior
@@ -302,55 +320,50 @@ beh_conds = ['2','4','6','8', '4 spaced','6 spaced','8 spaced']
 #     fig.suptitle(beh_conds[beh_ind])
 
 
-fig,ax = plt.subplots(2,2)
-ax = np.reshape(ax,4)
-for cnd in range(2,len(cond_bind)):
-    ax[cnd-2].scatter(features[:,cnd + len(cond_bind)],consec_coh)
-    ax[cnd-2].set_title(cond_bind[cnd])
+fig,ax = plt.subplots(4,2)
+ax = np.reshape(ax,8)
+for feat in range(8):
+    ax[feat].scatter(features[feat+1,:],consec_coh)
+    ax[feat].scatter(features[feat+1,:],spaced_coh)
+    ax[feat].set_title(feat_names[feat+1])
     
-ax[3].set_xlabel('EEG Feat')
-ax[3].set_ylabel('Beh Accuracy')
-fig.suptitle('Consecutive Coherence')
+ax[7].set_xlabel('EEG Feat')
+ax[7].set_ylabel('Beh Accuracy')
+fig.suptitle('Consecutive Coherence / Spaced')
 
 
-fig,ax = plt.subplots(2,2)
-ax = np.reshape(ax,4)
-for cnd in range(2,len(cond_bind)):
-    ax[cnd-2].scatter(features[:,cnd + len(cond_bind)],spaced_coh)
-    ax[cnd-2].set_title(cond_bind[cnd])
+# fig,ax = plt.subplots(4,2)
+# ax = np.reshape(ax,8)
+# for feat in range(8):
+#     ax[feat].scatter(features[feat+1,:],spaced_coh)
+#     ax[feat].set_title(feat_names[feat+1])
     
-ax[3].set_xlabel('EEG Feat')
-ax[3].set_ylabel('Beh Accuracy')
-fig.suptitle('Spaced Coherence')
-  
+# ax[7].set_xlabel('EEG Feat')
+# ax[7].set_ylabel('Beh Accuracy')
+# fig.suptitle('Spaced Coherence')
+
+
+
 plt.figure()
 plt.scatter(spaced_coh,consec_coh)
 plt.xlabel('Spaced Coh')
 plt.ylabel('Consec Coh')
 
 
-plt.figure()
-plt.scatter(features[B_present,10],consec_coh[B_present])
-plt.scatter(features[~B_present,10],consec_coh[~B_present])
-
-plt.figure()
-plt.scatter(features[B_present,10],spaced_coh[B_present])
-plt.scatter(features[~B_present,10],spaced_coh[~B_present])
-
-
-plt.figure()
-plt.scatter(features[:,11] / features[:,9], consec_coh)
-
-plt.figure()
-plt.scatter(features[:,11] / features[:,9], spaced_coh)
-
-plt.figure()
-plt.scatter(features[:,11] - features[:,9], spaced_coh)
-
-
 fig,ax = plt.subplots(2,1)
-ax[0].scatter(X[:,0:2].mean(axis=1),consec_coh)
+ax[0].scatter(features[0,:],consec_coh)
 ax[0].set_ylabel('Consecutive Accuracy')
-ax[1].scatter(X[:,0:2].mean(axis=1),spaced_coh)
+ax[1].scatter(features[0,:],spaced_coh)
 ax[1].set_ylabel('Spaced Accuracy')
+
+
+save_dict = {'spacedCoh': spaced_coh, 'consecCoh': consec_coh,
+             'features': features}
+
+mod_vars_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Model/' 
+
+sio.savemat(mod_vars_loc + 'Binding20TonesModelVars.mat',save_dict)
+
+
+
 
