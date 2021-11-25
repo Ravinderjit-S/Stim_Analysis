@@ -67,28 +67,31 @@ for cnd in range(len(beh_conds)):
  
 
 
-binding_combined = acc_bind[1:2,:].mean(axis=0)
+consec_coh = acc_bind[1:2,:].mean(axis=0)
 
 plt.figure()
-plt.scatter(cmr,binding_combined)
+plt.scatter(cmr,consec_coh)
 plt.ylabel('Consecutive Coherence Detection')
 plt.xlabel('CMR')
 plt.ylim([0,1.1])
 
-binding_combined2 = acc_bind[5:6,:].mean(axis=0)
+spaced_coh = acc_bind[5:6,:].mean(axis=0)
 
 plt.figure()
-plt.scatter(cmr,binding_combined2)
+plt.scatter(cmr,spaced_coh)
 plt.ylabel('Spaced Coherence Detection')
 plt.xlabel('CMR')
 plt.ylim([0,1.1])
 
 plt.figure()
-plt.scatter(binding_combined,binding_combined2)
+plt.scatter(consec_coh,spaced_coh)
 plt.xlabel('Consecutive Coherence Detection')
 plt.ylabel('Spaced Coherence Detection')
 plt.ylim([0,1.1])
 
+MTB_behloc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/'
+sio.savemat(MTB_behloc + 'CMR_Bind.mat',{'CMR':cmr, 'spacedCoh': spaced_coh,
+                                         'consec_coh': consec_coh,'Subjects':Subjects})
 
 
 

@@ -91,10 +91,10 @@ plt.savefig(os.path.join(fig_loc,'All_12vs20.png'),format='png')
 
 #%% Normalize Data to max of of abs of onset response
 
-for sub in range(len(Subjects)):
-     sub_norm = np.max(np.abs((A_epochs[sub][0].mean(axis=0) + A_epochs[sub][1].mean(axis=0)) / 2))
-     for cnd in range(len(cond_bind)):
-        A_epochs[sub][cnd] /= sub_norm
+# for sub in range(len(Subjects)):
+#      sub_norm = np.max(np.abs((A_epochs[sub][0].mean(axis=0) + A_epochs[sub][1].mean(axis=0)) / 2))
+#      for cnd in range(len(cond_bind)):
+#         A_epochs[sub][cnd] /= sub_norm
        
 
 #%% Plot all Onsets, AB, or BA
@@ -102,7 +102,7 @@ for sub in range(len(Subjects)):
 fig,ax = plt.subplots(int(np.ceil(len(Subjects)/2)),2,sharex=True,sharey=True,figsize=(14,12))
 ax = np.reshape(ax,[int(len(Subjects))])
 
-cnd_plot = 2
+cnd_plot = 1
 labels = ['Onset', 'AtoB', 'BtoA']
    
 fig.suptitle(labels[cnd_plot])
@@ -213,14 +213,14 @@ for cond in range(len(conds_s)):
     
     
 for cond in range(len(conds_s)):
-    print("Varaince explained in cond " + str(cond) + ": " + str(X_expVar[cond][0:3].sum()))
+    print("Varaince explained in cond " + str(cond) + ": " + str(X_expVar[cond][0:2].sum()))
     
 
 fix,ax = plt.subplots(3,2)
 ax = np.reshape(ax,6)
 for cond in range(len(conds_s)):
-    ax[cond].plot(tp[t1:t2],X_comp[cond][0:3,:].T)
-    ax[cond].plot(tp[t1:t2],np.sum(X_comp[cond][0:3,:],axis=0),color='k')
+    ax[cond].plot(tp[t1:t2],X_comp[cond][0:2,:].T)
+    ax[cond].plot(tp[t1:t2],np.sum(X_comp[cond][0:2,:],axis=0),color='k')
     
     
         
@@ -270,7 +270,7 @@ features = np.zeros((9,16))
 
 for sub in range(len(Subjects)):
     for cond in range(len(conds_s)):
-        features[cond,sub] = X_pca[cond][sub,0:3].sum()
+        features[cond,sub] = X_pca[cond][sub,0:2].sum()
     
     for ss in range(4):
         features[ss+5,sub] = ss_mean[sub,ss]
@@ -358,7 +358,7 @@ ax[1].set_ylabel('Spaced Accuracy')
 
 
 save_dict = {'spacedCoh': spaced_coh, 'consecCoh': consec_coh,
-             'features': features}
+             'features': features.T}
 
 mod_vars_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Model/' 
 

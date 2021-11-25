@@ -17,9 +17,10 @@ import psignifit as ps
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/CMR_beh/'
 
-Subjects = [ 'S246', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', #Add S211, S246 later
+Subjects = [ 'S211','S246', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', #Add S211, S246 later
  'S273', 'S274', 'S277', 'S279', 'S280', 'S281', 'S282',
- 'S284', 'S285', 'S288', 'S290'] 
+ 'S284', 'S285', 'S288', 'S290', 'S207', 'S303', 'S305' ,'S078'] 
+
 
 CMR = np.zeros((len(Subjects)))
 
@@ -29,8 +30,11 @@ for sub in range(len(Subjects)):
     data = sio.loadmat(data_loc + subject + '_CMRrandModClicky.mat',squeeze_me=True)
     ntrials = 20
     
-    SNRs_0 = np.concatenate((np.array([-10]),np.arange(-25,-55,-5)))
-    SNRs_1 = np.concatenate((np.array([-20]),np.arange(-37,-61,-3)))
+    #SNRs_0 = np.concatenate((np.array([-10]),np.arange(-25,-55,-5)))
+    #SNRs_1 = np.concatenate((np.array([-20]),np.arange(-37,-61,-3)))
+    
+    SNRs_0 = data['SNR_0']
+    SNRs_1 = data['SNR_1']
     
     snrList_unique = np.concatenate((SNRs_0,SNRs_1))
     snrList = matlib.repmat(snrList_unique,1,20).squeeze()

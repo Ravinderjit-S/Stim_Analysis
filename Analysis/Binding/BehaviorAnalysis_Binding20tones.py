@@ -16,7 +16,8 @@ data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/MTB_beh/'
 fig_loc = '/media/ravinderjit/Data_Drive/Data/Figures/MTB/'
 
 Subjects = ['S211', 'S246', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272',
- 'S273', 'S274', 'S277', 'S279', 'S280', 'S281', 'S282', 'S284', 'S285', 'S288','S290']
+ 'S273', 'S274', 'S277', 'S279', 'S280', 'S281', 'S282', 'S284', 'S285', 'S288','S290',
+ 'S207', 'S303', 'S305', 'S078']
 
 acc = np.zeros((7,len(Subjects)))
 for sub in range(len(Subjects)):

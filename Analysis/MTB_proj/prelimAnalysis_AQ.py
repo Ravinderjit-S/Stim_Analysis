@@ -59,37 +59,43 @@ aq_scores = aq_scores[:,aq_sort]
 # 5 = 1, 4, 8, 12, 16, 20
 # 6 = 1, 4, 6, 9, 12, 15, 17, 20
 
-aq_full = np.sum(aq_scores,axis=0)
+# aq_full = np.sum(aq_scores,axis=0)
 #aq_full = aq_scores[4,:]
 
-plt.figure()
-plt.scatter(aq_full,acc_bind[1])
-plt.xlabel('AQ score')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 4 cont')
-
-plt.figure()
-plt.scatter(aq_full,acc_bind[2])
-plt.xlabel('AQ score')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 6 cont')
 
 
-plt.figure()
-plt.scatter(aq_full,acc_bind[5])
-plt.xlabel('AQ score')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 6 spaced')
+# fig, ax = plt.subplots(2,1)
+# ax[0].scatter(aq_full,consec_coh)
+# ax[1].scatter(aq_full,spaced_coh)
 
-plt.figure()
-plt.scatter(aq_full,acc_bind[6])
-plt.xlabel('AQ score')
-plt.ylabel('Accurary')
-plt.ylim([0,1.2])
-plt.title('Binding 8 spaced')
+# plt.figure()
+# plt.scatter(aq_full,acc_bind[1])
+# plt.xlabel('AQ score')
+# plt.ylabel('Accurary')
+# plt.ylim([0,1.2])
+# plt.title('Binding 4 cont')
+
+# plt.figure()
+# plt.scatter(aq_full,acc_bind[2])
+# plt.xlabel('AQ score')
+# plt.ylabel('Accurary')
+# plt.ylim([0,1.2])
+# plt.title('Binding 6 cont')
+
+
+# plt.figure()
+# plt.scatter(aq_full,acc_bind[5])
+# plt.xlabel('AQ score')
+# plt.ylabel('Accurary')
+# plt.ylim([0,1.2])
+# plt.title('Binding 6 spaced')
+
+# plt.figure()
+# plt.scatter(aq_full,acc_bind[6])
+# plt.xlabel('AQ score')
+# plt.ylabel('Accurary')
+# plt.ylim([0,1.2])
+# plt.title('Binding 8 spaced')
 
 #%% Get Subjects in right order for CMR comparison
 
@@ -117,19 +123,26 @@ aq_scores = aq_scores[:,aq_sort]
 
 aq_full = np.sum(aq_scores,axis=0)
 
-aq_full = aq_scores[4,:]
+#aq_full = aq_scores[4,:]
 
 plt.figure()
 plt.scatter(aq_full, cmr)
 plt.ylabel('CMR (dB)')
 plt.xlabel('AQ score')
 
+plt.figure()
+plt.scatter(aq_scores[1,:], cmr)
+plt.ylabel('CMR (dB)')
+plt.xlabel('AQ score')
 
 
+consec_coh = acc_bind[1:2,:].mean(axis=0)
+spaced_coh = acc_bind[5:6,:].mean(axis=0)
 
 
-
-
+fig, ax = plt.subplots(2,1)
+ax[0].scatter(aq_full,consec_coh)
+ax[1].scatter(aq_full,spaced_coh)
 
 
 
