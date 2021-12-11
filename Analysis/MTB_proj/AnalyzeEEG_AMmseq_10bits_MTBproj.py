@@ -19,8 +19,6 @@ import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
 from mseqHelper import mseqXcorrEpochs_fft
-
-
 from sklearn.decomposition import PCA
 
 
@@ -36,8 +34,7 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/mTRF/'
 pickle_loc = data_loc + 'Pickles/'
 
-Subjects = ['S268', 'S269','S270','S271','S273','S277','S279','S282', 'S285']
-
+Subjects = ['S078', 'S259','S268', 'S269','S270','S271','S273', 'S274' ,'S277','S279','S281','S282', 'S285','S290']
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
@@ -56,6 +53,12 @@ for subject in Subjects:
     
     if subject == 'S207':
         data_eeg.info['bads'].append('A15') 
+        
+    if subject == 'S078':
+        data_eeg.info['bads'].append('A6')
+        
+    if subject == 'S281':
+        data_eeg.info['bads'].append('A28')
         
     
     
@@ -88,6 +91,12 @@ for subject in Subjects:
     
     if subject == 'S207':
         remove_chs = [14]
+        
+    elif subject == 'S078':
+        remove_chs = [5]
+        
+    elif subject =='S281':
+        reomve_chs = [27]
     
     
     ch_picks = np.delete(ch_picks,remove_chs)
