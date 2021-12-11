@@ -71,7 +71,7 @@ ylim([0 10.4])
 ylabel('Detection Improvement (dB)')
 set(gca,'Ycolor',sq_color)
 yyaxis right
-ylabel('Oscor Accuracy')
+ylabel('Detection Accuracy')
 ylim([0.3 1.02])
 plot(os_FM,s211_oscor,'linewidth',2,'Color',os_color)
 plot(os_FM,os_acc_white,'LineStyle','--','Color',os_color, 'linewidth',2)
@@ -93,7 +93,7 @@ print([Fig_path 'IACbehavior_s211'],'-dsvg')
 
 s211_oscor = oscor.Accuracy(:,1);
 figure, hold on
-ylabel('Oscor Accuracy')
+ylabel('Detection Accuracy')
 ylim([0.3 1.02])
 plot(os_FM,s211_oscor,'linewidth',2,'Color','k')
 plot(os_FM,os_acc_white,'LineStyle','--','Color','k', 'linewidth',2)
@@ -116,7 +116,7 @@ print([Fig_path 'IACbehavior_OSCORs211'],'-depsc')
 
 fig = figure;
 hold on
-ylabel('OSCOR Accuracy')
+ylabel('Detection Accuracy')
 ylim([0.3,1.02])
 os = errorbar(os_FM, os_acc,os_sem,'Marker','square','MarkerSize',10, ...
     'Color','k','LineWidth',2);

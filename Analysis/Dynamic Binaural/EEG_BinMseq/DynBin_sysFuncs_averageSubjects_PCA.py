@@ -465,7 +465,7 @@ mse_physFit = np.mean((BMLD[1:9] - out[1:9])**2)
     
 fig, ax = plt.subplots(1)
 fig.set_size_inches(3.5,4)
-ax.errorbar(Window_t,BMLD, AcrossSubjectSEM, label='behavior',color='k',fmt='o',linewidth=2) #behavior
+ax.errorbar(Window_t,BMLD, AcrossSubjectSEM[:,0], label='behavior',color='k',fmt='o',linewidth=2) #behavior
 ax.plot(Window_t,out, label='physio')
 ax.scatter(Window_t,out)
 ax.set_xlabel('Time (sec)')
