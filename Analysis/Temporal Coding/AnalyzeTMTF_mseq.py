@@ -6,7 +6,6 @@ This is a temporary script file.
 """
 
 import numpy as np
-import scipy as sp
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import mne
@@ -18,12 +17,7 @@ import pickle
 import sys
 sys.path.append(os.path.abspath('../mseqAnalysis/'))
 from mseqHelper import mseqXcorr
-
-from sklearn.decomposition import PCA
-from sklearn.decomposition import FastICA
-
-from anlffr.spectral import mtplv
-
+from mseqHelper import mseqXcorrEpochs_fft
 
 nchans = 34;
 refchans = ['EXG1','EXG2']
@@ -34,10 +28,17 @@ data_evnt = [];
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/TMTF/'
 pickle_loc = data_loc + 'Pickles/'
-Subjects = ['Hari 1', 'Hari 2','E002_Visit_1','E002_Visit_2','E002_Visit_3',
-            'E004_Visit_1','E004_Visit_2','E004_Visit_3']
-Subjects = ['E004_Visit_1','E004_Visit_2','E004_Visit_3']
-Subjects = ['E002_Visit_3']
+
+Subjects = ['E001_1', 'E001_2','E002_Visit_1','E002_Visit_2','E002_Visit_3',
+            'E003', 'E004_Visit_1','E004_Visit_2','E004_Visit_3', 'E005_Visit_1',
+            'E005_Visit_2', 'E006_Visit_1', 'E006_Visit_2', 'E006_Visit_3',
+            'E007_Visit_1', 'E007_Visit_2', 'E007_Visit_3', 'E012_Visit_1', 'E012_Visit_2' ,
+            'E012_Visit_3', 'E014', 'E016', 'E022_Visit_1', 'E022_Visit_2', 'E022_Visit_3',
+            ]
+
+
+# E007_Visit_2 has weird blink projection
+# ask about E006_Visit1_R+004
 
 mseq_loc = os.path.join(data_loc, 'TMTFmseq_resampled.mat')
 Mseq_dat = sio.loadmat(mseq_loc)
@@ -61,7 +62,7 @@ for subject in Subjects:
 
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=1000)
+    data_eeg.filter(l_freq=2,h_freq=800)
     #data_eeg, data_evnt = data_eeg.resample(4096,events=data_evnt)
     
     if subject == 'E004_Visit_1':
@@ -77,7 +78,49 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A9')
     elif subject == 'E002_Visit_1':
         data_eeg.info['bads'].append('A15')
+        data_eeg.info['bads'].append('A28') 
+    elif subject == 'E005_Visit_2':
+        data_eeg.info['bads'].append('A23')
+        data_eeg.info['bads'].append('A24')
+        data_eeg.info['bads'].append('A25')
+        data_eeg.info['bads'].append('A27')
         data_eeg.info['bads'].append('A28')
+        data_eeg.info['bads'].append('A21')
+        data_eeg.info['bads'].append('A3')
+        data_eeg.info['bads'].append('A4')
+        data_eeg.info['bads'].append('A6')
+        data_eeg.info['bads'].append('A7')
+    elif subject == 'E003':
+        data_eeg.info['bads'].append('A24')
+    elif subject == 'E006_Visit_1':
+        data_eeg.info['bads'].append('A12')
+        data_eeg.info['bads'].append('A28')
+    elif subject == 'E006_Visit_2':
+        data_eeg.info['bads'].append('A6')
+        data_eeg.info['bads'].append('A28')
+    elif subject == 'E007_Visit_1':
+        data_eeg.info['bads'].append('A21')
+        data_eeg.info['bads'].append('A24')
+        data_eeg.info['bads'].append('A15')        
+        data_eeg.info['bads'].append('A11')      
+        data_eeg.info['bads'].append('A1')  
+        data_eeg.info['bads'].append('A7')  
+        data_eeg.info['bads'].append('A30')  
+    elif subject == 'E007_Visit_3':
+        data_eeg.info['bads'].append('A11')
+        data_eeg.info['bads'].append('A24')
+        data_eeg.info['bads'].append('A7')
+    elif subject == 'E012_Visit_1':
+        data_eeg.info['bads'].append('A7')
+    elif subject == 'E012_Visit_2':
+        data_eeg.info['bads'].append('A7')
+    elif subject == 'E012_Visit_3':
+        data_eeg.info['bads'].append('A20')
+    elif subject == 'E014':
+        data_eeg.info['bads'].append('A10')
+        data_eeg.info['bads'].append('A28')
+    elif subject == 'E022_Visit_2':
+        data_eeg.info['bads'].append('A21')
     
     #%% Blink Removal
     blinks = find_blinks(data_eeg,ch_name = ['A1'],thresh = 100e-6, l_trans_bandwidth = 0.5, l_freq =1.0)
@@ -85,14 +128,14 @@ for subject in Subjects:
                                   baseline=(-0.25,0),reject=dict(eeg=500e-6))
     Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8,verbose='DEBUG')
     
-    if subject ==  'Hari 1':
+    if subject ==  'E001_1':
             ocular_projs = [Projs[0]]#,Projs[1]]
             
     ocular_projs = [Projs[0]]
     
     data_eeg.add_proj(ocular_projs)
     data_eeg.plot_projs_topomap()
-    data_eeg.plot(events=blinks,show_options=True)
+    #data_eeg.plot(events=blinks,show_options=True)
     
     del ocular_projs, blink_epochs, Projs, blinks
     
@@ -106,6 +149,8 @@ for subject in Subjects:
     elif subject == 'E002_Visit_2':
         Reject_Thresh = 300e-6
     elif subject == 'E002_Visit_2':
+        Reject_Thresh = 200e-6
+    elif subject == 'E005_Visit_2':
         Reject_Thresh = 200e-6
     reject = dict(eeg=Reject_Thresh)
     epochs = []
@@ -131,6 +176,8 @@ for subject in Subjects:
         remove_chs = [14,27]
         
     ch_picks = np.delete(ch_picks,remove_chs)
+    
+    ch_picks = 31 #just look at cz for now
     
     epdat = []
     evkdat = []
@@ -161,105 +208,26 @@ for subject in Subjects:
         epdat[m] = epdat[m][:,mask_trials,:]
         print('Total Trials Left: ' + str(epdat[m].shape[1]))
         Tot_trials[m] = epdat[m].shape[1]
-        
-    ch_picks[Peak2Peak.mean(axis=1).argsort()]
+
         
     plt.figure()
     plt.plot(Peak2Peak.T)
-    
-    plt.figure()
-    plt.plot(Peak2Peak[14,:].T)
-    
-    
-    
-    #%% compute PLV
-    # TW = 6
-    # Fres = (1/t[-1]) * TW * 2
-    
-    # params = dict()
-    # params['Fs'] = fs
-    # params['tapers'] = [TW,2*TW-1]
-    # params['fpass'] = [0, 1000]
-    # params['itc'] = 0
-    
-    # plv_m=[]
-    # for m in range(len(epdat)):
-    #     print('On mseq # ' + str(m+1))
-    #     plv,f = mtplv(epdat[m][30:,:,:],params)
-    #     plv_m.append(plv)
-        
-    # plt.figure()
-    # plt.plot(f,plv_m[0][0,:])
-    # plt.plot(f,plv_m[1][0,:])
-        
+
     
     #%% Correlation Analysis
         
-    
     Ht = []
     Htnf = []
     # do cross corr
     for m in range(len(epdat)): 
-    # for m in range(len(evkdat)): 
         print('On mseq # ' + str(m+1))
-        #resp_m = epdat[m].mean(axis=1)
-        # resp_m = evkdat[m]
-        Ht_m = mseqXcorr(epdat[m],mseq[:,0])
-        # Ht_m = np.zeros(resp_m.shape)
-        # for ch in range(resp_m.shape[0]):
-        #     Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq[:,0],mode='full')
-        Ht.append(Ht_m)
-        # for nf in range(num_nfs):
-        #     resp = epdat[m]
-        #     inv_inds = np.random.permutation(epdat[m].shape[1])[:round(epdat[m].shape[1]/2)]
-        #     resp[:,inv_inds,:] = -resp[:,inv_inds,:]
-        #     resp_nf = resp.mean(axis=1)
-        #     Ht_nf = np.zeros(resp_nf.shape)
-        #     for ch in range(resp_nf.shape[0]):
-        #         Ht_nf[ch,:] = np.correlate(resp_nf[ch,:],mseq[m][0,:],mode='full')[mseq[m].size-1:]
-        #     Htnf.append(Ht_nf[:,:tend_ind])
-        
-    
-    #%% Plot Ht
-        
-    # if ch_picks.size == 31:
-    #     sbp = [5,3]
-    #     sbp2 = [4,4]
-    # elif ch_picks.size == 32:
-    #     sbp = [4,4]
-    #     sbp2 = [4,4]
-    # elif ch_picks.size == 30:
-    #     sbp = [5,3]
-    #     sbp2 = [5,3]
-            
-    
-    # for m in range(len(Ht)):
-    #     Ht_1 = Ht[m]
-    #     fig,axs = plt.subplots(sbp[0],sbp[1],sharex=True,gridspec_kw=None)
-    #     for p1 in range(sbp[0]):
-    #         for p2 in range(sbp[1]):
-    #             axs[p1,p2].plot(t,Ht_1[p1*sbp[1]+p2,:],color='k')
-    #             axs[p1,p2].set_title(ch_picks[p1*sbp[1]+p2])    
-    #             # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #             #     axs[p1,p2].plot(t,Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-                
-    #     fig.suptitle('Ht ' + str(m) )
-        
-        
-    #     fig,axs = plt.subplots(sbp2[0],sbp2[1],sharex=True,gridspec_kw=None)
-    #     for p1 in range(sbp2[0]):
-    #         for p2 in range(sbp2[1]):
-    #             axs[p1,p2].plot(t,Ht_1[p1*sbp2[1]+p2+sbp[0]*sbp[1],:],color='k')
-    #             axs[p1,p2].set_title(ch_picks[p1*sbp2[1]+p2+sbp[0]*sbp[1]])   
-    #             # for n in range(m*num_nfs,num_nfs*(m+1)):
-    #             #     axs[p1,p2].plot(t,Htnf[n][p1*sbp[1]+p2,:],color='grey',alpha=0.3)
-                
-    #     fig.suptitle('Ht ' + str(m) )    
-            
+        Ht_m, t_keep = mseqXcorrEpochs_fft(epdat[m],mseq[:,0],fs)
+        Ht.append(Ht_m[0,:,:])
+
 
 
     #%% Save Data
-    with open(os.path.join(pickle_loc,subject+'_TMTF.pickle'),'wb') as file:
-        pickle.dump([t, Tot_trials, Ht, info_obj, ch_picks],file)
+    with open(os.path.join(pickle_loc,subject+'_TMTF_cz.pickle'),'wb') as file:
+        pickle.dump([t_keep, Ht, info_obj, ch_picks],file)
     del data_eeg, data_evnt, epdat, Ht, info_obj,Htnf, Ht_m
            

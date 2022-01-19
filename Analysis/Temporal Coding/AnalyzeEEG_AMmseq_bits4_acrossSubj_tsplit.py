@@ -21,7 +21,7 @@ import scipy.io as sio
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
 # pickle_loc = data_loc + 'Pickles_full_wholeHead/'
-pickle_loc = data_loc + 'Pickles_full/'
+pickle_loc = data_loc + 'Pickles/'
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
 
@@ -50,9 +50,6 @@ A_ch_picks = []
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
     with open(os.path.join(pickle_loc,subject+'_AMmseqbits4.pickle'),'rb') as file:
-        # [tdat, Tot_trials, Ht, Htnf, pca_sp, pca_coeff, pca_expVar, 
-        #  pca_sp_nf, pca_coeff_nf,pca_expVar_nf,ica_sp,
-        #  ica_coeff,ica_sp_nf,ica_coeff_nf, info_obj, ch_picks] = pickle.load(file)
         [tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
     
     A_Tot_trials.append(Tot_trials)

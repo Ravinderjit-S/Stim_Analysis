@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import freqz
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
-pickle_loc = data_loc + 'Pickles_full/'
+pickle_loc = data_loc + 'Pickles/'
 
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy

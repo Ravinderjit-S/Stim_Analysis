@@ -4,7 +4,6 @@
 Created on Wed Sep 15 14:15:54 2021
 
 @author: ravinderjit
-Investigate repeatability of "ACR"
 """
 
 import os

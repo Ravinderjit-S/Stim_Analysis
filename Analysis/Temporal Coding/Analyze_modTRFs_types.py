@@ -76,17 +76,44 @@ print('Done Loading from MTB Project')
 t_epochs = t_epochs[t1:t2]
 Subjects = Subjects + Subjects2
 
-#%% Lets get all mod-TRFs into a numpy array and plot them
+#%% Lets get all mod-TRFs into a numpy array
 
 Cz_Ht = np.zeros((len(Subjects), len(t)))
 
 for sub in range(len(Subjects)):
     Cz_Ht[sub,:] = A_Ht[sub]
     
+    
+#%% Normalize mod-TRF amplitudes by magnitude of 1st peak. This is to get rid of geomteric affects on amplitude (bigger head = smaller amplitude)
+
+t1 = np.where(t>=0.012)[0][0]
+
+Cz_Ht = Cz_Ht / (Cz_Ht[:,:t1].max(axis=1)[:,np.newaxis])
+
+
+#%% Plot all mod-TRFs
+
 plt.figure()
 plt.plot(t,Cz_Ht.T)   
 
-#%%
+fig,ax = plt.subplots(11,2)
+ax = np.reshape(ax,22)
+for c in range(22):
+    ax[c].plot(t,Cz_Ht[c,:])
+    
+#%% Get rid of an outlier
+
+Cz_Ht = np.delete(Cz_Ht,14,axis=0)
+    
+#%% Look at Cov matrix
+
+cov_m = np.cov(Cz_Ht.T)
+plt.figure()
+plt.imshow(cov_m)
+plt.colorbar()
+
+
+#%% Can PCA identify "types" of mod-TRFs
 
 pc = PCA(n_components=6)
 pc_sp = pc.fit_transform(Cz_Ht)
@@ -106,13 +133,13 @@ plt.scatter(pc_sp[:,0],pc_sp[:,1])
 plt.figure()
 plt.scatter(pc_sp[:,0],pc_sp[:,2])
 
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(pc_sp[:,0],pc_sp[:,1],pc_sp[:,2])
 
 
 plt.figure()
 plt.plot(np.abs(pc_sp))
-
-
-
 
 
 

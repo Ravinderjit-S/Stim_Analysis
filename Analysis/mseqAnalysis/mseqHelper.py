@@ -48,7 +48,7 @@ def mseqXcorrEpochs_fft(epochs,mseq,fs):
     mseq_f = np.fft.fft(mseq,n=nfft)
     mseq_f = mseq_f[np.newaxis,:]
     for ep in range(epochs.shape[1]):
-        epoch_fft = np.fft.fft(epochs[:,ep,:],n=nfft)
+        epoch_fft = np.fft.fft(epochs[:,ep,:] - np.mean(epochs[:,ep,:]),n=nfft)
         Ht_ep = np.fft.ifft(epoch_fft * np.conj(mseq_f))
         Ht_ep = np.concatenate([Ht_ep[:,-half_keep:],Ht_ep[:,:half_keep]],axis=1)
         Ht_epochs[:,ep,:] = Ht_ep
