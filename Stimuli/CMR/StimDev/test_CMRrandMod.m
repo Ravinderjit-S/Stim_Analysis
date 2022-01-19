@@ -32,7 +32,7 @@ figure,spectrogram(Sig,round(0.02*fs),round(0.02*fs*.8),2000:1:7000,fs,'yaxis')
 
 %% 3AFC version
 tic()
-[Sig,answer] = CMR_randMod_clicky_3AFC(noise_bands,target_f,SNRdb,mod_band,target_modf,fs,tlen,0,.050,.3);
+[Sig,answer] = CMR_randMod_clicky_3AFC(noise_bands,target_f,SNRdb,mod_band,target_modf,fs,tlen,1,.050,.3);
 toc()
 
 soundsc(Sig,fs)
