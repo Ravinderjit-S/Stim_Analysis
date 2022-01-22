@@ -16,12 +16,13 @@ import os
 import pickle
 #from sklearn.decomposition import PCA
 
-
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['S211', 'S259', 'S268', 'S269', 'S270', 'S271', 'S272', 'S273',
-            'S274','S277','S279','S282', 'S284', 'S285', 'S288', 'S290']
+Subjects = ['S072','S078','S088','S207','S211', 'S259', 'S268', 'S269', 
+            'S270', 'S271', 'S272', 'S273', 'S274','S277','S279','S282',
+            'S284', 'S285', 'S288', 'S290' ,'S281','S291','S303','S305',
+            'S308','S310']
 
 
 fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/Binding/'
@@ -34,7 +35,7 @@ for subject in Subjects:
     datapath = os.path.join(data_loc,subject + '_Binding')
     
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=40)
+    data_eeg.filter(l_freq=0.5,h_freq=40)
     
     if subject == 'S273':
         data_eeg.info['bads'].append('A1')
@@ -54,7 +55,18 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A25')
         data_eeg.info['bads'].append('A28')
         data_eeg.info['bads'].append('A3')
+        
+    if subject == 'S072':
+        data_eeg.info['bads'].append('A1')
+        data_eeg.info['bads'].append('A30')
     
+    if subject == 'S088':
+        data_eeg.info['bads'].append('A6') #not that bad
+        
+    if subject == 'S303':
+        data_eeg.info['bads'].append('A1') #not that bad
+        data_eeg.info['bads'].append('A30') #not that bad
+
     
     #%% Remove Blinks
     
@@ -94,7 +106,7 @@ for subject in Subjects:
         ep_cnd = mne.Epochs(data_eeg,data_evnt,cnd+1,tmin=-0.3,tmax=5.3,reject = reject, baseline = (-0.1,0.))
         epochs_whole.append(ep_cnd)
         evkd_whole.append(ep_cnd.average())
-        #evkd_whole[cnd].plot(titles=conds[cnd])
+        evkd_whole[cnd].plot(titles=conds[cnd])
         
     #%% Extract Different Conditions
         
@@ -116,6 +128,18 @@ for subject in Subjects:
         epochs.append(ep_cnd)
         evkd.append(ep_cnd.average())
         #evkd[cnd].plot(picks=31,titles=conds[cnd])
+        
+    # Also get whole interval without baselining each interval
+    conds.extend(['12', '20' ])
+    ep_cnd = mne.Epochs(data_eeg,data_evnt,1,tmin=-0.3,tmax=5.5, reject = reject, baseline = (-0.1,0.))
+    epochs.append(ep_cnd)
+    evkd.append(ep_cnd.average())
+    
+    ep_cnd = mne.Epochs(data_eeg,data_evnt,2,tmin=-0.3,tmax=5.5, reject = reject, baseline = (-0.1,0.))
+    epochs.append(ep_cnd)
+    evkd.append(ep_cnd.average())
+    
+    
         
     #%% Plot 1st and second interval
     
@@ -164,37 +188,6 @@ for subject in Subjects:
     plt.savefig(os.path.join(fig_loc,subject + '_12vs20.png'),format='png')
     
     
-    #%% Look at 32-channel response 
-    
-    
-    # pca = PCA(n_components = 2)
-    
-    # t0 = np.where(t>=0)[0][0]
-    # t1 = np.where(t>=0.4)[0][0]
-    
-    # dat = epochs[12].get_data().mean(axis=0)[:32,t0:t1]
-    # pca_sp = pca.fit_transform(dat.T)
-    # pca_expVar = pca.explained_variance_ratio_
-    # pca_coeff = pca.components_
-    
-    # plt.figure()
-    # plt.plot(t[t0:t1],pca_sp)
-    # plt.plot(t[t0:t1], dat[31,:] * 2.5, color='k')
-    
-    # plt.figure()
-    # vmin = pca_coeff.mean() - 2 * pca_coeff.std()
-    # vmax = pca_coeff.mean() + 2 * pca_coeff.std()
-    
-    # plt.subplot(1,2,1)
-    # mne.viz.plot_topomap(pca_coeff[0,:], mne.pick_info(data_eeg.info,np.arange(32)),vmin=vmin,vmax=vmax)
-    # plt.title('ExpVar ' + str(np.round(pca_expVar[0]*100)))    
-    
-    # plt.subplot(1,2,2)
-    # mne.viz.plot_topomap(pca_coeff[1,:], mne.pick_info(data_eeg.info,np.arange(32)),vmin=vmin,vmax=vmax)
-    # plt.title('ExpVar ' + str(np.round(pca_expVar[1]*100)))    
-    
-    
-    
     
     #%% Compute induced activity
     
@@ -223,18 +216,22 @@ for subject in Subjects:
     
     #%% Save Epochs
     
-    save_indexes = [0,1,10,11,12,13]
+    save_indexes = [0,1,10,11,12,13,14,15]
     conds_save = []
     epochs_save = []
+    evkd_save = [] #save 32 channel evkd response
+    
+    t_full = epochs[-1].times
     
     for si in save_indexes:
         conds_save.append(conds[si])
+        evkd_save.append(evkd[si])
         epochs_save.append(epochs[si].get_data()[:,31,:]) # Only save epochs for channel 31 
     
     with open(os.path.join(pickle_loc,subject+'_Binding.pickle'),'wb') as file:
-        pickle.dump([t, conds_save, epochs_save],file)
+        pickle.dump([t, t_full, conds_save, epochs_save,evkd_save],file)
         
-    del epochs, evkd
+    del epochs, evkd, evkd_save,epochs_save
     
     
     

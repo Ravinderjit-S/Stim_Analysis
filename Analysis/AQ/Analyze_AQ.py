@@ -11,7 +11,7 @@ import os
 import scipy.io as sio
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/AQ/'
-data_file = 'AQ_November 24, 2021_14.27.csv'
+data_file = 'AQ_January 21, 2022_16.36.csv'
 
 data = pd.read_csv(os.path.join(data_loc,data_file))
 

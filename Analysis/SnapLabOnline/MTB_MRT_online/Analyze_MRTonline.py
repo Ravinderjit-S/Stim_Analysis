@@ -65,7 +65,8 @@ accuracy = np.delete(accuracy,pilots,axis=1)
 
 options = dict({
     'sigmoidName': 'norm',
-    'expType': '3AFC'
+    'expType': 'nAFC',
+    'expN': 6
     })
 
 
