@@ -170,7 +170,7 @@ for jj in range(3):
     cnd2 = conds_comp[jj][1]
     
     onset12_mean = A_evkd_cz[:,young,cnd1].mean(axis=1)
-    onset12_sem = A_evkd_cz[:,young,cnd1].std(axis=1) / np.sqrt(A_evkd_cz.shape[1])
+    onset12_sem = A_evkd_cz[:,young,cnd1].std(axis=1) / np.sqrt(A_evkd_cz[:,young,cnd1].shape[1])
     
     ax[jj].plot(t,onset12_mean,label='Young')  
     ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5)
