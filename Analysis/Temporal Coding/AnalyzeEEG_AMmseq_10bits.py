@@ -34,10 +34,12 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10bits/'
 pickle_loc = data_loc + 'Pickles/'
 
-Subjects = ['S207','S228','S236','S238','S239','S246','S247','S250', 'S250_visit2']
+Subjects = ['S207','S211','S228','S236','S238','S239','S246','S247','S250', 'S250_visit2']
+Subjects = ['S211']
+
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
-num_nfs = 20
+num_nfs = 1
 
 for subject in Subjects:
     print('On Subject ................... ' + subject)
@@ -62,6 +64,8 @@ for subject in Subjects:
     
     if subject == 'S207':
         ocular_projs = [Projs[0]] #not using Projs[2] for now
+    elif subject == 'S211':
+        ocular_projs = [Projs[0]]
     elif subject == 'S228':
         ocular_projs = [Projs[0]] #not using Projs[2] cause its rotated
     elif subject == 'S236':
@@ -91,7 +95,7 @@ for subject in Subjects:
     fs = data_eeg.info['sfreq']
     reject = dict(eeg=1000e-6)
     epochs = mne.Epochs(data_eeg,data_evnt,1,tmin=-0.3,tmax=np.ceil(mseq.size/fs)+0.4, reject = reject, baseline=(-0.1,0.))     
-    epochs.average().plot(picks=[31],titles='10 bit AMmseq')
+    epochs.average().plot(titles='10 bit AMmseq')
     
     #%% Extract part of response when stim is on
     ch_picks = np.arange(32)

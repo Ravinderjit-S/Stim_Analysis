@@ -66,8 +66,9 @@ for cnd in range(len(beh_conds)):
     
  
 
-
-consec_coh = acc_bind[1:2,:].mean(axis=0)
+thresh_coh = acc_bind[0,:]
+consec_coh = acc_bind[1:4,:].mean(axis=0)
+spaced_coh = acc_bind[4:7,:].mean(axis=0)
 
 plt.figure()
 plt.scatter(cmr,consec_coh)
@@ -75,13 +76,22 @@ plt.ylabel('Consecutive Coherence Detection')
 plt.xlabel('CMR')
 plt.ylim([0,1.1])
 
-spaced_coh = acc_bind[5:6,:].mean(axis=0)
 
 plt.figure()
 plt.scatter(cmr,spaced_coh)
 plt.ylabel('Spaced Coherence Detection')
 plt.xlabel('CMR')
 plt.ylim([0,1.1])
+
+plt.figure()
+plt.scatter(cmr, consec_coh + spaced_coh + thresh_coh)
+plt.ylabel('Thresh Coherence Detection')
+plt.xlabel('CMR')
+#plt.ylim([0,1.1])
+
+plt.figure()
+plt.scatter(cmr,acc_bind.mean(axis=0))
+
 
 plt.figure()
 plt.scatter(consec_coh,spaced_coh)

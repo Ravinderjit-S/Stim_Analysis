@@ -24,6 +24,7 @@ Subjects = [ 'S072', 'S078', 'S088', 'S207', 'S211','S246', 'S259', 'S260',
 
 
 CMR = np.zeros((len(Subjects)))
+lapse = np.zeros((len(Subjects)))
 
 for sub in range(len(Subjects)):
 
@@ -73,8 +74,19 @@ for sub in range(len(Subjects)):
     ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
     plt.title(Subjects[sub])
     
-    percentCorr = 0.75
+    percentCorr = 0.68
     CMR[sub] = ps.getThreshold(result_0ps,percentCorr)[0] - ps.getThreshold(result_1ps,percentCorr)[0]
+    lapse[sub] = (result_0ps['Fit'][2] + result_1ps['Fit'][2]) / 2
     
-sio.savemat(data_loc + 'CMRclickMod.mat',{'CMR':CMR, 'Subjects':Subjects})
+sio.savemat(data_loc + 'CMRclickMod.mat',{'CMR':CMR, 'lapse':lapse, 'Subjects':Subjects})
+
+
+
+
+
+
+
+
+
+
 

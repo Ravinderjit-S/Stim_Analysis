@@ -10,6 +10,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat 
+from scipy.io import savemat 
 import psignifit as ps
 
 
@@ -69,12 +70,15 @@ options = dict({
     'expN': 6
     })
 
-
 result_ps = []
+thresh_68 = np.zeros(len(subjects))
+lapse = np.zeros(len(subjects))
 plt.figure()
 for sub in range(len(subjects)):
     data_sub = np.concatenate((SNRs[:,np.newaxis], accuracy[:,sub][:,np.newaxis] *cond_trials[:,np.newaxis] , cond_trials[:,np.newaxis] ),axis=1)
     result_sub = ps.psignifit(data_sub,options)
+    thresh_68[sub] = ps.getThreshold(result_sub,0.68)[0]
+    lapse[sub] = result_sub['Fit'][2]
     
     result_ps.append(result_sub)
     ps.psigniplot.plotPsych(result_sub)
@@ -83,6 +87,8 @@ for sub in range(len(subjects)):
 
 plt.figure()
 plt.plot(SNRs,accuracy)
+
+savemat('MTB_MRT.mat',{'Subjects':subjects,'thresholds': thresh_68, 'lapse':lapse})
 
 
 
