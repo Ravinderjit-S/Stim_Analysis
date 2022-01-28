@@ -19,20 +19,10 @@ Investigate repeatability of "ACR"
 import os
 import pickle
 import numpy as np
-import mne
 import matplotlib.pyplot as plt
-from scipy.signal import freqz
-from sklearn.decomposition import PCA
-from sklearn.metrics import explained_variance_score
 import scipy.io as sio
-from scipy.signal import find_peaks
 
-import sys
-sys.path.append(os.path.abspath('../ACRanalysis/'))
-from ACR_helperFuncs import ACR_sourceHf
-from ACR_helperFuncs import Template_tcuts
-from ACR_helperFuncs import PCA_tcuts
-from ACR_helperFuncs import PCA_tcuts_topomap
+
 
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/TemporalCoding/')
 
@@ -64,7 +54,7 @@ cortexTemplate = pca_coeffs_cuts[2][0,:]
 
 data_loc_old = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bits4/'
 pickle_loc_old = data_loc_old + 'Pickles/'
-Subjects = ['S207','S228','S236','S238'] 
+Subjects = ['S207', 'S211', 'S228','S236','S238'] 
 
 A_Tot_trials_old = []
 A_Ht_old = []
@@ -76,6 +66,7 @@ A_Ht_old_epochs = []
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
+    print('Loading ' + subject)
     with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4.pickle'),'rb') as file:
         [tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
     
@@ -173,6 +164,9 @@ cuts_tms = []
 #S207
 cuts_tms.append([.0185, .036, .067, .136 ,.266])
 
+#S211
+cuts_tms.append([.016, .037, .063, .123, .300])
+
 #S228
 cuts_tms.append([.016, .043, .069, .125, .238])
 
@@ -197,17 +191,17 @@ cuts_tms.append([.016, .049, .123, .220, .334])
 # ax[4] = plt.subplot2grid((2,6), (1,3), colspan=2)
 
 fs = 4096
-fig,ax = plt.subplots(6,2)
+fig,ax = plt.subplots(3,2)
 fig.set_size_inches(10,10)
 
 t_0 = np.where(t_epochs>=0)[0][0]
 colors = ['tab:blue','tab:orange','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
 
 
-for sub in np.arange(len(Subjects)):
+for sub in np.arange(len(Subjects[:3])):
     #Plot Cz
     
-    if sub <5:
+    if sub <2:
         ax[sub,0].axes.xaxis.set_visible(False)
         ax[sub,1].axes.xaxis.set_visible(False)
         
@@ -219,8 +213,8 @@ for sub in np.arange(len(Subjects)):
     
     cz_mean_v2 = Ht_mean[-1,:] - Ht_mean[-1,t_0] #Look at cz. Make time 0 start at 0
     
-    ax[sub,0].plot(t_epochs, cz_mean_v2,color='grey', label='2nd Visit')
-    ax[sub,0].fill_between(t_epochs,cz_mean_v2 -Ht_sem[-1,:],cz_mean_v2 + Ht_sem[-1,:], color='grey',alpha=0.4)
+    #ax[sub,0].plot(t_epochs, cz_mean_v2,color='grey', label='2nd Visit')
+    #ax[sub,0].fill_between(t_epochs,cz_mean_v2 -Ht_sem[-1,:],cz_mean_v2 + Ht_sem[-1,:], color='grey',alpha=0.4)
     
     cz_mean_v1 = Ht_mean_old[-1,:] - Ht_mean_old[-1,t_0]
     
@@ -241,42 +235,44 @@ for sub in np.arange(len(Subjects)):
     
     
     ax[sub,0].set_xlim([-0.05,0.5])
-    ax[sub,0].set_title('Participant ' + str(sub+1),fontweight='bold')
+    ax[sub,0].set_title('S' + str(sub+1),fontweight='bold',fontsize=16)
     ax[sub,0].set_xticks([0,0.1,0.2,0.3,0.4])
     ax[sub,0].set_yticks([-.002,0,.002])
     ax[sub,0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
     
     
-    t_05 = np.where(t_epochs>=0.5)[0][0]
+    t_05 = np.where(t_epochs>=t_cuts[-1])[0][0]
     cz_mean_v2 = cz_mean_v2[t_0:t_05]
     cz_mean_v2 = cz_mean_v2 - cz_mean_v2.mean()
-    Ht_freq_v2 = np.fft.fft(cz_mean_v2[:])
+    Ht_freq_v2 = np.fft.fft(cz_mean_v2[:],np.round(0.3*fs)) / (np.round(0.3*fs))
     f = np.fft.fftfreq(Ht_freq_v2.size,d=1/fs)
     
     Ht_freq_v2 = Ht_freq_v2[f>=0]
     f = f[f>=0]
     
     phase_v2 = np.unwrap(np.angle(Ht_freq_v2))
-    ax2 = ax[sub,1].twinx()
+    #ax2 = ax[sub,1].twinx()
     
-    l1, = ax[sub,1].plot(f,np.abs(Ht_freq_v2),color='k',label='Whole')
-    l2, = ax2.plot(f,phase_v2,color='k',linestyle='--',label='Whole Phase')
-    ax[sub,1].set_xlim([0,75])
-    ax[sub,1].set_yticks([0,0.5])
+    l1, = ax[sub,1].plot(f,np.abs(Ht_freq_v2),color='k',label='Whole',linewidth=3)
+    #l2, = ax2.plot(f,phase_v2,color='k',linestyle='--',label='Whole Phase')
+    ax[sub,1].set_xlim([1,100])
+    #ax[sub,1].set_xscale('log')
+    #ax[sub,1].set_yticks([0,0.5,1])
     ax[sub,1].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
     
-    ax2.axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-    ax2.set_ylim([-25,0])
-    ax2.set_yticks([-10,0])
+    #ax2.axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+    #ax2.set_ylim([-25,0])
+    #ax2.set_yticks([-10,0])
     
     
     
     if sub == 0:
-        lines = [l1,l2]
+        #lines = [l1,l2]
+        lines = [l1]
         ax[0,1].legend(lines,[l.get_label() for l in lines],fontsize=9)
     
     t_cuts = cuts_tms[sub]
-    for t_c in range(len(cuts_tms)):
+    for t_c in range(len(t_cuts)):
         if t_c ==0:
             t_1 = np.where(t_epochs>=0)[0][0]
         else:
@@ -286,11 +282,15 @@ for sub in np.arange(len(Subjects)):
         
         t_ep = t_epochs[t_1:t_2]
         
-        Ht_freq = np.abs(np.fft.fft(A_Ht_epochs[sub][-1,:,t_1:t_2] - A_Ht_epochs[sub][-1,:,t_1:t_2].mean(axis=-1)[:,np.newaxis]))
+        Ht_freq = np.abs(np.fft.fft(A_Ht_epochs[sub][-1,:,t_1:t_2] - A_Ht_epochs[sub][-1,:,t_1:t_2].mean(axis=-1)[:,np.newaxis],n=np.round(0.3*fs))) / (np.round(0.3*fs))
         Ht_freq_mean = Ht_freq.mean(axis=0)
         Ht_freq_sem = Ht_freq.std(axis=0) / np.sqrt(Ht_freq.shape[0])     
                    
         f_t = np.fft.fftfreq(Ht_freq_mean.size,d=1/fs)
+        
+        Ht_freq_mean = Ht_freq_mean[f_t >= 0]
+        Ht_freq_sem = Ht_freq_sem[f_t>=0]
+        f_t = f_t[f_t>=0]
 
 
         ax[sub,1].plot(f_t,Ht_freq_mean,color=colors[t_c])
@@ -298,34 +298,76 @@ for sub in np.arange(len(Subjects)):
 
     
     
+ind_set = 2
     
-    
+ax[ind_set,0].set_xlim([-0.05,0.4])
+ax[ind_set,0].set_xlabel('Time (sec)',fontsize=14)
+ax[ind_set,0].set_ylabel('Amplitude',fontsize=14)
+ax[ind_set,0].set_yticks([-.002,0,.002,.004])
+ax[ind_set,0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+#ax[0,0].legend(fontsize=9)
 
+ax[ind_set,1].set_xlim([0,100])
+ax[ind_set,1].set_xlabel('Frequency (Hz)',fontsize=14)
+ax[ind_set,1].set_ylabel('Magnitude',fontsize=14)
+#ax[ind_set,1].set_yticks([0, 0.5, 1])
+ax[ind_set,1].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 
-
-
-ax[5,0].plot(t_epochs, cz_mean_v1,color='k') # replace with participant 6 later
-ax[5,0].set_xlim([-0.05,0.5])
-
-ax[5,0].set_xlabel('Time (sec)')
-ax[5,0].set_ylabel('Amplitude')
-ax[5,0].set_yticks([-.002,0,.002,.004])
-ax[5,0].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-ax[0,0].legend(fontsize=9)
-
-ax[5,1].plot(f,np.abs(Ht_freq_v2),color='k',linestyle='--') # replace with participant 6 later
-ax[5,1].set_xlim([0,75])
-
-ax[5,1].set_xlabel('Frequency (Hz)')
-ax[5,1].set_ylabel('Magnitude')
-ax[5,1].set_yticks([0, 0.5])
-ax[5,1].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+plt.tick_params(labelsize=12)
 
 plt.savefig(os.path.join(fig_path,'ModTRF_rep.svg'),format='svg')
-plt.savefig(os.path.join(fig_path,'ModTRF_rep.eps'),format='eps')
+plt.savefig(os.path.join(fig_path,'ModTRF_rep.png'),format='png')
 
 
 #fig.suptitle('Ch. Cz',fontweight='bold')
+
+#%% Just plot time domain
+
+fs = 4096
+fig,ax = plt.subplots(2,3,sharex=True)
+fig.set_size_inches(15,10)
+
+ax = np.reshape(ax,6)
+t_0 = np.where(t_epochs>=0)[0][0]
+
+for sub in np.arange(len(Subjects)):
+    #Plot Cz
+    
+    if sub !=3:
+        ax[sub].axes.xaxis.set_visible(False)
+        ax[sub].axes.yaxis.set_visible(False)
+        
+    Ht_mean_old = A_Ht_old_epochs[sub].mean(axis=1) 
+    Ht_mean = A_Ht_epochs[sub].mean(axis=1)
+    
+    Ht_sem_old = A_Ht_old_epochs[sub].std(axis=1) / np.sqrt(A_Ht_old_epochs[sub].shape[1])
+    Ht_sem = A_Ht_epochs[sub].std(axis=1) / np.sqrt(A_Ht_epochs[sub].shape[1])
+    
+    cz_mean_v2 = Ht_mean[-1,:] - Ht_mean[-1,t_0] #Look at cz. Make time 0 start at 0
+    
+    ax[sub].plot(t_epochs, cz_mean_v2,color='grey', label='2nd Visit')
+    ax[sub].fill_between(t_epochs,cz_mean_v2 -Ht_sem[-1,:],cz_mean_v2 + Ht_sem[-1,:], color='grey',alpha=0.4)
+    
+    cz_mean_v1 = Ht_mean_old[-1,:] - Ht_mean_old[-1,t_0]
+    
+    ax[sub].plot(t_epochs, cz_mean_v1,color='k',label = '1st Visit')
+    ax[sub].fill_between(t_epochs,cz_mean_v1 -Ht_sem_old[-1,:],cz_mean_v1 + Ht_sem_old[-1,:], color='k',alpha=0.5)
+    
+    #ax[sub].set_xscale('log')
+    ax[sub].set_title('S' + str(sub+1),fontweight='bold',fontsize=16)
+
+ax[3].set_xlim([-0.05,0.5])
+ax[3].set_xlabel('Time (s)',fontsize=14)
+ax[3].set_ylabel('Amplitdue',fontsize=14)
+ax[3].set_xticks([0,0.1,0.2,0.3,0.4])
+ax[3].set_yticks([-.002,0,.002,.004])
+ax[3].tick_params(labelsize=12)
+ax[3].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax[0].legend(['1st visit','2nd visit'],fontsize=13)
+
+plt.savefig(os.path.join(fig_path,'ModTRF_rep_t.svg'),format='svg')
+plt.savefig(os.path.join(fig_path,'ModTRF_rep_t.png'),format='png')
+
 
 #%% Look at epochs with t cuts and in freq domain
 

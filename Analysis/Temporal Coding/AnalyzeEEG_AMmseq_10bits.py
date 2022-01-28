@@ -35,7 +35,6 @@ data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10b
 pickle_loc = data_loc + 'Pickles/'
 
 Subjects = ['S207','S211','S228','S236','S238','S239','S246','S247','S250', 'S250_visit2']
-Subjects = ['S211']
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
