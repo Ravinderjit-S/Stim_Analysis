@@ -39,6 +39,7 @@ A_evkd = []
 #%% Load data
 
 for subject in Subjects:
+    print('Loading ' + subject)
     with open(os.path.join(pickle_loc,subject+'_Binding.pickle'),'rb') as file:
        [t, t_full, conds_save, epochs_save,evkd_save] = pickle.load(file)
         
@@ -172,14 +173,14 @@ for jj in range(3):
     onset12_mean = A_evkd_cz[:,young,cnd1].mean(axis=1)
     onset12_sem = A_evkd_cz[:,young,cnd1].std(axis=1) / np.sqrt(A_evkd_cz[:,young,cnd1].shape[1])
     
-    ax[jj].plot(t,onset12_mean,label='Young')  
-    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5)
+    ax[jj].plot(t,onset12_mean,label='Young',color='tab:green')  
+    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5, color='tab:green')
     
     onset20_mean = A_evkd_cz[:,old,cnd2].mean(axis=1)
-    onset20_sem = A_evkd_cz[:,old,cnd2].std(axis=1) / np.sqrt(A_evkd_cz.shape[1])
+    onset20_sem = A_evkd_cz[:,old,cnd2].std(axis=1) / np.sqrt(A_evkd_cz[:,old,cnd2].shape[1])
     
-    ax[jj].plot(t,onset20_mean,label='old')  
-    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)
+    ax[jj].plot(t,onset20_mean,label='Old', color='tab:purple')  
+    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5,color='tab:purple')
     
     ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
     ax[jj].set_title(labels[jj])
@@ -189,6 +190,8 @@ ax[0].legend()
 ax[2].set_xlabel('Time')
 #ax[2].set_ylabel('$\mu$V')
 fig.suptitle('Average Across Participants')
+
+plt.savefig(os.path.join(fig_loc,'YoungvsOld_20.png'),format='png')
 
 
 #%% Normalize Data to max of of abs of onset response
