@@ -36,6 +36,7 @@ A_Ht_epochs = []
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
+    print('Loading ' + subject)
     with open(os.path.join(picklePassive_loc,subject +'_AMmseq10bits.pickle'),'rb') as file:
         [t, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
         
@@ -239,10 +240,10 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_f.png'),format='png')
 # Just magnitude
 
 fig,ax = plt.subplots()
-ax.plot(f,Cz_hf.mean(axis=0),color='k')
-ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='k')
+ax.plot(f,Cz_hf.mean(axis=0),color='tab:blue')
+ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='tab:blue')
 ax.set_ylabel('Magnitude',fontsize=16)
-ax.set_xlabel('Frequency (Hz)',fontsize=16)
+ax.set_xlabel('Modulation Frequency (Hz)',fontsize=16)
 ax.set_xlim([0,75])
 ax.tick_params(labelsize=12)
 ax.set_title('Average mod-TRF across 9 participants',fontsize=14)

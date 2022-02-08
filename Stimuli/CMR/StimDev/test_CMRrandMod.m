@@ -29,6 +29,11 @@ soundsc(Sig,fs)
 
 figure,pmtm(Sig,2.5,[],fs)
 figure,spectrogram(Sig,round(0.02*fs),round(0.02*fs*.8),2000:1:7000,fs,'yaxis')
+yticks([3,4,5])
+ylim([2.5, 6])
+xticks([250, 500, 750])
+
+
 
 %% 3AFC version
 tic()

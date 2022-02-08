@@ -23,8 +23,9 @@ corr_inds = data['Corr_inds']
 
 
 fig, axs = plt.subplots(2,2)
-fig.set_size_inches(11,8)
-rcParams.update({'font.size': 15})
+fig.set_size_inches(12,12)
+plt.rcParams.update({'font.size': 26})
+#rcParams.update({'font.size': 15})
 
 t = np.arange(0,stimABAB.size/fs,1/fs)
 t_mask = (t>=1) & (t <=2.01)
@@ -56,7 +57,7 @@ f,t,Sxx2 = signal.spectrogram(stimABAB_2,fs,nperseg= n_seg, noverlap = int(np.ro
 Sxx1 = 10*np.log10(Sxx1)
 Sxx2 = 10*np.log10(Sxx2)
 
-axs[1,0].pcolormesh(t,f[1:],Sxx1[1:,:], vmin= -40, vmax = -25 ,rasterized = True)
+axs[1,0].pcolormesh(t,f[1:],Sxx1[1:,:], vmin= -45, vmax = -30 ,rasterized = True)
 axs[1,0].set_xlim([0.75,2.25])
 axs[1,0].set_ylim([150,9000])
 axs[1,0].set_yscale('log')
@@ -67,7 +68,7 @@ axs[1,0].set_xticklabels(['0','0.5','1'])
 axs[1,0].set_xlabel('Time (s)')
 axs[1,0].set_ylabel('Frequency (kHz)')
 
-axs[1,1].pcolormesh(t,f[1:],Sxx2[1:,:], vmin= -40, vmax = -25, rasterized= True )
+axs[1,1].pcolormesh(t,f[1:],Sxx2[1:,:], vmin= -45, vmax = -30, rasterized= True )
 axs[1,1].set_xlim([0.75,2.25])
 axs[1,1].set_ylim([150,8500])
 axs[1,1].set_yscale('log')
@@ -77,8 +78,10 @@ axs[1,1].set_xticks([1,1.5,2])
 axs[1,1].set_xticklabels(['0','0.5','1'])
 axs[1,1].set_xlabel('Time (s)')
 
-plt.savefig( 'BindingEnvCohFig.svg' , format='svg')
 
+
+plt.savefig( 'BindingEnvCohFig.svg' , format='svg')
+plt.savefig( 'BindingEnvCohFig.png' , format='png')
 
 
 

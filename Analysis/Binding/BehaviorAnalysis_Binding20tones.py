@@ -48,19 +48,21 @@ for sub in range(len(Subjects)):
 # 4 = 1, 8, 14, 20
 # 5 = 1, 4, 8, 12, 16, 20
 # 6 = 1, 4, 6, 9, 12, 15, 17, 20
-        
-rcParams.update({'font.size': 15})
+
 
 mean_acc = acc.mean(axis=1)    
 se_acc = acc.std(axis=1) / np.sqrt(acc.shape[1])    
         
-plt.figure()
-plt.bar([0,0.7],mean_acc[1:3],  width = 0.3, yerr= se_acc[1:3],color='k')
-plt.bar([0.3,1],mean_acc[4:6],  width = 0.3, yerr = se_acc[4:6],color='grey')
-plt.ylim([0,1])
-plt.xticks([0,0.3,0.7,1],labels=['1.5 ERBs', '6.3 ERBs', '1.5 ERBs','5.7 ERBs'])
-plt.ylabel('Accuracy')
-plt.savefig(fig_loc + 'BindingAccuracy.svg',format='svg')
+fig = plt.figure()
+fig.set_size_inches(15,8)
+plt.bar([0,0.7, 1.4],mean_acc[1:4],  width = 0.3, yerr= se_acc[1:4],color='k', label ='Consecutive')
+plt.bar([0.3,1,1.7],mean_acc[4:7],  width = 0.3, yerr = se_acc[4:7],color='grey', label='Interrupted')
+plt.ylim([0,1.1])
+plt.xticks([0,0.3,0.7,1,1.4,1.7],labels=['1.5 ERBs', '9.5 ERBs', '1.5 ERBs','5.7 ERBs', '1.5 ERBs', '4 ERBs'],fontsize=18)
+plt.yticks([0,0.5,1])
+plt.ylabel('Accuracy',fontsize=20)
+plt.legend(fontsize=16)
+plt.savefig(fig_loc + 'BindingAccuracy.png',format='png')
 
 plt.figure()
 plt.plot([1,2,3,4],acc[:4,:])
@@ -70,6 +72,7 @@ plt.plot([1,2,3],acc[4:,:])
 
 plt.figure()
 plt.plot(np.arange(7)+1,acc)
+plt.plot(np.arange(7)+1,acc.mean(axis=1),color='k',linewidth=3)
 
 
 sio.savemat(data_loc + 'BindingBeh.mat',{'acc':acc, 'Subjects':Subjects})

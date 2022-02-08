@@ -42,11 +42,15 @@ data_loc_cmr = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/CMR_beh/CMRclick
 data_loc_mtb_beh = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/MTB_beh/BindingBeh.mat'
 data_loc_JANE = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/SIN_Info_JANE/SINinfo_Jane.mat'
 data_loc_MRT = '/media/ravinderjit/Data_Drive/Stim_Analysis/Analysis/SnapLabOnline/MTB_MRT_online/MTB_MRT.mat'
+data_loc_Aud = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/Audiograms/BekAud.mat'
+data_loc_memr = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/MEMR/MEMR_thresholds.mat'
 
 cmr = sio.loadmat(data_loc_cmr,squeeze_me = True)
 mtb_beh = sio.loadmat(data_loc_mtb_beh,squeeze_me = True)
 jane = sio.loadmat(data_loc_JANE,squeeze_me = True)
 mrt = sio.loadmat(data_loc_MRT,squeeze_me = True)
+aud = sio.loadmat(data_loc_Aud,squeeze_me=True)
+memr = sio.loadmat(data_loc_memr,squeeze_me=True)
 
 #AQ and age
 data_loc_aq = '/media/ravinderjit/Data_Drive/Data/AQ/AQscores.mat'
@@ -58,7 +62,7 @@ Subjects_age = [ 'S072', 'S078', 'S088', 'S207', 'S211', 'S246', 'S259',
                 'S274', 'S277', 'S279', 'S280', 'S281', 'S282', 'S284', 
                 'S285', 'S288', 'S290', 'S291', 'S303', 'S305', 'S308',
                 'S309', 'S310']
-age = [55, 47, 52, 25, 28, 26, np.nan, 33, 19, 19, 21, 21, 20, 18, 19, 20, 20, 
+age = [55, 47, 52, 25, 28, 26, 20, 33, 19, 19, 21, 21, 20, 18, 19, 20, 20, 
        20, 21, 19, 26, 19, 30, 21, 66, 28, 27, 59, 33, 70]
 
 age_class = []
@@ -93,7 +97,9 @@ spaced_coh = np.empty(len(Subjects_age))
 jane_dat = np.empty(len(Subjects_age))
 mrt_dat = np.empty(len(Subjects_age))
 aq_dat = np.empty(len(Subjects_age))
-memr = np.empty(len(Subjects_age))
+memr_w = np.empty(len(Subjects_age))
+memr_hp = np.empty(len(Subjects_age))
+aud_dat = np.empty(len(Subjects_age))
 
 cmr_dat[:] = np.nan
 cmr_lapse[:] = np.nan
@@ -103,9 +109,28 @@ spaced_coh[:] = np.nan
 jane_dat[:] = np.nan
 mrt_dat[:] = np.nan
 aq_dat[:] = np.nan
-memr[:] = np.nan
+memr_w[:] = np.nan
+memr_hp[:] = np.nan
+aud_dat[:] = np.nan
 
 data = pd.DataFrame(data={'Subjects': Subjects_age, 'age':age_class})
+
+#Add audiogram data
+index_sort, del_inds = SortSubjects(Subjects_age, aud['Subjects'])
+aud_r = aud['audiogram_R']
+aud_l = aud['audiogram_L']
+
+aud_min = np.zeros(aud_r.shape);
+aud_f = aud['f_fit']
+for a in range(aud_r.shape[1]):
+    aud_sub_lr = np.concatenate((aud_r[:,a][:,np.newaxis],aud_l[:,a][:,np.newaxis]),axis=1)
+    aud_min[:,a] = np.nanmin(aud_sub_lr,axis=1)
+    
+aud_4k = aud_min[aud_f==4000,:]
+
+aud_dat[index_sort] = aud_4k
+data['aud_4k'] = aud_dat
+
 
 # Add CMR data
 index_sort, del_inds = SortSubjects(Subjects_age, cmr['Subjects'])
@@ -124,12 +149,12 @@ acc_bind = mtb_beh['acc']
 index_sort, del_inds = SortSubjects(Subjects_age, mtb_beh['Subjects'])
 acc_bind = np.delete(acc_bind,del_inds,axis=1)
 
-thresh_coh[index_sort] = acc_bind[0,:]
-consec_coh[index_sort] = acc_bind[1:4,:].mean(axis=0)
-spaced_coh[index_sort] = acc_bind[4:7,:].mean(axis=0)
+thresh_coh[index_sort] = acc_bind[1,:]
+consec_coh[index_sort] = acc_bind[2:4,:].mean(axis=0)
+spaced_coh[index_sort] = acc_bind[5:7,:].mean(axis=0)
 
 data['thresh_coh'] = thresh_coh
-data['consec_coh'] = consec_coh
+data['bind_lapse'] = 1 - consec_coh
 data['spaced_coh'] = spaced_coh
 
 # Add JANE
@@ -152,37 +177,34 @@ data['aq'] = aq_dat
 # Add MTB Phys
 index_sort, del_inds = SortSubjects(Subjects_age,mtb_phys['Subjects'])
 
-feat_labels = mtb_phys['feat_labels']
-features = np.delete(mtb_phys['features'],del_inds,axis=1)
-pca_feats = np.delete(mtb_phys['pca_feats'],del_inds,axis=0)
+feat_labels = ['Bon', 'Bon_diff','Bmn','Bmn_diff','Aall','Ball','Oall']
+Bon = mtb_phys['feats_Bon']
+Bmn = mtb_phys['feats_Bmn']
+Aall = mtb_phys['Aall_feat'] 
+Ball = mtb_phys['Ball_feat'] 
+On_f = mtb_phys['O_feature']
+
+Bon[:,1] = -Bon[:,1] #make interpretation the 20 -12 ... already true for Bmn
+
+features = np.concatenate((Bon,Bmn,Aall.T,Ball.T,On_f.T),axis=1)
 
 for ff in range(len(feat_labels)):
     feat = np.empty(len(Subjects_age))
     feat[:] = np.nan
-    feat[index_sort] = features[ff,:]
+    feat[index_sort] = features[:,ff]
     data[feat_labels[ff].strip()] = feat
 
-pca_f1 = np.empty(len(Subjects_age))
-pca_f2 = np.empty(len(Subjects_age))
-pca_f1[:] = np.nan
-pca_f2[:] = np.nan
-
-pca_f1[index_sort] = pca_feats[:,0]
-pca_f2[index_sort] = pca_feats[:,1]
-
-data['PCA_f1'] = pca_f1
-data['PCA_f2'] = pca_f2
-
 #temp MEMR
-Sub_memr = ['S072','S078','S088','S207','S259','S260','S270', 
-    'S271','S273','S274','S277','S281','S282','S285','S291', 
-    'S305', 'S308', 'S309', 'S310']
-
-memr_thresh = [70,82,67,58,67,54,70,64,64,64,70,58,73,67,82,46,55,67,64]
+Sub_memr = memr['Subjects']
 index_sort, del_inds = SortSubjects(Subjects_age,Sub_memr)
-memr[index_sort] = memr_thresh
 
-data['memr'] = memr
+memr_w[index_sort] = memr['thresholds_w']
+memr_hp[index_sort] = memr['thresholds_hp']
+
+data['memr_w'] = memr_w
+data['memr_hp'] = memr_hp
+
+
 
 
 
@@ -196,7 +218,7 @@ ax[4].set_xlabel('AGE')
 ax[0].scatter(data['age'], data['CMR'],color='tab:blue', label = 'CMR')
 ax[0].set_ylabel('CMR')
 
-ax[1].scatter(data['age'], data['consec_coh'], label= 'consec coh')
+ax[1].scatter(data['age'], data['thresh_coh'], label= 'thresh_coh')
 ax[1].scatter(data['age'], data['spaced_coh'], label='spaced coh')
 ax[1].set_ylabel('Bind Acc')
 ax[1].legend()
@@ -207,7 +229,7 @@ ax[2].set_ylabel('Jane Thresh')
 ax[3].scatter(data['age'], data['MRT'])
 ax[3].set_ylabel('MRT Thresh')
 
-ax[4].scatter(data['age'],data['memr'])
+ax[4].scatter(data['age'],data['memr_w'])
 ax[4].set_ylabel('MEMR thresh')
 
 
@@ -216,8 +238,8 @@ ax[4].set_ylabel('MEMR thresh')
 fig,ax = plt.subplots(3)
 ax[2].set_xlabel('CMR')
 
-ax[0].scatter(data['CMR'], (data['consec_coh'] + data['spaced_coh']) / 2)
-#ax[0].scatter(data['CMR'],data['spaced_coh'])
+ax[0].scatter(data['CMR'], data['thresh_coh'])
+ax[0].scatter(data['CMR'],data['spaced_coh'])
 ax[0].set_ylabel('Bind acc')
 
 ax[1].scatter(data['CMR'], data['Jane'])
@@ -226,12 +248,15 @@ ax[1].set_ylabel('Jane Thresh')
 ax[2].scatter(data['CMR'], data['MRT'])
 ax[2].set_ylabel('MRT Thresh')
 
+plt.figure()
+plt.scatter(data['aud_4k'],data['CMR'])
+
 # Plot Binding stuff
 
 fig,ax = plt.subplots(3)
 ax[2].set_xlabel('bind acc')
 
-bind_acc = (data['consec_coh'] + data['spaced_coh']) / 2
+bind_acc = data['spaced_coh']# (data['consec_coh'] + data['spaced_coh']) / 2
 
 ax[0].scatter(bind_acc,data['Jane'])
 ax[0].set_ylabel('Jane Thresh')
@@ -239,7 +264,7 @@ ax[0].set_ylabel('Jane Thresh')
 ax[1].scatter(bind_acc,data['MRT'])
 ax[1].set_ylabel('MRT Thresh')
 
-ax[2].scatter(bind_acc,data['consec_coh'])
+ax[2].scatter(bind_acc,data['thresh_coh'])
 ax[2].set_ylabel('consec_coh acc')
 
 # Plot MEMR stuff
@@ -247,20 +272,20 @@ ax[2].set_ylabel('consec_coh acc')
 fig,ax = plt.subplots(3)
 ax[2].set_xlabel('MEMR thresh')
 
-ax[0].scatter(data['memr'],data['CMR'])
+ax[0].scatter(data['memr_w'],data['CMR'])
 ax[0].set_ylabel('CMR')
 
-ax[1].scatter(data['memr'],data['spaced_coh'])
+ax[1].scatter(data['memr_w'],data['spaced_coh'])
 ax[1].set_ylabel('Spaced acc')
 
-ax[2].scatter(data['memr'],data['Jane'])
+ax[2].scatter(data['memr_w'],data['Jane'])
 ax[2].set_ylabel('Jane')
 
 
 # Plot MTB phys stuff
 
 fig,ax = plt.subplots(4)
-feat = data['PCA_f2']
+feat = data['Ball']
 
 ax[0].scatter(feat,data['spaced_coh'])
 ax[0].set_ylabel('Spaced acc')
@@ -273,6 +298,22 @@ ax[2].set_ylabel('Jane Thresh')
 
 ax[3].scatter(feat,data['MRT'])
 ax[3].set_ylabel('MRT thresh')
+
+#%% Look at AQ stuff
+
+mask = np.array(age)< 35
+
+plt.figure()
+plt.scatter(data['aq'][mask],data['CMR'][mask])
+
+plt.figure()
+plt.scatter(data['aq'][mask],data['spaced_coh'][mask])
+
+plt.figure()
+plt.scatter(data['aq'],data['thresh_coh'])
+
+plt.figure()
+plt.scatter(data['aq'],data['Ball'])
 
 
 #%% Save as r data frame

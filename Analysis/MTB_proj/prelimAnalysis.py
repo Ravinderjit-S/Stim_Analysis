@@ -64,11 +64,10 @@ for cnd in range(len(beh_conds)):
     ax[cnd].scatter(cmr[bad_subjects],acc_bind[cnd,bad_subjects],color='tab:orange')
     ax[cnd].set_title(beh_conds[cnd])
     
- 
 
-thresh_coh = acc_bind[0,:]
-consec_coh = acc_bind[1:4,:].mean(axis=0)
-spaced_coh = acc_bind[4:7,:].mean(axis=0)
+thresh_coh = acc_bind[1,:]
+consec_coh = acc_bind[2:4,:].mean(axis=0)
+spaced_coh = acc_bind[5:7,:].mean(axis=0)
 
 plt.figure()
 plt.scatter(cmr,consec_coh)
@@ -84,8 +83,8 @@ plt.xlabel('CMR')
 plt.ylim([0,1.1])
 
 plt.figure()
-plt.scatter(cmr, consec_coh + spaced_coh + thresh_coh)
-plt.ylabel('Thresh Coherence Detection')
+plt.scatter(cmr, spaced_coh + thresh_coh)
+plt.ylabel('Both Coherence Detection')
 plt.xlabel('CMR')
 #plt.ylim([0,1.1])
 
@@ -102,6 +101,20 @@ plt.ylim([0,1.1])
 MTB_behloc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/'
 sio.savemat(MTB_behloc + 'CMR_Bind.mat',{'CMR':cmr, 'spacedCoh': spaced_coh,
                                          'consec_coh': consec_coh,'Subjects':Subjects})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

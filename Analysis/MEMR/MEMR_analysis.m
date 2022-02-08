@@ -11,6 +11,12 @@ freq = linspace(200, 8000, 1024);
 MEMband = [500, 2000];
 ind = (freq >= MEMband(1)) & (freq <= MEMband(2));
 
+MEMR_white = {};
+elict_white = {};
+
+MEMR_hp = {};
+elict_hp = {};
+
 for s = 1:length(Subjects)
     fold = dir([path Subjects{s}]);
     for fl = 1:2
@@ -51,11 +57,21 @@ for s = 1:length(Subjects)
         
         close([f1,f2])
         
+        if fl == 1
+            MEMR_white{end+1} = mean(abs(MEM(:, ind)), 2);
+            elict_white{end+1} = elicitor;
+        elseif fl == 2
+            MEMR_hp{end+1} = mean(abs(MEM(:, ind)), 2);
+            elict_hp{end+1} = elicitor;
+        end
+        
         
     end
     
     
 end
+
+save('MEMR_pressures.mat','MEMR_white','elict_white','MEMR_hp','elict_hp','Subjects')
 
 
 
