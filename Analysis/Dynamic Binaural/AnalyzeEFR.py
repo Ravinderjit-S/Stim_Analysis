@@ -46,8 +46,8 @@ evkd_data.plot(titles = 'EFR',picks=31)
 
 
 #data_raw = data_eeg.get_data()[0:31,:]
-data_raw = evkd_data.data[0:31,:]
-data_raw = data_raw[30,:]; #data_raw.mean(axis=0)
+data_raw = evkd_data.data[0:32,:]
+data_raw = data_raw[31,:]; #data_raw.mean(axis=0)
 data_raw = data_raw - data_raw.mean()
 plt.figure()
 plt.plot(data_raw)
@@ -61,8 +61,8 @@ freq = np.fft.fftfreq(data_raw.shape[0],1/fs)
 #t = np.arange(0,data_raw.size/fs,1./fs)
 #plt.plot(t,data_raw)
 plt.figure()
-#plt.plot(freq,np.abs(data_fft.T))
-plt.plot(freq,20*np.log10(np.abs(data_fft.T)))
+plt.plot(freq,np.abs(data_fft.T))
+#plt.plot(freq,20*np.log10(np.abs(data_fft.T)))
 
 
 #params = {"fs": fs, "tapers": [1,1], "fpass": [1, 300]}
