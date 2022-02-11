@@ -38,7 +38,7 @@ exclude = ['EXG1','EXG2','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need
 
 
 IAC_eeg,IAC_evnt = EEGconcatenateFolder(direct_IAC+Subject+'/',nchans,refchans,exclude)
-IAC_eeg.filter(1,1000)
+IAC_eeg.filter(1,40)
 
 #%% blink removal
 blinks_IAC = find_blinks(IAC_eeg, ch_name = ['A1'], thresh = 100e-6,  l_trans_bandwidth=0.5, l_freq = 1.0) 
@@ -53,13 +53,13 @@ eye_projsIAC = [Projs_IAC[0],Projs_IAC[1]]
 IAC_eeg.add_proj(eye_projsIAC)
 
 IAC_eeg.plot_projs_topomap()
-IAC_eeg.plot(show_options=True)
+#IAC_eeg.plot(show_options=True)
 
 #%% epoch
 
 IAC_epochs = mne.Epochs(IAC_eeg,IAC_evnt,1,tmin=-0.5,tmax=14,proj=True,baseline=(-0.2, 0.),reject=None)
 IAC_evoked = IAC_epochs.average()
-IAC_evoked.plot(titles ='IACt_evoked')
+#IAC_evoked.plot(titles ='IACt_evoked')
 
 #%% Extract epochs when stim is on
 t = IAC_epochs.times
@@ -74,7 +74,7 @@ IAC_ep = IAC_epochs.get_data()[:,ch_picks,t1:t2].transpose(1,0,2)
 
 #%% Remove any epochs with large deflections
 
-reject_thresh = 800e-6
+reject_thresh = 200e-6
     
 Peak2Peak = IAC_ep.max(axis=2) - IAC_ep.min(axis=2)
 mask_trials = np.all(Peak2Peak < reject_thresh,axis=0)
@@ -87,6 +87,12 @@ Tot_trials_IAC = IAC_ep.shape[1]
 #%% Calculate Ht
 
 IAC_Ht = mseqXcorr(IAC_ep,Mseq[:,0])
+
+
+#%% Save Stuff
+
+with open(os.path.join(direct_IAC, Subject+'_DynBin_SysFunc' + '.pickle'),'wb') as file:     
+        pickle.dump([t, IAC_Ht, Tot_trials_IAC],file)
 
 
 #%% Plot Ht

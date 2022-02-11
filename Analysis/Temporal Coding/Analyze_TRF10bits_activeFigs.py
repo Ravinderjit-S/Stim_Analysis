@@ -147,6 +147,8 @@ ax = np.reshape(ax,4)
 
 t_0 = np.where(t_epochs>=0)[0][0]
 
+t_epochs *= 1e3 #change to ms
+
 for sub in range(len(Subjects[:4])):
     subject = Subjects[sub]
     
@@ -176,7 +178,7 @@ for sub in range(len(Subjects[:4])):
     ax[sub].plot(t_epochs,cz_pass, label='Passive', color='k',linewidth=2)
     ax[sub].fill_between(t_epochs,cz_pass-cz_pass_sem, cz_pass+cz_pass_sem,color='k',alpha=0.5)
     
-    ax[sub].plot(t_epochs,cz_count, label='Count', color='tab:blue')
+    ax[sub].plot(t_epochs,cz_count, label='Count (easy)', color='tab:blue')
     ax[sub].fill_between(t_epochs,cz_count-cz_count_sem, cz_count+cz_count_sem,color='tab:blue',alpha=0.5)
     
     if (subject in Subjects_sd):
@@ -190,25 +192,27 @@ for sub in range(len(Subjects[:4])):
         
         cz_sd = cz_sd - cz_sd[t_0]
         
-        ax[sub].plot(t_epochs,cz_sd, label='Shift Detect', color='tab:orange')
+        ax[sub].plot(t_epochs,cz_sd, label='Shift Detect (hard)', color='tab:orange')
         ax[sub].fill_between(t_epochs,cz_sd - cz_sd_sem, cz_sd + cz_sd_sem, color='tab:orange',alpha=0.5)
     
     #ax[sub].set_title('S' + str(sub+1))
-    ax[sub].set_title(subject,fontweight='bold',fontsize=15)
-    ax[sub].set_xlim([-0.010,0.3])
+    ax[sub].set_title('S' + str(sub+1),fontweight='bold',fontsize=15)
+    ax[sub].set_xlim([-0.010*1e3,0.3*1e3])
     #ax[sub].set_xlim([-.005,0.050])
     #ax[sub].set_xticks([0,0.050,0.1])
     #ax[sub].set_xticks([0,0.2,0.4])
     
 ax[2].legend(fontsize=12)
 ax[2].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-ax[2].set_xlabel('Time (sec)',fontsize=12)
+ax[2].set_xlabel('Time (msec)',fontsize=12)
 ax[2].set_ylabel('Amplitude',fontsize=12)
 #ax[2].set_xticks([0,0.1,0.2,0.3])
 ax[2].set_yticks([-0.0075,0, .01])
 plt.tick_params(labelsize=11)
 
-plt.savefig(os.path.join(fig_path,'ModTRF_active.png'),format='png')
+plt.savefig(os.path.join(fig_path,'ModTRF_active.svg'),format='svg')
+
+t_epochs /= 1e3
 
 #%% Average Attention Effects
 
@@ -273,7 +277,6 @@ plt.plot(t, Avg_Ht_count[31,:])
 plt.plot(t, Avg_Ht_sd[31,:])
 plt.xlim([-0.05,0.4])
 
-
 pass_mean = Ht_pass_cz.mean(axis=0)
 count_mean = Ht_count_cz.mean(axis=0)
 sd_mean = Ht_sd_cz.mean(axis=0)
@@ -283,7 +286,8 @@ count_sem = Ht_count_cz.std(axis=0) / np.sqrt(Ht_count_cz.shape[0])
 sd_sem = Ht_sd_cz.std(axis=0) / np.sqrt(Ht_sd_cz.shape[0])
 
 fig = plt.figure()
-fig.set_size_inches(12,5)
+t*=1e3
+fig.set_size_inches(10,5)
 plt.plot(t,pass_mean,color='k',linewidth=2)
 plt.fill_between(t,pass_mean - pass_sem, pass_mean+pass_sem,color='k',alpha=0.5)
 
@@ -292,17 +296,17 @@ plt.fill_between(t,count_mean - count_sem, count_mean+pass_sem,color='tab:blue',
 
 plt.plot(t, sd_mean, color='tab:orange',linewidth=2)
 plt.fill_between(t,sd_mean - sd_sem, sd_mean+ sd_sem,color='tab:orange',alpha=0.5)
-
-plt.xlim(-.050,0.3)
-plt.xticks([0,0.1,0.2,0.3])
+t/=1e3
+plt.xlim(-50,300)
+plt.xticks([0,50,100,200,300])
 plt.yticks([-.004,0, .004])
 plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 plt.ylabel('Amplitude',fontsize=14)
-plt.xlabel('Time (sec)',fontsize=14)
+plt.xlabel('Time (msec)',fontsize=14)
 plt.tick_params(labelsize=11)
 plt.legend(['Passive', 'Easy (Counting)', 'Hard (Shift Detect)'])
 
-plt.savefig(os.path.join(fig_path,'ModTRF_active_avg.png'),format='png')
+plt.savefig(os.path.join(fig_path,'ModTRF_active_avg.svg'),format='svg')
 
 
 
@@ -417,7 +421,7 @@ for t_c in range(len(t_cuts_pass)):
     plt.title('ExpVar ' + str(np.round(pca_expVar_sd[t_c][0]*100)) + '%')
     mne.viz.plot_topomap(pca_coeff_sd[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vmin=vmin,vmax=vmax)
     
-plt.savefig(os.path.join(fig_path,'topomaps.png'),format='png')
+plt.savefig(os.path.join(fig_path,'topomaps.svg'),format='svg')
 
 
 

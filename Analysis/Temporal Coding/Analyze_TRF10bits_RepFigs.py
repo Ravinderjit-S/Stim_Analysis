@@ -146,7 +146,8 @@ sub = 0
 ch_cz = np.where(A_ch_picks[sub]==31)[0][0]
 cz = A_Ht[sub][ch_cz,:]
 
-plt.figure()
+fig = plt.figure()
+fig.set_size_inches(7,4.5)
 plt.plot(t*1000,cz, color='k',linewidth = 2)
 plt.xlim([-100,500])
 #plt.xticks([7.3,29, 47, 94, 201, 500, 1000],labels=['7.3','29','47','94','201','500','1000'])
@@ -154,9 +155,12 @@ plt.xlabel('Time (msec)', fontsize=12)
 plt.ylabel('Amplitude',fontsize=12)
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
-plt.title('mod-TRF Ch. Cz',fontsize=14)
+#plt.title('mod-TRF Ch. Cz',fontsize=14)
 plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 #plt.xscale('log')
+
+plt.savefig(os.path.join(fig_path,'ModTRF_ex.svg'),format='svg')
+
 
 #%% Manual Peak Cutoff Reading CZ and FP
     
@@ -180,7 +184,7 @@ cuts_tms.append([.0155, .045, .062, .124, .287])
 cuts_tms.append([.016, .049, .123, .220, .334])
       
 
-#%% Look at epochs: 1st visit and 2nd Visit
+#%%
 
 # fig = plt.figure()
 # ax = [None] *5
@@ -252,8 +256,9 @@ for sub in np.arange(len(Subjects[:3])):
     
     phase_v2 = np.unwrap(np.angle(Ht_freq_v2))
     #ax2 = ax[sub,1].twinx()
-    
+    lines = []
     l1, = ax[sub,1].plot(f,np.abs(Ht_freq_v2),color='k',label='Whole',linewidth=3)
+    lines.append(l1)
     #l2, = ax2.plot(f,phase_v2,color='k',linestyle='--',label='Whole Phase')
     ax[sub,1].set_xlim([1,100])
     #ax[sub,1].set_xscale('log')
@@ -266,10 +271,7 @@ for sub in np.arange(len(Subjects[:3])):
     
     
     
-    if sub == 0:
-        #lines = [l1,l2]
-        lines = [l1]
-        ax[0,1].legend(lines,[l.get_label() for l in lines],fontsize=9)
+
     
     t_cuts = cuts_tms[sub]
     for t_c in range(len(t_cuts)):
@@ -293,9 +295,12 @@ for sub in np.arange(len(Subjects[:3])):
         f_t = f_t[f_t>=0]
 
 
-        ax[sub,1].plot(f_t,Ht_freq_mean,color=colors[t_c])
+        l1, = ax[sub,1].plot(f_t,Ht_freq_mean,color=colors[t_c], label = 'S' + str(t_c+1))
+        lines.append(l1)
         ax[sub,1].fill_between(f_t,Ht_freq_mean-Ht_freq_sem,Ht_freq_mean+Ht_freq_sem,color=colors[t_c],alpha=0.5)
 
+    if sub == 0:
+        ax[0,1].legend(lines,[l.get_label() for l in lines],fontsize=10)
     
     
 ind_set = 2
@@ -315,8 +320,8 @@ ax[ind_set,1].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 
 plt.tick_params(labelsize=12)
 
-plt.savefig(os.path.join(fig_path,'ModTRF_rep.svg'),format='svg')
-plt.savefig(os.path.join(fig_path,'ModTRF_rep.png'),format='png')
+plt.savefig(os.path.join(fig_path,'ModTRF_tf_source.svg'),format='svg')
+plt.savefig(os.path.join(fig_path,'ModTRF_tf_source.png'),format='png')
 
 
 #fig.suptitle('Ch. Cz',fontweight='bold')

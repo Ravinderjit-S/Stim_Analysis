@@ -100,9 +100,9 @@ plt.ylabel('Amplitude',fontsize=12)
 plt.xticks([0, 0.1, 0.2, 0.3])
 plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
 plt.tick_params(labelsize=11)
-plt.title('Average mod-TRF across 9 Particpants',fontsize=14)
+#plt.title('Average mod-TRF across 9 Particpants',fontsize=14)
 
-plt.savefig(os.path.join(fig_path,'ModTRF_avg.png'),format='png')
+plt.savefig(os.path.join(fig_path,'ModTRF_s_avg.svg'),format='svg')
 
 
 
@@ -162,38 +162,34 @@ for t_c in range(len(t_cuts)):
     
     
 
-plt.figure()
-for t_c in range(len(t_cuts)):
-    plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,0])
-plt.plot(t,Avg_Ht[31,:] -Avg_Ht[31,:].mean(),color='k')
-plt.xlim([0,0.5])
+# plt.figure()
+# for t_c in range(len(t_cuts)):
+#     plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,0])
+# plt.plot(t,Avg_Ht[31,:] -Avg_Ht[31,:].mean(),color='k')
+# plt.xlim([0,0.5])
     
-plt.figure()
-plt.title('2nd component')
-for t_c in range(len(t_cuts)):
-    plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,1])
+# plt.figure()
+# plt.title('2nd component')
+# for t_c in range(len(t_cuts)):
+#     plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,1])
     
-plt.figure()
-plt.plot(t,Avg_Ht[31,:])
-plt.plot(t,-Avg_Ht[0,:])
-plt.title('Ch. Cz and Fp1')
-plt.xlim([0,0.5])
-plt.legend(['Cz','- Fp1'])
 
-plt.figure()
+fig = plt.figure()
+fig.set_size_inches(9,4)
 labels = ['comp1', 'comp2']
 vmin = pca_coeff_cuts[-1][0,:].mean() - 2 * pca_coeff_cuts[-1][0,:].std()
 vmax = pca_coeff_cuts[-1][0,:].mean() + 2 * pca_coeff_cuts[-1][0,:].std()
 for t_c in range(len(t_cuts)):
-    plt.subplot(2,len(t_cuts),t_c+1)
+    plt.subplot(1,len(t_cuts),t_c+1)
     plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][0]*100)) + '%')
     mne.viz.plot_topomap(pca_coeff_cuts[t_c][0,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
     
-    plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
-    plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][1]*100)) + '%')
-    mne.viz.plot_topomap(pca_coeff_cuts[t_c][1,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
+    # plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
+    # plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][1]*100)) + '%')
+    # mne.viz.plot_topomap(pca_coeff_cuts[t_c][1,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
     
 
+plt.savefig(os.path.join(fig_path,'ModTRF_passive_sources.svg'),format='svg')
 
 
 
@@ -203,7 +199,7 @@ fs = 4096.0
 t_0 = np.where(t>=0)[0][0]
 t_1 = np.where(t>=0.5)[0][0]
 
-Cz_hf = np.fft.fft(Cz_sub[:,t_0:t_1],axis=1)
+Cz_hf = np.fft.fft(Cz_sub[:,t_0:t_1],axis=1,n=np.round(0.5*fs))  / (np.round(0.5*fs))
 f = np.fft.fftfreq(Cz_hf.shape[1],d=1/fs)
 phase = np.unwrap(np.angle(Cz_hf),axis=1)
 
@@ -240,15 +236,38 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_f.png'),format='png')
 # Just magnitude
 
 fig,ax = plt.subplots()
-ax.plot(f,Cz_hf.mean(axis=0),color='tab:blue')
-ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='tab:blue')
+ax.plot(f,Cz_hf.mean(axis=0),color='black')
+ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='black')
 ax.set_ylabel('Magnitude',fontsize=16)
 ax.set_xlabel('Modulation Frequency (Hz)',fontsize=16)
 ax.set_xlim([0,75])
+ax.set_yticks([0, 2e-4, 4e-4])
+ax.set_xticks([0,10,20,30,40,50,60,70])
 ax.tick_params(labelsize=12)
-ax.set_title('Average mod-TRF across 9 participants',fontsize=14)
+ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+#ax.set_title('Average mod-TRF across 9 participants',fontsize=14)
 
-plt.savefig(os.path.join(fig_path,'ModTRF_avg_fmag.png'),format='png')
+
+plt.savefig(os.path.join(fig_path,'ModTRF_avg_fmag.svg'),format='svg')
+
+# Just Phase
+fig,ax = plt.subplots()
+ax.plot(f,phase_mn,color='grey')
+ax.fill_between(f,phase_mn-phase_sem,phase_mn+phase_sem,color='grey',alpha=0.5)
+ax.set_ylabel('Phase (Radians)',fontsize=16)
+ax.set_xlabel('Modulation Frequency (Hz)',fontsize=16)
+ax.set_xlim([0,75])
+ax.tick_params(labelsize=12)
+ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+ax.set_xticks([0,10,20,30,40,50,60,70])
+ax.set_yticks([-2e1, -1e1, 0])
+
+
+plt.savefig(os.path.join(fig_path,'ModTRF_avg_phase.svg'),format='svg')
+
+
+
+
 
 
 
