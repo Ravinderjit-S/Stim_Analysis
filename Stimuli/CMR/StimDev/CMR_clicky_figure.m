@@ -37,9 +37,9 @@ yticks([3,4,5])
 ylim([2.5, 6])
 xticks([0.01, 1, 1.2, 2.19])
 xticklabels({'0','1','0','1'})
-set(gca,'fontsize',30)
+set(gca,'fontsize',15)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 14 6];
-print([fig_path 'CMR_clicky'],'-dpng')
+print([fig_path 'CMR_clicky'],'-dsvg')
 

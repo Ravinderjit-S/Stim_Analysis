@@ -61,6 +61,22 @@ for sub in Subjects:
 sub_thresh = np.array(sub_thresh)
 
 
+#%% Box Plot
+fig = plt.figure()
+fig.set_size_inches(7,8)
+plt.rcParams.update({'font.size': 15})
+whisker =plt.boxplot(sub_thresh)
+#whisker['medians'][0].linewidth = 4
+plt.xticks([])
+plt.yticks([-45,-37, -30])
+plt.ylabel('TMR (dB)')
+
+fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
+plt.savefig(os.path.join(fig_loc,'MST_box.svg'),format='svg')
+
+
+#%% Save data
+
 sio.savemat(data_loc_jane + 'SINinfo_Jane.mat',{'thresholds':sub_thresh, 'Subjects':Subjects})
 
 

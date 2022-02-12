@@ -144,18 +144,20 @@ for jj in range(3):
     ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)
     
     ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-    ax[jj].set_title(labels[jj])
-    ax[jj].tick_params(labelsize=20)
+    #ax[jj].set_title(labels[jj])
+    ax[jj].tick_params(labelsize=12)
 
 
-ax[0].legend()
-ax[2].set_xlabel('Time (s)')
-ax[2].set_ylabel('\u03bcV')
+ax[0].legend(fontsize=12)
+ax[2].set_xlabel('Time (s)',fontsize=14)
+ax[2].set_ylabel('\u03bcV',fontsize=14)
+ax[2].set_xlim([-0.050,1])
+ax[2].set_xticks([0,0.2,0.4,0.6,0.8,1.0])
 #ax[2].set_ylabel('$\mu$V')
 #fig.suptitle('Average Across Participants')
 
 
-plt.savefig(os.path.join(fig_loc,'All_12vs20.png'),format='png')
+plt.savefig(os.path.join(fig_loc,'All_12vs20_baselined.svg'),format='svg')
 
 #%% Young Vs Old
 
@@ -219,17 +221,26 @@ for sub in range(len(Subjects)):
         A_evkd_f[:,sub,cond] = A_epochs[sub][6+cond].mean(axis=0)
 
                  
-sub_mean = A_evkd_f[:,:,0].mean(axis=1)
-sub_sem = A_evkd_f[:,:,0].std(axis=1) / np.sqrt(len(Subjects))
+sub_mean = A_evkd_f[:,:,0].mean(axis=1) * 1e6
+sub_sem = (A_evkd_f[:,:,0]*1e6).std(axis=1) / np.sqrt(len(Subjects))
+
 plt.figure()
-plt.plot(t_f,sub_mean)
+plt.plot(t_f,sub_mean,label='12')
 plt.fill_between(t_f, sub_mean-sub_sem,sub_mean+sub_sem,alpha=0.5)
 
-sub_mean = A_evkd_f[:,:,1].mean(axis=1)
-sub_sem = A_evkd_f[:,:,1].std(axis=1) / np.sqrt(len(Subjects))
+sub_mean = A_evkd_f[:,:,1].mean(axis=1) * 1e6
+sub_sem = (A_evkd_f[:,:,1]*1e6).std(axis=1) / np.sqrt(len(Subjects))
 
-plt.plot(t_f,sub_mean)
+plt.plot(t_f,sub_mean, label='20')
 plt.fill_between(t_f, sub_mean-sub_sem,sub_mean+sub_sem,alpha=0.5) 
+
+plt.xlabel('Time (s)',fontsize=14)
+plt.ylabel('\u03bcV',fontsize=14)
+plt.tick_params(labelsize=12)
+plt.legend(fontsize=12)
+
+plt.savefig(os.path.join(fig_loc,'All_12vs20_noBaseline.svg'),format='svg')
+
 
 #%% Plot Full time for individuals
 
@@ -367,11 +378,13 @@ for sub in range(len(Subjects)):
     
 pca = PCA(n_components=3)
 
-Aall_feature = pca.fit_transform(StandardScaler().fit_transform(A_resps))
+#Aall_feature = pca.fit_transform(StandardScaler().fit_transform(A_resps))
+Aall_feature = pca.fit_transform(A_resps)
 Aall_expVar = pca.explained_variance_ratio_
 Aall_comp = pca.components_
 
-Ball_feature = pca.fit_transform(StandardScaler().fit_transform(B_resps))    
+#Ball_feature = pca.fit_transform(StandardScaler().fit_transform(B_resps))  
+Ball_feature = pca.fit_transform(B_resps)
 Ball_expVar = pca.explained_variance_ratio_
 Ball_comp = pca.components_
 
@@ -379,7 +392,8 @@ ABall_feature = pca.fit_transform(StandardScaler().fit_transform(AB_resps))
 ABall_expVar = pca.explained_variance_ratio_
 ABall_comp = pca.components_
 
-O_feature = pca.fit_transform(StandardScaler().fit_transform(O_resps))
+#O_feature = pca.fit_transform(StandardScaler().fit_transform(O_resps))
+O_feature = pca.fit_transform(O_resps)
 O_expVar = pca.explained_variance_ratio_
 O_comp = pca.components_
 
@@ -390,30 +404,35 @@ plt.figure()
 plt.scatter(O_feature[:,0],Aall_feature[:,0])
 
 plt.figure()
-plt.plot(t[t_0:t_1],O_comp[0,:],label='Onset',linewidth='2')
-plt.plot(np.concatenate((t[t_0:t_1],t[t_0:t_1]+1+1/4096)),-Aall_comp[0,:], label= 'Incoherent')
-plt.plot(np.concatenate((t[t_0:t_1],t[t_0:t_1]+1+1/4096)),Ball_comp[0,:], label ='Coherent')
-plt.legend()
-plt.ylabel('Weight')
-plt.xlabel('Time')
-plt.title('EEG Feature From PCA')
+#plt.plot(t[t_0:t_1],O_comp[0,:],label='Onset',linewidth='2')
+plt.plot(np.concatenate((t[t_0:t_1],t[t_0:t_1]+1+1/4096)),Aall_comp[0,:], label= 'Incoherent', color='Grey')
+plt.plot(np.concatenate((t[t_0:t_1],t[t_0:t_1]+1+1/4096)),-Ball_comp[0,:], label ='Coherent', color='Black')
+plt.xticks([0,0.5,1.0, 1.5, 2.0])
+plt.yticks([0, 0.01, .02])
+plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+plt.legend(loc=2)
+plt.ylabel('PCA Feature Weight')
+plt.xlabel('Time (sec)')
+#plt.title('EEG Feature From PCA')
+
+plt.savefig(os.path.join(fig_loc,'PCA_FeatWeights.svg'),format='svg')
 
 fig = plt.figure()
-fig.set_size_inches(12,10)
-plt.rcParams.update({'font.size': 20})
-plt.plot(t[t_0:t_1],O_comp[0,:],label='Onset',linewidth='2')
+#fig.set_size_inches(12,10)
+plt.rcParams.update({'font.size': 12})
+#plt.plot(t[t_0:t_1],O_comp[0,:],label='Onset',linewidth='2')
 plt.plot(t[t_0:t_1], Aall_comp[0,4097:], label= 'Incoherent',linewidth='2')
 plt.plot(t[t_0:t_1], -Ball_comp[0,4097:], label ='Coherent',linewidth='2')
-plt.legend()
+plt.legend(loc = 4)
 plt.ylabel('Weight')
 plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 plt.xlabel('Time (s)')
 plt.title('EEG Feature Weights From PCA')
 plt.xticks([0,0.5,1.0])
-plt.yticks([0, 0.02, 0.04])
+#plt.yticks([0, 0.02, 0.04])
+plt.yticks([0, 0.01, .02])
 
 
-plt.savefig(os.path.join(fig_loc,'PCA_weights.png'),format='png')
 
 
 #plt.plot(np.concatenate((t[t_0:t_1],t[t_0:t_1]+1+1/4096, t[t_0:t_1]+2+1/4096,t[t_0:t_1]+3+1/4096 )),

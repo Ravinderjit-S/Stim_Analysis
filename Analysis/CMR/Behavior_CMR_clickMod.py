@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.special import erf
 import psignifit as ps
-
+import os
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/CMR_beh/'
 
@@ -25,6 +25,9 @@ Subjects = [ 'S072', 'S078', 'S088', 'S207', 'S211','S246', 'S259', 'S260',
 
 CMR = np.zeros((len(Subjects)))
 lapse = np.zeros((len(Subjects)))
+
+psCurve_0 = []
+psCurve_1 = []
 
 for sub in range(len(Subjects)):
 
@@ -69,15 +72,80 @@ for sub in range(len(Subjects)):
     result_0ps = ps.psignifit(data_0ps, options)
     result_1ps = ps.psignifit(data_1ps, options)
     
-    plt.figure()
-    ps.psigniplot.plotPsych(result_0ps)
-    ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
-    plt.title(Subjects[sub])
+    # plt.figure()
+    # ps.psigniplot.plotPsych(result_0ps)
+    # ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
+    # plt.title(Subjects[sub])
     
-    percentCorr = 0.68
+    percentCorr = 0.70
     CMR[sub] = ps.getThreshold(result_0ps,percentCorr)[0] - ps.getThreshold(result_1ps,percentCorr)[0]
     lapse[sub] = (result_0ps['Fit'][2] + result_1ps['Fit'][2]) / 2
     
+    #%% Pull out stuff to look at average 
+    x_vals  = np.linspace(-60, 0, num=1000)
+    
+    fit = result_0ps['Fit']
+    data = result_0ps['data']
+    options = result_0ps['options']
+
+    fitValues_0 = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
+    
+
+    fit = result_1ps['Fit']
+    data = result_1ps['data']
+    options = result_1ps['options']
+    
+    fitValues_1 = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
+    
+    psCurve_0.append(fitValues_0)
+    psCurve_1.append(fitValues_1)
+    
+    
+#%% Plot Average Response
+
+psCurve_0 = np.array(psCurve_0)
+psCurve_1 = np.array(psCurve_1)
+
+incoh_mean = psCurve_0.mean(axis=0)
+incoh_sem = psCurve_0.std(axis=0) / np.sqrt(psCurve_0.shape[0])
+
+coh_mean = psCurve_1.mean(axis=0)
+coh_sem = psCurve_1.std(axis=0) / np.sqrt(psCurve_1.shape[0])
+
+fig = plt.figure()
+fig.set_size_inches(8,8)
+plt.rcParams.update({'font.size': 15})
+plt.plot(x_vals,incoh_mean, color = 'Grey', label='Incoherent',linewidth=2)
+plt.fill_between(x_vals, incoh_mean - incoh_sem, incoh_mean + incoh_sem, color='grey',alpha =  0.5)
+plt.plot(x_vals, coh_mean, color = 'Black', label = 'Coherent',linewidth=2)
+plt.fill_between(x_vals, coh_mean - coh_sem, coh_mean + coh_sem, color='Black',alpha = 0.5)
+plt.legend(loc=2)
+plt.xlim([-60,-10])
+plt.xticks([-60,-40,-20])
+plt.yticks([0.33,0.66,1])
+plt.ylim([0.3, 1.03])
+plt.xlabel('SNR (dB)')
+plt.ylabel('Accuracy')
+
+fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
+plt.savefig(os.path.join(fig_loc,'CMR_psCurves.svg'),format='svg')
+
+#%% Make Box Plot
+
+fig = plt.figure()
+fig.set_size_inches(7,8)
+plt.rcParams.update({'font.size': 15})
+whisker =plt.boxplot(CMR)
+#whisker['medians'][0].linewidth = 4
+plt.xticks([])
+plt.yticks([4, 10, 16])
+plt.ylabel('CMR (dB)')
+
+fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
+plt.savefig(os.path.join(fig_loc,'CMR_box.svg'),format='svg')
+
+   
+#%% Save Data    
 sio.savemat(data_loc + 'CMRclickMod.mat',{'CMR':CMR, 'lapse':lapse, 'Subjects':Subjects})
 
 

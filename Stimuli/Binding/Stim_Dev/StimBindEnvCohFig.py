@@ -24,7 +24,7 @@ corr_inds = data['Corr_inds']
 
 fig, axs = plt.subplots(2,2)
 fig.set_size_inches(12,12)
-plt.rcParams.update({'font.size': 26})
+plt.rcParams.update({'font.size': 15})
 #rcParams.update({'font.size': 15})
 
 t = np.arange(0,stimABAB.size/fs,1/fs)
@@ -51,30 +51,32 @@ axs[0,1].set_yticks([-4,4])
 
 n_seg = int(np.round(0.050*fs))
 
-f,t,Sxx1 = signal.spectrogram(stimABAB,fs,nperseg= n_seg, noverlap = int(np.round(0.9*n_seg)))
-f,t,Sxx2 = signal.spectrogram(stimABAB_2,fs,nperseg= n_seg, noverlap = int(np.round(0.9*n_seg)))
+t_mask = (t>=0.75) & (t <=2.25)
+
+f,t,Sxx1 = signal.spectrogram(stimABAB[t_mask],fs,nperseg= n_seg, noverlap = int(np.round(0.9*n_seg)))
+f,t,Sxx2 = signal.spectrogram(stimABAB_2[t_mask],fs,nperseg= n_seg, noverlap = int(np.round(0.9*n_seg)))
 
 Sxx1 = 10*np.log10(Sxx1)
 Sxx2 = 10*np.log10(Sxx2)
 
 axs[1,0].pcolormesh(t,f[1:],Sxx1[1:,:], vmin= -45, vmax = -30 ,rasterized = True)
-axs[1,0].set_xlim([0.75,2.25])
+#axs[1,0].set_xlim([0,1.5])
 axs[1,0].set_ylim([150,9000])
 axs[1,0].set_yscale('log')
 axs[1,0].set_yticks([500, 2000, 8000])
 axs[1,0].set_yticklabels(['0.5','2','8'])
-axs[1,0].set_xticks([1,1.5,2])
+axs[1,0].set_xticks([0.25,0.75,1.25])
 axs[1,0].set_xticklabels(['0','0.5','1'])
 axs[1,0].set_xlabel('Time (s)')
 axs[1,0].set_ylabel('Frequency (kHz)')
 
-axs[1,1].pcolormesh(t,f[1:],Sxx2[1:,:], vmin= -45, vmax = -30, rasterized= True )
-axs[1,1].set_xlim([0.75,2.25])
-axs[1,1].set_ylim([150,8500])
+axs[1,1].pcolormesh(t,f[1:],Sxx2[1:,:], vmin= -45, vmax = -30, rasterized= True)
+#axs[1,1].set_xlim([0.75,2.25])
+axs[1,1].set_ylim([150,9000])
 axs[1,1].set_yscale('log')
-axs[1,1].set_yticks([500, 2000, 9000])
+axs[1,1].set_yticks([500, 2000, 8000])
 axs[1,1].set_yticklabels(['0.5','2','8'])
-axs[1,1].set_xticks([1,1.5,2])
+axs[1,1].set_xticks([0.25,0.75,1.25])
 axs[1,1].set_xticklabels(['0','0.5','1'])
 axs[1,1].set_xlabel('Time (s)')
 
@@ -83,5 +85,49 @@ axs[1,1].set_xlabel('Time (s)')
 plt.savefig( 'BindingEnvCohFig.svg' , format='svg')
 plt.savefig( 'BindingEnvCohFig.png' , format='png')
 
+#%% Full Second
 
+data = sio.loadmat('Binding20tonesExample_12.mat',squeeze_me=True)
+
+fs = data['fs']
+stimABAB = data['stimABAB']
+envs_1 = data['envs']
+corr_inds = data['Corr_inds']
+
+
+fig, axs = plt.subplots(2,1)
+fig.set_size_inches(12,12)
+plt.rcParams.update({'font.size': 15})
+#rcParams.update({'font.size': 15})
+
+t = np.arange(0,stimABAB.size/fs,1/fs)
+
+axs[0].plot(t,stimABAB, color='k')
+#axs[0].plot(t,envs_1[:,19]*6.5,linestyle='dashed',color='tab:blue')
+axs[0].set_xlim([0,5])
+#axs[0,0].set_xlabel('Time (s)')
+axs[0].set_ylabel('Stimulus Amplitdue')
+#axs[0].set_xticks([1,1.5,2])
+#axs[0].set_xticklabels(['0','0.5','1'])
+axs[0].set_yticks([-4,4])
+
+n_seg = int(np.round(0.050*fs))
+
+f,t,Sxx1 = signal.spectrogram(stimABAB,fs,nperseg= n_seg, noverlap = int(np.round(0.9*n_seg)))
+
+Sxx1 = 10*np.log10(Sxx1)
+
+axs[1].pcolormesh(t,f[1:],Sxx1[1:,:], vmin= -45, vmax = -30 ,rasterized = True)
+axs[1].set_xlim([0,5])
+axs[1].set_ylim([150,9000])
+axs[1].set_yscale('log')
+axs[1].set_yticks([500, 2000, 8000])
+axs[1].set_yticklabels(['0.5','2','8'])
+#axs[1].set_xticks([0.25,0.75,1.25])
+#axs[1].set_xticklabels(['0','0.5','1'])
+axs[1].set_xlabel('Time (s)')
+axs[1].set_ylabel('Frequency (kHz)')
+
+
+plt.savefig('Binding_wholeStim.svg' , format='svg')
 

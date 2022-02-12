@@ -1,5 +1,5 @@
 fs = 48828;
-Corr_inds = [10:20];
+Corr_inds = [9:20];
 f_start = 200;
 f_end = 8000; 
 Tones_num = 20;
@@ -28,4 +28,6 @@ soundsc(stimABAB,fs)
 
 figure()
 spectrogram(stimABAB,fs/50,[],[],fs,'yaxis'), ylim([0 10])
+
+%save('Binding20tonesExample_12.mat', 'Corr_inds', 'envs', 'fs', 'stimABAB')
 

@@ -18,8 +18,13 @@ dat$age = as.factor(dat$age)
 m <- lm(spaced_coh ~ thresh_coh + bind_lapse , data=dat)
 summary(m)
 
+svg("Binding_ConsecVsInter.svg")
+
 plot(x=predict(m,dat),dat$spaced_coh)
 abline(a=0, b=1)
+
+dev.off()
+
 
 
 m2 <- lm(CMR ~ Jane, data=dat)
@@ -37,21 +42,23 @@ plot(Predict(m),data=dat)
 
 m1_phys <- lm(spaced_coh ~  bind_lapse + Ball ,data=dat)
 summary(m1_phys)
-
-ggplot(data = dat) + 
-  geom_point(mapping = aes(x = predict(m1_phys,dat), y=spaced_coh)) +
-  geom_abline(intercept=0,slope=1) +
-  labs( x ='Predicted Accuracy', y='True Accuracy', title ='Interrupted Coherence')
+Anova(m1_phys)
 
 
-plot(x=predict(m1_phys,dat),dat$spaced_coh, main='Interrupted Coherence',
-     xlab = 'Predicted Accuracy', ylab='True Accuracy',
+#ggplot(data = dat) + 
+#  geom_point(mapping = aes(x = predict(m1_phys,dat), y=spaced_coh)) +
+#  geom_abline(intercept=0,slope=1) +
+#  labs( x ='Predicted Accuracy', y='True Accuracy', title ='Interrupted Coherence')
+
+svg('Interrupted_vsB.svg')
+plot(x=predict(m1_phys,dat),dat$spaced_coh,
+     xlab = 'Predicted Interrupted Accuracy', ylab='True Interrupted Accuracy',
      xlim=c(0.3,1),ylim=c(0.3,1), cex.main=1.25, cex.lab=1.25, cex.axis=1.1, lwd=2)
 abline(a=0, b=1,lwd=3)
 #axis(side=1,lwd=2)
 #axis(side=2,lwd=2)
 box(lwd=2)
-png('/media/ravinderjit/Data_Drive/Interrupted_vsB.png')
+dev.off()
 
 
 m2_phys <- lm(spaced_coh ~ bind_lapse + Bmn ,data=dat)
@@ -95,14 +102,16 @@ abline(a=0, b=1)
 m3_phys <- lm(Jane ~ Ball,data=dat)
 summary(m3_phys)
 
-plot(x=dat$Ball,dat$Jane, main='JANE',
-     xlab = 'Coh Phys', ylab='JANE',
+svg('MST_Bphys.svg')
+plot(x=dat$Ball,dat$Jane,
+     xlab = 'Coherent Feature', ylab='MST Threshold',
      cex.main=1.25, cex.lab=1.25, cex.axis=1.1, lwd=2)
 abline(m3_phys)
 #abline(a=0, b=1,lwd=3)
 #axis(side=1,lwd=2)
 #axis(side=2,lwd=2)
 box(lwd=2)
+dev.off()
 
 plot(x=predict(m3_phys,dat),dat$Jane)
 abline(a=0, b=1)
@@ -111,14 +120,17 @@ abline(a=0, b=1)
 m4_phys <- lm(MRT ~   Ball ,dat)
 summary(m4_phys)
 
-plot(x=dat$Ball,dat$MRT, main='MRT',
-     xlab = 'Coh Phys', ylab='MRT',
+svg('MRT_Bphys.svg')
+
+plot(x=dat$Ball,dat$MRT,
+     xlab = 'Coherent Feature', ylab='MRT Threshold',
      ylim=c(-6,0), cex.main=1.25, cex.lab=1.25, cex.axis=1.1, lwd=2)
 abline(m4_phys)
 #abline(a=0, b=1,lwd=3)
 #axis(side=1,lwd=2)
 #axis(side=2,lwd=2)
 box(lwd=2)
+dev.off()
 
 #MTB phys vs CMR
 ### add acconting for periphery
@@ -136,16 +148,21 @@ box(lwd=2)
 plot(x=predict(m3_beh,dat),dat$CMR)
 abline(a=0, b=1)
 
+
+
 m5_phys <- lm(CMR ~ aud_4k  + Aall, dat)
 summary(m5_phys)
 
-plot(x=predict(m5_phys,dat),dat$CMR, main='CMR',
+svg('CMR_Aphys.svg')
+plot(x=predict(m5_phys,dat),dat$CMR,
      xlab = 'Predicted CMR', ylab='True CMR',
      xlim=c(4,17),ylim=c(4,17), cex.main=1.25, cex.lab=1.25, cex.axis=1.1, lwd=2)
 abline(a=0, b=1,lwd=3)
 #axis(side=1,lwd=2)
 #axis(side=2,lwd=2)
 box(lwd=2)
+
+dev.off()
 
 #AQ
 m4_beh <- lm(spaced_coh ~ aq + bind_lapse, data=dat)

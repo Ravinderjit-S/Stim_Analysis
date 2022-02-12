@@ -3,3 +3,6 @@
 *.mat
 *.json
 *.pickle
+*.svg
+*.png
+*.eps
