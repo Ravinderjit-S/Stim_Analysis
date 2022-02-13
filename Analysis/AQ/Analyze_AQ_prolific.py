@@ -11,7 +11,7 @@ import os
 import scipy.io as sio
 
 data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
-data_file = 'AQ_Prolific_Jan1422.csv'
+data_file = 'AQ_Prolific_Feb1122.csv'
 
 data = pd.read_csv(os.path.join(data_loc,data_file))
 
