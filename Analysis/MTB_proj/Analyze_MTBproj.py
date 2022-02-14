@@ -67,10 +67,8 @@ age = [55, 47, 52, 25, 28, 26, 20, 33, 19, 19, 21, 21, 20, 18, 19, 20, 20,
 
 age_class = []
 for a in age:
-    if np.isnan(a):
-        age_class.append(0) #i think its a young person
     
-    elif (a <= 35):
+    if (a <= 35):
         age_class.append(0)
     elif((a >35) & (a <=55)):
         age_class.append(1)
