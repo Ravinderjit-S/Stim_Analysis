@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb 12 00:57:25 2022
+Created on Wed Feb 16 17:32:35 2022
 
 @author: ravinderjit
 """
@@ -14,30 +14,25 @@ import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
 
-fig_loc = '/home/ravinderjit/Documents/Figures/AQ/'
 data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
-fodl_file = 'F0DLs_results.csv'
+fig_loc = '/home/ravinderjit/Documents/Figures/AQ/'
+mrt_file = 'mrt_hari_results.csv'
 
+#%% Get mrt data
+data_mrt =  pd.read_csv(os.path.join(data_loc,mrt_file))
 
-#%% Load Data
-data_fodl =  pd.read_csv(os.path.join(data_loc,fodl_file))
+Subjects_mrt= data_mrt['subj'].to_numpy()
 
-#%% Get F0dl data
+Subjects_mrt, ind = np.unique(Subjects_mrt,return_index=True)
 
-Subjects_fodl = data_fodl['subj'].to_numpy()
-age_fodl = data_fodl['age']
+acc_mrt = np.zeros([4,len(Subjects_mrt)])
 
-Subjects_fodl, ind = np.unique(Subjects_fodl,return_index=True)
-age_fodl = age_fodl[ind].to_numpy()
+for s in range(len(Subjects_mrt)):
+    acc_mrt[:,s] = data_mrt['score'][data_mrt['subj'] == Subjects_mrt[s]]
+    
+    
 
-acc_fodl = np.zeros([10,len(Subjects_fodl)])
-
-for s in range(len(Subjects_fodl)):
-    acc_fodl[:,s] = data_fodl['score'][data_fodl['subj'] == Subjects_fodl[s]]
-
-df = data_fodl['dfHz'][0:10]
-
-#%% Load AQ prolific data
+#%% Get AQ data
     
 AQ = sio.loadmat(data_loc + 'AQscores_Prolific.mat',squeeze_me=True)
 
@@ -45,15 +40,14 @@ aq_subj = AQ['Subjects']
 aq_scores = AQ['Scores']
 aq_ages = AQ['age']
 
-subjs, ind1,ind2 = np.intersect1d(Subjects_fodl,aq_subj,return_indices=True)
+subjs, ind1,ind2 = np.intersect1d(Subjects_mrt,aq_subj,return_indices=True)
 
-subjs_age = age_fodl[ind1]
-subjs_acc = acc_fodl[:,ind1]
+subjs_acc = acc_mrt[:,ind1]
 
 aq_scores = aq_scores[:,ind2]
 aq_ages = aq_ages[ind2]
 
-#%% Compare quartiles and median
+#%% Look at AQ vs MRT
 
 full_score = aq_scores.sum(axis=0)
 
@@ -73,33 +67,34 @@ sem_low = np.std(subjs_acc[:,low_mask],axis=1) / np.sqrt(np.sum(low_mask))
 sem_med = np.std(subjs_acc[:,med_mask],axis=1) / np.sqrt(np.sum(med_mask))
 sem_high = np.std(subjs_acc[:,high_mask],axis=1) / np.sqrt(np.sum(high_mask))
 
-plt.figure()
-plt.errorbar(df, acc_low, sem_low,label='Bottom Quartile (n=' + str(np.sum(low_mask)) + ')',linewidth=2)
-plt.errorbar(df, acc_med, sem_med,label='Middle 50 (n=' + str(np.sum(med_mask)) + ')', linestyle='dashed' )
-plt.errorbar(df, acc_high, sem_high,label='Top Quartile (n=' + str(np.sum(high_mask)) + ')',linewidth=2)
-plt.ylabel('Accuracy')
-plt.xlabel('dfHz')
-plt.xticks(df)
-plt.xscale('log')
-plt.legend()
+snrs = [10,5,0,-5]
 
 fsz = 15
 fig = plt.figure()
 fig.set_size_inches(9,9)
-plt.errorbar(df, acc_low, sem_low,label='Bottom Quartile (n=' + str(np.sum(low_mask)) + ')',linewidth=2)
-plt.errorbar(df, acc_med, sem_med,label='Middle 50 (n=' + str(np.sum(med_mask)) + ')', linestyle='dashed')
-plt.errorbar(df, acc_high, sem_high,label='Top Quartile (n=' + str(np.sum(high_mask)) + ')',linewidth=2)
+plt.errorbar(snrs, acc_low, sem_low,label='Bottom Quartile (n=' + str(np.sum(low_mask)) + ', AQ < ' + str(int(low_score)) + ')',linewidth=2)
+plt.errorbar(snrs, acc_med, sem_med,label='Middle 50 (n=' + str(np.sum(med_mask)) + ')', linestyle='dashed')
+plt.errorbar(snrs, acc_high, sem_high,label='Top Quartile (n=' + str(np.sum(high_mask)) + ', AQ >' + str(int(high_score)) + ')',linewidth=2)
 plt.ylabel('Accuracy',fontsize=fsz)
-plt.xlabel('F0 Difference (%)',fontsize=fsz)
-plt.xscale('log')
-plt.xticks([0.1,0.5,1,3], labels = ['0.1', '0.5', '1', '3'],fontsize=fsz)
-plt.yticks([33, 66, 100],fontsize=fsz)
+plt.xlabel('SNR',fontsize=fsz)
+plt.xticks([-5,0,5,10],fontsize=fsz)
+plt.yticks([50, 75, 100],fontsize=fsz)
 plt.legend(fontsize=fsz)
-plt.savefig(fig_loc + 'AQvsF0dl.svg',format='svg')
+plt.savefig(fig_loc + 'AQvsMRT.svg',format='svg')
 
-plt.figure()
-plt.plot(df, subjs_acc[:,low_mask],color='tab:blue')
-plt.plot(df, subjs_acc[:,high_mask],color='tab:green')
+fig = plt.figure()
+fsz = 15
+fig.set_size_inches(9,9)
+plt.bar([0, 0.3, 0.6], [acc_low[2], acc_med[2], acc_high[2]] , 
+        yerr = [sem_low[2], sem_med[2], sem_high[2]], width = 0.2, 
+        edgecolor=['Tab:blue', 'Tab:orange', 'Tab:green'], linewidth= 5 ,color='k',alpha=0.5)
+plt.xticks([0, 0.3, 0.6],labels=['Bottom Quartile', 'Middle 50', 'Top Quartile'],fontsize=fsz)
+plt.ylabel('Accuracy at 0 dB SNR',fontsize=fsz)
+plt.yticks([70, 85, 100],fontsize=fsz)
+plt.ylim([70, 100])
+plt.savefig(fig_loc + 'AQvsMRT_0db.svg',format='svg')
+
+ttest_ind(subjs_acc[:,low_mask],subjs_acc[:,high_mask],axis=1)
 
 age_mean = [aq_ages[low_mask].mean(), aq_ages[med_mask].mean(), aq_ages[high_mask].mean()]
 age_sem = [aq_ages[low_mask].std() / np.sqrt(np.sum(low_mask)), 
@@ -114,8 +109,7 @@ plt.xticks([0, 0.3, 0.6],labels=['Bottom Quartile', 'Middle 50', 'Top Quartile']
 plt.ylabel('Age',fontsize=fsz)
 plt.yticks([25, 30, 35],fontsize=fsz)
 plt.ylim([22, 38])
-
-plt.savefig(fig_loc + 'AQvsF0dl_age.svg',format='svg')
+plt.savefig(fig_loc + 'AQvsMRT_age.svg',format='svg')
 
 
 

@@ -47,8 +47,10 @@ subjs_acc = acc[:,ind1]
 
 aq_scores = aq_scores[:,ind2]
 
+sio.savemat(data_loc + 'AQscores_Prolific.mat', {'Scores': aq_scores, 'Subjects': subjs, 'age': subjs_age})
+
 #%% Look at certain age group
-age_mask = subjs_age >=35
+age_mask = subjs_age > 0
 
 subjs_acc = subjs_acc[:,age_mask]
 aq_scores = aq_scores[:,age_mask]

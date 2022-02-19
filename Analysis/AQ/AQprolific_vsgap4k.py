@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
 fodl_file = 'Gap4KHz_results.csv'
+fig_loc = '/home/ravinderjit/Documents/Figures/AQ/'
 
 #%% Load Data
 data_gap4k =  pd.read_csv(os.path.join(data_loc,fodl_file))
@@ -35,10 +36,11 @@ gap = data_gap4k['gap'][0:8]
 
 #%% Load AQ prolific data
     
-AQ = sio.loadmat(data_loc + 'AQscores_Prolific.mat')
+AQ = sio.loadmat(data_loc + 'AQscores_Prolific.mat',squeeze_me=True)
 
 aq_subj = AQ['Subjects']
 aq_scores = AQ['Scores']
+aq_ages = AQ['age']
 
 subjs, ind1,ind2 = np.intersect1d(Subjects_gap4k,aq_subj,return_indices=True)
 
@@ -46,6 +48,7 @@ subjs_age = age_gap4k[ind1]
 subjs_acc = acc_gap4k[:,ind1]
 
 aq_scores = aq_scores[:,ind2]
+aq_ages = aq_ages[ind2]
 
 #%% Compare quartiles and median
 
@@ -75,6 +78,32 @@ plt.ylabel('Accuracy')
 plt.xlabel('gap')
 plt.legend()
 
+fsz = 15
+fig = plt.figure()
+fig.set_size_inches(9,9)
+plt.errorbar(gap, acc_low, sem_low,label='Bottom Quartile (n=' + str(np.sum(low_mask)) + ')',linewidth=2)
+plt.errorbar(gap, acc_med, sem_med,label='Middle 50 (n=' + str(np.sum(med_mask)) + ')', linestyle='dashed')
+plt.errorbar(gap, acc_high, sem_high,label='Top Quartile (n=' + str(np.sum(high_mask)) + ')',linewidth=2)
+plt.ylabel('Accuracy',fontsize=fsz)
+plt.xlabel('Gap (ms)',fontsize=fsz)
+plt.xticks([0,15,30],fontsize=fsz)
+plt.yticks([50, 75, 100], fontsize=fsz)
+plt.legend(fontsize=fsz)
+plt.savefig(fig_loc + 'AQvsGap4k.svg',format='svg')
 
+age_mean = [aq_ages[low_mask].mean(), aq_ages[med_mask].mean(), aq_ages[high_mask].mean()]
+age_sem = [aq_ages[low_mask].std() / np.sqrt(np.sum(low_mask)), 
+           aq_ages[med_mask].std() / np.sqrt(np.sum(med_mask)),
+           aq_ages[high_mask].std() / np.sqrt(np.sum(high_mask))]
+           
+fig = plt.figure()
+fsz = 10
+fig.set_size_inches(4,4)
+plt.bar([0, 0.3, 0.6], age_mean , yerr = age_sem, width = 0.2, color=['Tab:blue', 'Tab:orange', 'Tab:green'])
+plt.xticks([0, 0.3, 0.6],labels=['Bottom Quartile', 'Middle 50', 'Top Quartile'],fontsize=fsz)
+plt.ylabel('Age',fontsize=fsz)
+plt.yticks([25, 30, 35],fontsize=fsz)
+plt.ylim([22, 38])
+plt.savefig(fig_loc + 'AQvsGap4k_age.svg',format='svg')
 
 
