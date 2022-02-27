@@ -2,9 +2,10 @@ fs = 48828;
 f_start = 200;
 f_end = 8000; 
 Tones_num = 20;
-Corr_inds = [19:20];
+%Corr_inds = [15:20];
 %Corr_inds = [2,8,14,20];
 %Corr_inds = [1,4,7,10,13,16];
+Corr_inds = [1,4,8,12,16,20];
 ERB_spacing = []; %if specified, takes precedence over Tones_num
 
 tic()
@@ -16,7 +17,7 @@ order = randperm(3);
 order = [1 order+1];
 
 for i = 1:3
-    sound(stims(order(i),:),fs)
+    soundsc(stims(order(i),:),fs)
     pause(1.5)
 end
 

@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 14 19:34:33 2022
+
+@author: ravinderjit
+"""
+
+
+import numpy as np
+import scipy.io as sio
+import os
+import matplotlib.pyplot as plt
+
+fig_loc = '/media/ravinderjit/Data_Drive/Data/Figures/AQ/'
+data_loc_lab = '/media/ravinderjit/Data_Drive/Data/AQ/AQscores.mat'
+data_loc_online = '/media/ravinderjit/Data_Drive/Data/AQ/AQscores_Prolific.mat'
+
+aq_lab = sio.loadmat(data_loc_lab,squeeze_me=True)
+
+aq_on = sio.loadmat(data_loc_online,squeeze_me=True)
+
+
+aq_lab_full = aq_lab['Scores'].sum(axis=0)
+aq_on_full = aq_on['Scores'].sum(axis=0)
+
+
+plt.rcParams.update({'font.size':15})
+plt.figure()
+plt.boxplot([aq_lab_full, aq_on_full],positions=[1,1.4],labels= ['In Person', 'Online'])
+plt.xlim([0.75, 1.65])
+plt.ylabel('AQ Score')
+plt.yticks([10, 20, 30, 40])
+
+plt.savefig(os.path.join(fig_loc,'AQ_onVSin.svg'),format='svg')
+
