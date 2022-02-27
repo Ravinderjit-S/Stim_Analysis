@@ -47,6 +47,14 @@ subjs_acc = acc[:,ind1]
 
 aq_scores = aq_scores[:,ind2]
 
+sio.savemat(data_loc + 'AQscores_Prolific.mat', {'Scores': aq_scores, 'Subjects': subjs, 'age': subjs_age})
+
+#%% Look at certain age group
+age_mask = subjs_age > 0
+
+subjs_acc = subjs_acc[:,age_mask]
+aq_scores = aq_scores[:,age_mask]
+
 #%% Compare above and below median
 
 full_score = aq_scores.sum(axis=0)
@@ -82,7 +90,6 @@ plt.title('Top vs Bottom half')
 
 #%% Compare bottom and top 25 percentile
 
-
 low_score = np.percentile(full_score,25)
 high_score = np.percentile(full_score,75)
 
@@ -92,16 +99,6 @@ acc_high = np.median(subjs_acc[:,full_score >= high_score],axis=1)
 sem_low = np.std(subjs_acc[:,full_score <= low_score],axis=1) / np.sqrt(np.sum(full_score <= low_score))
 sem_high = np.std(subjs_acc[:,full_score >= high_score],axis=1) / np.sqrt(np.sum(full_score >= high_score))
 
-plt.figure()
-plt.errorbar(snrs[0:6],acc_low[0:6],sem_low[0:6])
-plt.errorbar(snrs[6:],acc_low[6:],sem_low[0:6])
-plt.title('AQ scores below median')
-
-
-plt.figure()
-plt.errorbar(snrs[0:6],acc_high[0:6],sem_high[0:6])
-plt.errorbar(snrs[6:],acc_high[6:],sem_high[6:])
-plt.title('AQ scores above median')
 
 
 plt.figure()

@@ -169,7 +169,7 @@ for ph in range(len(phi_conds)):
     plt.ylim([0.2,1])
     plt.xticks(fontsize=fontsize)
     plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-    fig.savefig(os.path.join(fig_path, 'AM_phi' + str(phi_conds[ph])  +'.png'),format='png')
+    fig.savefig(os.path.join(fig_path, 'AM_phi' + str(phi_conds[ph])  +'.svg'),format='svg')
    
 
 conf_95 = spst.binom(n=20,p=1/3).interval(.95)[1]/20  #20 trials per condition
@@ -185,7 +185,7 @@ plt.xlabel('Modulation Freq',fontsize=fontsize)
 plt.title('AM Incoherence Detection',fontsize=fontsize)
 plt.ylim([0.2,1])
 plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-fig.savefig(os.path.join(fig_path, 'AM_phi_all_median'  +'.png'),format='png')
+fig.savefig(os.path.join(fig_path, 'AM_phi_all_median'  +'.svg'),format='svg')
 
 conf_95 = spst.binom(n=20,p=1/3).interval(.95)[1]/20  #20 trials per condition
 fig, ax =plt.subplots(figsize=(10,9))
@@ -200,7 +200,7 @@ plt.xlabel('Modulation Freq',fontsize=fontsize)
 plt.title('AM Dichotic Incoherence Detection',fontsize=fontsize)
 plt.ylim([0.2,1])
 plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
-fig.savefig(os.path.join(fig_path, 'AM_phi_all_dichotic_median'  +'.png'),format='png')
+fig.savefig(os.path.join(fig_path, 'AM_phi_all_dichotic_median'  +'.svg'),format='svg')
 
 
 

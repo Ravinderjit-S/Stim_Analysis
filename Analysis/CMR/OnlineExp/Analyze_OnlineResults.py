@@ -184,7 +184,7 @@ for task in range(4):
     plt.ylabel('Accuracy',fontsize=fontsize,fontweight='bold')
     plt.title(Mod_labels[task],fontsize=fontsize)
     plt.legend(fontsize=fontsize)
-    fig.savefig(os.path.join(fig_path, 'CMRrandMod_' + Mod_labels[task][0:4] +'.png'),format='png')
+    fig.savefig(os.path.join(fig_path, 'CMRrandMod_' + Mod_labels[task][0:4] +'.svg'),format='svg')
     
     A_SNRs_1.append(SNRs_1)
     A_SNRs_2.append(SNRs_2)
@@ -201,7 +201,7 @@ plt.ylabel('CMR (dB)',fontsize=fontsize)
 plt.xlabel('Noise Modulation',fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
-fig.savefig(os.path.join(fig_path, 'CMRrandMod_summary'  +'.png'),format='png')
+fig.savefig(os.path.join(fig_path, 'CMRrandMod_summary'  +'.svg'),format='svg')
 
 fig,ax = plt.subplots(figsize=(12,10))
 fontsize=35
