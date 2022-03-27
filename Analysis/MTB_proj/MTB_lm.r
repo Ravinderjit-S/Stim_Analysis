@@ -3,6 +3,7 @@ library(rmatio)
 library(feather)
 library(lme4)
 library(car)
+library(cocor)
 
 
 
@@ -131,6 +132,12 @@ abline(m4_phys)
 #axis(side=2,lwd=2)
 box(lwd=2)
 dev.off()
+
+#Compare MRT corr with Jane corr
+
+dat2 <-dat %>% filter(MRT!='NA', Jane!='NA')
+cocor( ~Ball + MRT | Ball + Jane, dat2)
+
 
 #MTB phys vs CMR
 ### add acconting for periphery
