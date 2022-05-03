@@ -88,7 +88,7 @@ for sub in range(len(subjects)):
     ps.psigniplot.plotPsych(result_sub)
     
     
-    #%% Store curves to look at a verage
+    #%% Store curves to look at average
     x_vals  = np.linspace(-13, 13, num=1000)
     
     fit = result_sub['Fit']
@@ -99,26 +99,6 @@ for sub in range(len(subjects)):
     
     psCurves.append(fitValues)
 
-#%% Plot average curves
-
-psCurves = np.array(psCurves)
-ps_mean = psCurves.mean(axis=0)
-ps_sem = psCurves.std(axis=0) / np.sqrt(psCurves.shape[0])
-
-fig = plt.figure()
-fig.set_size_inches(8,8)
-plt.rcParams.update({'font.size': 15})
-plt.plot(x_vals,ps_mean, color = 'Black',linewidth=2)
-plt.fill_between(x_vals, ps_mean - ps_sem, ps_mean + ps_sem, color='black',alpha =  0.5)
-plt.xlim([-13,13])
-#plt.xticks([-60,-40,-20])
-plt.yticks([0.2,0.6,1])
-plt.ylim([0.1, 1.03])
-plt.xlabel('SNR (dB)')
-plt.ylabel('Accuracy')
-
-#fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
-#plt.savefig(os.path.join(fig_loc,'MRT_psCurve.svg'),format='svg')
 
 #%% Make Box Plot
 
@@ -160,59 +140,26 @@ no_aut = ['5ebd841ddea21b08a0aa3057','5ea492e3b1b3620a6fee3b90','5d86c09df681a10
 '5ef51de92a8ed116654bc910','5e175705cfe8dc000b559793','5b6a87d2cda8590001db8e07',
 '5eb81d360943fe74d6aba62b','5ddc516e82a527bc2397e6e1','5ef110ef74978d1e943f0e7a',
 '5c01bf7d4c14cf00019ce2a4','5c7c4d0dffaec400019b3699','5eeacbcbb570dc1ab706417a',
-'5e7daa886c123242e86c8138',
-'5e9b44743ed5ca041adb1830',
-'56c1adc20aab29000c7d556a',
-'5dea9fb3cb53ca1cda9f6116',
-'58f3760092ac81000154f8af',
+'5e7daa886c123242e86c8138','5e9b44743ed5ca041adb1830','56c1adc20aab29000c7d556a',
+'5dea9fb3cb53ca1cda9f6116','58f3760092ac81000154f8af',
 '5eaf1a2c649fd108284c2b5f','5c08c9f3217d600001117a08','5c5fc0136467ac0001b80940',
 '5ed427e3bcd0c00b58a177c0','5e89ce643ac81466c24cb5d8','5d62886927a84f00010fbbb4',
 '5f0ec4a78bd5a9220f83e0c2','5e53497a059e37368a22933a','5d100e740277ff00152f7562',
-'5dc592c6aa431440aa755d5b',
-'5dc59aea37023940a0860dea',
-'5cb7d2f8f0e73600180b9555',
-'5d76d2f7daf4bf00164d585b',
-'5be4ad0aff68b30001975464',
-'5dc47ddd034b45342d3b2e3a',
-'5eaefec7c1324e5def56caf8',
-'5e8601d90126b207e8c7a2aa',
-'5d5f07cdca10e90016bc0103',
-'5e83adf76ea9870c99d4b086',
-'5ef90b249bafa50a311593ae',
-'5eea4934bde1301131abb0f3',
-'5dd6d370194e486498e13ab6',
-'559c3ad8fdf99b32b55f2d32',
-'5dc1c27fb3e5c212018d9e33',
-'5dd96ebccf8e7e8fb2261249',
-'5dd43922ecd14c4370d02a2e',
-'5b9eddfed259900001106b05',
-'5e500ab1ec45d305b6b82d9f',
-'5a04869ff2e3460001edad2e',
-'5d30f9dfc86fc70001907dfa',
-'5f0523936e93408277d06897',
-'5eb2d579ed24d507082b07a2',
-'5d847ac9be4b0b00188463d7',
-'5de8695380e0fc7e7ac9f271',
-'5d9f8573ce3daf0015e3e400',
-'5c1c137b0739430001693cf5',
-'5f0dbbd17058d70008cc3c99',
-'5cabaa10ed17090015e1eb75',
-'5e4a28f9d897cf49bb42a41c',
-'5e820eb36551aa02fd72e1dc',
-'5e7abfb31699ef0bad04e087',
-'5da3dfbcbbbc120019e083ee',
-'5c756f32c3c75a0001334269',
-'5d5069303945ac00012780b7',
-'5e2a425609072a0abb76094b',
-'5c02ae85b5dd6600019de021',
-'5e32cbad3db17e2868d1f41e',
-'5ad7835e9c198c0001fad31a',
-'5ea49733ad3e962d73cc0238',
-'5e9a567a22a6fa0ee4cf44f1',
-'5dffc4b8f9e750be9cd65c07',
-'5d42407c2de85600173b5f1e',
-'5caf93416ef0d1001c761380',
-'5ec5ba3e981556631c1a78ba',
+'5dc592c6aa431440aa755d5b','5dc59aea37023940a0860dea','5cb7d2f8f0e73600180b9555',
+'5d76d2f7daf4bf00164d585b','5be4ad0aff68b30001975464','5dc47ddd034b45342d3b2e3a',
+'5eaefec7c1324e5def56caf8','5e8601d90126b207e8c7a2aa','5d5f07cdca10e90016bc0103',
+'5e83adf76ea9870c99d4b086','5ef90b249bafa50a311593ae','5eea4934bde1301131abb0f3',
+'5dd6d370194e486498e13ab6','559c3ad8fdf99b32b55f2d32','5dc1c27fb3e5c212018d9e33',
+'5dd96ebccf8e7e8fb2261249','5dd43922ecd14c4370d02a2e','5b9eddfed259900001106b05',
+'5e500ab1ec45d305b6b82d9f','5a04869ff2e3460001edad2e','5d30f9dfc86fc70001907dfa',
+'5f0523936e93408277d06897','5eb2d579ed24d507082b07a2','5d847ac9be4b0b00188463d7',
+'5de8695380e0fc7e7ac9f271','5d9f8573ce3daf0015e3e400','5c1c137b0739430001693cf5',
+'5f0dbbd17058d70008cc3c99','5cabaa10ed17090015e1eb75','5e4a28f9d897cf49bb42a41c',
+'5e820eb36551aa02fd72e1dc','5e7abfb31699ef0bad04e087','5da3dfbcbbbc120019e083ee',
+'5c756f32c3c75a0001334269','5d5069303945ac00012780b7','5e2a425609072a0abb76094b',
+'5c02ae85b5dd6600019de021','5e32cbad3db17e2868d1f41e','5ad7835e9c198c0001fad31a',
+'5ea49733ad3e962d73cc0238','5e9a567a22a6fa0ee4cf44f1','5dffc4b8f9e750be9cd65c07',
+'5d42407c2de85600173b5f1e','5caf93416ef0d1001c761380','5ec5ba3e981556631c1a78ba',
 '583f02c8ca2e57000184353c',
 '5ea8fe56a6d1a135a5a442cd',
 '5efc74d0aa189600088be26a',
@@ -262,4 +209,35 @@ plt.errorbar(SNRs,no_aut_acc.mean(axis=1),no_aut_sem,label='No Aut')
 plt.errorbar(SNRs,aut_acc.mean(axis=1),aut_sem,label='Autism')
 plt.legend()
 
+#%% Plot average curves
+
+psCurves = np.array(psCurves)
+ps_aut_mean = psCurves[aut_ind,:].mean(axis=0)
+ps_nt_mean = psCurves[no_aut_ind,:].mean(axis=0)
+
+ps_aut_sem = psCurves[aut_ind,:].std(axis=0) / np.sqrt(len(aut_ind))
+ps_nt_sem = psCurves[no_aut_ind,:].std(axis=0) / np.sqrt(len(no_aut_ind))
+
+ps_mean = psCurves.mean(axis=0)
+ps_sem = psCurves.std(axis=0) / np.sqrt(psCurves.shape[0])
+
+fig = plt.figure()
+fig.set_size_inches(8,8)
+plt.rcParams.update({'font.size': 15})
+plt.plot(x_vals,ps_nt_mean, linewidth=2, label='Neurotypical')
+plt.fill_between(x_vals, ps_nt_mean - ps_nt_sem, ps_nt_mean + ps_nt_sem, alpha =  0.5)
+
+plt.plot(x_vals,ps_aut_mean, linewidth=2, label= 'Autism')
+plt.fill_between(x_vals, ps_aut_mean - ps_aut_sem, ps_aut_mean + ps_aut_sem, alpha =  0.5)
+
+plt.legend()
+#plt.xlim([-13,13])
+#plt.xticks([-60,-40,-20])
+#plt.yticks([0.2,0.6,1])
+#plt.ylim([0.1, 1.03])
+plt.xlabel('SNR (dB)')
+plt.ylabel('Accuracy')
+
+#fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
+#plt.savefig(os.path.join(fig_loc,'MRT_psCurve.svg'),format='svg')
 
