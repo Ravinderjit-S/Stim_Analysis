@@ -11,7 +11,7 @@ import os
 import scipy.io as sio
 
 data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
-data_file = 'AQ_Prolific_Feb1122.csv'
+data_file = 'AQ_Prolific_Apr2622.csv'
 
 data = pd.read_csv(os.path.join(data_loc,data_file))
 
@@ -53,3 +53,42 @@ for qtype in range(Qtypes.shape[1]):
 
 sio.savemat(data_loc + 'AQscores_Prolific.mat',{'Scores':Scores, 'Subjects':Subjects})
 
+del Subjects, data, Scores, survey, point_q
+
+#%% repeat data
+
+data_file_repeat = 'AQ_Prolific_2ndRun_May0422.csv'
+data_rep = pd.read_csv(os.path.join(data_loc,data_file_repeat))
+
+
+Subjects_rep = data_rep['1a'][2:].to_numpy()
+del_inds = []
+for sub in range(len(Subjects_rep)):
+    if int(data_rep.Progress[sub+2]) != 100:
+        del_inds.append(sub+2)
+    
+data_rep = data_rep.drop(del_inds)        
+Subjects_rep = data_rep['1a'][2:].to_numpy()
+
+survey_rep = np.zeros((50,len(Subjects_rep)))
+for q in range(50):
+    question = 'Q' + str( int(np.floor(q/10)+2)) #2-6
+    trial = str(int(np.mod(q,10) + 1)) #1-10
+    index = question + '_' + trial
+    for sub in range(len(Subjects_rep)):
+        survey_rep[q,sub] = answers.index(data_rep[index][sub+2])
+
+point_q_rep = np.zeros((50,len(Subjects_rep)))
+
+point_q_rep[Agree-1,:] = (survey_rep[Agree-1,:] == 0) | (survey_rep[Agree-1,:] == 1) 
+point_q_rep[Disagree-1,:] = (survey_rep[Disagree-1,:] ==2) | (survey_rep[Disagree-1,:] == 3)
+
+Scores_rep = np.zeros([5,len(Subjects_rep)])
+for qtype in range(Qtypes.shape[1]):
+    Scores_rep[qtype,:] = np.sum(point_q_rep[Qtypes[:,qtype]],axis=0)
+    
+
+sio.savemat(data_loc + 'AQscores_rep_Prolific.mat',{'Scores_rep':Scores_rep, 
+                                                    'Subjects_rep': Subjects_rep})
+
+del Subjects_rep, Scores_rep, point_q_rep, survey_rep, data_rep
