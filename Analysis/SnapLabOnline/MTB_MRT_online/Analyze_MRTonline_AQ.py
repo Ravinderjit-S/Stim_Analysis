@@ -241,3 +241,30 @@ plt.ylabel('Accuracy')
 #fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
 #plt.savefig(os.path.join(fig_loc,'MRT_psCurve.svg'),format='svg')
 
+#%% Get AQ scores
+
+data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
+AQ = loadmat(data_loc + 'AQscores_Prolific.mat',squeeze_me=True)
+
+aq_subj = AQ['Subjects']
+aq_scores = AQ['Scores'].sum(axis=0)
+
+subjs, ind1,ind2 = np.intersect1d(np.array(subjects)[no_aut_ind],aq_subj,return_indices=True)
+
+aq_subj = aq_subj[ind2]
+aq_scores = aq_scores[ind2]
+
+plt.figure()
+plt.scatter(aq_scores,thresh_70[no_aut_ind]) 
+
+
+#%% Who hasn't done no_aut
+
+subjs_notDone = np.setdiff1d(np.array(no_aut),np.array(subjects)[no_aut_ind])
+
+#%% Aut pr
+
+subjects_aut = np.array(subjects)[aut_ind]
+
+
+
