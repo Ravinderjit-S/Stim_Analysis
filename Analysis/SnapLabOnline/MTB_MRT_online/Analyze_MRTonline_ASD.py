@@ -13,6 +13,7 @@ from scipy.io import loadmat
 from scipy.io import savemat 
 import psignifit as ps
 import os
+import pandas as pd
 
 
 #%% Load Data
@@ -113,14 +114,6 @@ plt.ylabel('SNR (dB)')
 
 #fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/'
 #plt.savefig(os.path.join(fig_loc,'MRT_box.svg'),format='svg')
-
-
-
-
-#%% Save data
-
-#savemat('MTB_MRT.mat',{'Subjects':subjects,'thresholds': thresh_70, 'lapse':lapse})
-
 
 
 
@@ -243,7 +236,8 @@ plt.ylabel('Accuracy')
 
 #%% Get AQ scores
 
-data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
+#data_loc = '/home/ravinderjit/Documents/Data/AQ_prolific/'
+data_loc = '/media/ravinderjit/Data_Drive/Data/AQ/'
 AQ = loadmat(data_loc + 'AQscores_Prolific.mat',squeeze_me=True)
 
 aq_subj = AQ['Subjects']
@@ -265,6 +259,43 @@ subjs_notDone = np.setdiff1d(np.array(no_aut),np.array(subjects)[no_aut_ind])
 #%% Aut pr
 
 subjects_aut = np.array(subjects)[aut_ind]
+
+#%% Get age and gender 
+
+f_name_core = 'core_survey_results.csv'
+core = pd.read_csv(os.path.join(data_loc,f_name_core))
+
+subjects_core = core['subject'].tolist()
+sub_core_inds = []
+for sub in subjects :
+    sub_core_inds.append(subjects_core.index(sub))
+
+gender = core['gender'][sub_core_inds].to_numpy()
+age = core['age'][sub_core_inds].to_numpy()
+race = core['race'][sub_core_inds].to_numpy()
+english = core['american_english'][sub_core_inds].to_numpy()
+neuro = core['neuro'][sub_core_inds].to_numpy()
+
+
+
+
+#%% Save data
+data_loc = '/media/ravinderjit/Data_Drive/Data/AQ/'
+savemat(data_loc +'MRT_AQ.mat',{'Subjects':subjects,'thresholds': thresh_70, 'lapse':lapse,
+                      'gender': gender, 'age':age,'race':race, 'english':english,
+                      'neuro':neuro, 'aut_ind': aut_ind, 'no_aut_ind': no_aut_ind})
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
