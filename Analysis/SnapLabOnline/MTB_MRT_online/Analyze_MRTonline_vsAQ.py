@@ -38,7 +38,7 @@ mrt_data = loadmat(data_loc + 'MRT_AQ.mat',squeeze_me=True)
 subjects = list(mrt_data['Subjects'])
 aut_ind = mrt_data['aut_ind']
 
-asd = np.zeros(subjects.size)
+asd = np.zeros(len(subjects))
 asd[aut_ind] = 1
 
 data = pd.DataFrame(data={'subjects': subjects, 'mrt_70': mrt_data['thresholds'],
@@ -58,17 +58,17 @@ aq_score1_subjects = aq_score1['Subjects'].tolist()
 index_sub_aq, del_inds_aq = SortSubjects(subjects,aq_score1_subjects)
 aq_scores1_full = aq_score1['Scores'].sum(axis=0)
 aq_scores1_full = np.delete(aq_scores1_full,del_inds_aq)
-aq1[index_sub_aq] = aq_scores1_full
+aq_full[index_sub_aq] = aq_scores1_full
 
 #aut scrn
 aq_autScrn_subjects = aq_autScrn['Subjects_aut'].tolist()
 index_sub_aut, del_inds_aut = SortSubjects(subjects,aq_autScrn_subjects)
 aq_scoresAut_full = aq_autScrn['Scores_aut'].sum(axis=0)
 aq_scoresAut_full = np.delete(aq_scoresAut_full,del_inds_aut)
-aq1[index_sub_aut] = aq_scoresAut_full
+aq_full[index_sub_aut] = aq_scoresAut_full
 
 
-data['aq'] = aq1
+data['aq'] = aq_full
 
 #x = x[~numpy.isnan(x)]
 
@@ -82,8 +82,8 @@ plt.xlabel('Age')
 plt.ylabel('MRT 70% Threshold')
 
 plt.figure()
-plt.scatter(data['age'][aq1<=24],data['mrt_70'][aq1<=24],label='Below Meidan AQ')
-plt.scatter(data['age'][aq1>31],data['mrt_70'][aq1>31],label='Above Median AQ')
+plt.scatter(data['age'][aq_full<=24],data['mrt_70'][aq_full<=24],label='Below Meidan AQ')
+plt.scatter(data['age'][aq_full>31],data['mrt_70'][aq_full>31],label='Above Median AQ')
 plt.legend()
 plt.xlabel('Age')
 plt.ylabel('MRT 70% Threshold')
@@ -101,6 +101,13 @@ plt.scatter(data['age'][asd==1],data['lapse'][asd==1],label='ASD')
 plt.legend()
 plt.xlabel('Age')
 plt.ylabel('lapse')
+
+#%% AQ score dist
+
+plt.figure()
+plt.boxplot([data['aq'][asd==0], data['aq'][asd==1 & ~np.isnan(data['aq']).to_numpy()]], labels= ['No Aut', 'Aut'])
+
+
 
 
 
