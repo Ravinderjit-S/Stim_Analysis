@@ -13,6 +13,7 @@ import numpy as np
 import scipy.io as sio
 from scipy import signal
 import mne
+import matplotlib 
 
 import sys
 sys.path.append(os.path.abspath('../../mseqAnalysis/'))
@@ -72,6 +73,29 @@ plt.savefig(os.path.join(fig_path, 'IAC_Ht_topo.svg') , format='svg')
 t = np.arange(0,Mseq.size/fs,1/fs)
 plt.figure()
 plt.plot(t,Mseq)
+
+Mseq_f = np.abs(np.fft.fft(Mseq,axis=0)) 
+f = np.fft.fftfreq(Mseq_f.size,1/fs)
+
+
+Mseq_f = Mseq_f[f>=0]
+f = f[f>=0]
+
+Mseq_fdb = 20*np.log10(Mseq_f)
+Mseq_fdb = Mseq_fdb - Mseq_fdb[1]
+
+fontsz = 14
+fig, ax = plt.subplots(1)
+fig.set_size_inches(5,5)
+ax.plot(f,Mseq_fdb)
+ax.set_xlim([0, 20])
+ax.set_ylim([-50, 1])
+ax.set_xlabel('Frequency (Hz)')
+ax.set_ylabel('dB')
+ax.set_xticks([0,10,20])
+ax.set_yticks([-40,-20,0])
+matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
+plt.savefig(os.path.join(fig_path, 'Mseq_spectrum.svg') , format='svg')
 
 #%% Get average mcBTRF
 data_loc = os.path.abspath('/media/ravinderjit/Data_Drive/Data/EEGdata/DynamicBinaural/Pickles_32_refAvg/')

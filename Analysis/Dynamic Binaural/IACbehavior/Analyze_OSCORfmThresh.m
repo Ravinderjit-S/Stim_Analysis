@@ -1,6 +1,7 @@
 clear all
 data_path = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/';
-Fig_path = '../../../../Figures/DynBin/';
+%Fig_path = '../../../../Figures/DynBin/';
+Fig_path = '/media/ravinderjit/Data_Drive/Data/Figures/DynBin/';
 %OL_path = '../../../../../Apps/Overleaf/Binaural Bash 2019/Figures/';
 addpath(data_path)
 
@@ -79,6 +80,18 @@ legend([PerfAvg, Individ(1), Chance(1)], {['Performance ' char(177) ' SEM'], 'In
 % print([Fig_path 'OscorFMbehavior'],'-depsc','-r0')
 % print([Fig_path 'OscorFMbehavior'],'-dpng','-r0')
 %print([OL_path 'OscorFMbehavior'],'-depsc','-r0')
+
+
+figure('Position',[1, 1, 1000, 637]), hold on,%plot((0:1/fs:1.6)*1000,FittedCurve,'r','linewidth',2), hold on
+boxplot(Accuracy',FM_played,'Colors','k', 'Symbol','+k')
+xlabel('OSCOR(Hz)'), ylabel('Accuracy')
+set(gca,'fontsize',15)
+yticks([0,0.25, 0.5,0.75,1])
+%set(findobj(gca,'type','line'),'linew',1.5)
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 9 6];
+print([Fig_path 'OscorFm_bp'],'-dsvg','-r0')
 
 save([data_path 'OSCORfmThresh_processed.mat'],'FM_played','Accuracy','sem')
 

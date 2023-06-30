@@ -15,8 +15,8 @@ import matplotlib.colors as mcolors
 import os
 #import pickle
 
-fig_path = '/home/ravinderjit/Documents/Figures/FM_coherence/'
-
+#fig_path = '/home/ravinderjit/Documents/Figures/FM_coherence/'
+fig_path = '/media/ravinderjit/Data_Drive/Data/Figures/FM_coherence/'
 
 StimData = ['../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_4.mat']
 StimData.append('../../../Stimuli/TemporalCoding/OnlineExp_FMphi/StimData_8.mat')
@@ -38,6 +38,7 @@ AM_mad_sem = np.zeros((4,len(AM)))
 AM_avgs = np.zeros((4,len(AM)))
 AM_sems = np.zeros((4,len(AM)))
 AM_rav = np.zeros((4,len(AM)))
+accuracy_mod = np.zeros((4,15,5))
 
 
 for j in range(0,len(AM)):
@@ -108,7 +109,8 @@ for j in range(0,len(AM)):
     
     AM_med[:,j] = np.median(accuracy_conds,axis=1)
     AM_avgs[:,j] = accuracy_conds.mean(axis=1)
-    AM_mad_sem[:,j] = spst.median_absolute_deviation(accuracy_conds,axis=1,scale=1.4826) / np.sqrt(accuracy_conds.shape[1])
+    AM_mad_sem[:,j] = spst.median_abs_deviation(accuracy_conds,axis=1,scale=1.4826) / np.sqrt(accuracy_conds.shape[1])
+    accuracy_mod[:,:,j] = accuracy_conds
     
     # np.sum(np.abs(accuracy_conds - 
     #                             np.repeat(np.reshape(accuracy_conds.mean(axis=1),[4,1]),15,axis=1)
@@ -200,6 +202,38 @@ plt.yticks(ticks=[0.2, 0.5, 0.8, 1.0],fontsize=fontsize)
 fig.savefig(os.path.join(fig_path, 'FM_phi_all_median'  +'.svg'),format='svg')
 
 
+medprop = dict(color = "tab:blue", linewidth = 1)
+flierprop =  dict(marker='+', linestyle='none')
+pos = np.array([0, 0.33, 0.66, 1])
+colors =['whitesmoke', 'lightgray', 'gray', 'black']
+
+fig,ax = plt.subplots()
+bp = ax.boxplot(accuracy_mod[:,:,0].T, positions=pos, medianprops = medprop,flierprops=flierprop, patch_artist=True)
+for cl in range(len(colors)):
+    bp['boxes'][cl].set_facecolor(colors[cl])
+
+bp = ax.boxplot(accuracy_mod[:,:,1].T, positions=pos+1.5, medianprops = medprop,flierprops=flierprop, patch_artist=True)
+for cl in range(len(colors)):
+    bp['boxes'][cl].set_facecolor(colors[cl])
+ 
+bp = ax.boxplot(accuracy_mod[:,:,2].T, positions=pos+3, medianprops = medprop,flierprops=flierprop, patch_artist=True)
+for cl in range(len(colors)):
+    bp['boxes'][cl].set_facecolor(colors[cl])
+    
+bp = ax.boxplot(accuracy_mod[:,:,3].T, positions=pos+4.5, medianprops = medprop,flierprops=flierprop, patch_artist=True)
+for cl in range(len(colors)):
+    bp['boxes'][cl].set_facecolor(colors[cl])
+
+bp = ax.boxplot(accuracy_mod[:,:,4].T, positions=pos+6, medianprops = medprop,flierprops=flierprop, patch_artist=True)
+for cl in range(len(colors)):
+    bp['boxes'][cl].set_facecolor(colors[cl])
+ax.legend([bp['boxes'][0], bp['boxes'][1], bp['boxes'][2], bp['boxes'][3]], ['30$^\circ$ ','60$^\circ$','90$^\circ$','180$^\circ$'], loc ='best')
+
+ax.set_xticks([0.5, 2, 3.5, 5, 6.5])
+ax.set_xticklabels(['4', '8', '16','32','64'])
+ax.set_xlabel('FM Frequency')
+ax.set_ylabel('Accuracy')
+fig.savefig(os.path.join(fig_path, 'FM_phi_bp'  +'.svg'),format='svg')
 
 
 

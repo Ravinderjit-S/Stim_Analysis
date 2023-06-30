@@ -296,7 +296,7 @@ b_IAC = pca_sp_Htavg_IAC
 w_IAC,h_IAC = freqz(b_IAC,a=1,worN=2000,fs=fs)
 phase_IAC = np.unwrap(np.angle(h_IAC))
 
-f_2_ind = np.where(w_IAC>=2.5)[0][0]
+f_2_ind = np.where(w_IAC>=2)[0][0]
 f_5_ind = np.where(w_IAC>=6)[0][0]
 
 coeff = np.polyfit(w_IAC[f_2_ind:f_5_ind],phase_IAC[f_2_ind:f_5_ind],deg=1)
@@ -307,7 +307,7 @@ b_ITD = pca_sp_Htavg_ITD
 w_itd,h_itd = freqz(b_ITD,a=1,worN=2000,fs=fs)
 phase_itd = np.unwrap(np.angle(h_itd))
 
-f_2_ind = np.where(w_itd>=2.5)[0][0]
+f_2_ind = np.where(w_itd>=2)[0][0]
 f_8_ind = np.where(w_itd>=6)[0][0]
 
 coeff = np.polyfit(w_itd[f_2_ind:f_8_ind],phase_itd[f_2_ind:f_8_ind],deg=1)
@@ -379,6 +379,38 @@ lines = [p1,p3, p2]
 #ax.legend(lines,[l.get_label() for l in lines])
 matplotlib.rcParams.update({'font.size':fontsz, 'font.family': 'sans-serif', 'font.sans-serif':['Arial']})
 plt.savefig(os.path.join(fig_path, 'ITD_HfAvg_pca.svg') , format='svg')
+
+#GD confidence interval using JN
+
+GD_IAC_jns = np.zeros(pca_sp_Htavg_IAC_JN.shape[1])
+
+for jn in range(pca_sp_Htavg_IAC_JN.shape[1]):
+    w_IAC_jn, h_iac_jn_phase = freqz(pca_sp_Htavg_IAC_JN[:,jn],a=1,worN=2000,fs=fs)
+    phase_iac_jn = np.unwrap(np.angle(h_iac_jn_phase))
+    f_1_in = np.where(w_IAC_jn>=2)[0][0]
+    f_2_in = np.where(w_IAC_jn>=6)[0][0]
+    coeff = np.polyfit(w_IAC_jn[f_1_in:f_2_in],phase_iac_jn[f_1_in:f_2_in],deg=1)
+    GD_line_IAC = coeff[0] * w_IAC_jn[f_1_in:f_2_in] + coeff[1]
+    GD_IAC_jn = -coeff[0] / (2*np.pi)
+    GD_IAC_jns[jn] = GD_IAC_jn
+    
+GD_IAC_jns_se = np.sqrt( (GD_IAC_jns.shape[0]-1) * np.sum( (GD_IAC_jns - GD_IAC_jns.mean()) **2) / GD_IAC_jns.shape[0]  )
+
+
+GD_ITD_jns = np.zeros(pca_sp_Htavg_ITD_JN.shape[1])
+
+for jn in range(pca_sp_Htavg_ITD_JN.shape[1]):
+    w_ITD_jn, h_itd_jn_phase = freqz(pca_sp_Htavg_ITD_JN[:,jn],a=1,worN=2000,fs=fs)
+    phase_itd_jn = np.unwrap(np.angle(h_itd_jn_phase))
+    f_1_in = np.where(w_ITD_jn>=2)[0][0]
+    f_2_in = np.where(w_ITD_jn>=6)[0][0]
+    coeff = np.polyfit(w_ITD_jn[f_1_in:f_2_in],phase_itd_jn[f_1_in:f_2_in],deg=1)
+    GD_line_ITD = coeff[0] * w_ITD_jn[f_1_in:f_2_in] + coeff[1]
+    GD_ITD_jn = -coeff[0] / (2*np.pi)
+    GD_ITD_jns[jn] = GD_ITD_jn
+    
+GD_ITD_jns_se = np.sqrt( (GD_ITD_jns.shape[0]-1) * np.sum( (GD_ITD_jns - GD_ITD_jns.mean()) **2) / GD_ITD_jns.shape[0]  )
+
 
 with open('_DynBin_SysFunc_PCA_Ht' + '.pickle','wb') as file:     
     pickle.dump([pca_sp_Htavg_IAC],file)

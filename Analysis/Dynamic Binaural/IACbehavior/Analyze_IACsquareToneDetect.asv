@@ -1,5 +1,5 @@
 clear all
-Fig_path = '/media/ravinderjit/Data_Drive/Data/Figures/DynBin/';
+Fig_path = '../../../../Figures/DynBin/';
 Subjects = [{'S001'},{'S132'},{'S205'},{'S206'},{'S207'},{'S208'},{'S203'},{'S204'},{'S211'}];
 Data_path = '/media/ravinderjit/Data_Drive/Data/BehaviorData/IACbehavior/';
 
@@ -98,18 +98,16 @@ fig.PaperPosition = [0 0 9 6];
 % fig.PaperPosition = [0 0 8 5];
 % print('ExRespTracks','-dpng','-r0')
 
-MedianSNR(9,strcmp(Subjects,'S132')) = nan; %S132 gave up on this trial due to exhaustion. Removing data point
 figure('Position',[1, 1, 1000, 637]), hold on,%plot((0:1/fs:1.6)*1000,FittedCurve,'r','linewidth',2), hold on
-boxplot((MedianSNR(2:end,:) - MedianSNR(1,:))',WindowSizes(2:end), 'Colors','k')
-%xticks([1,4, 7, 9])
-%xticklabels(WindowSizes([1,4, 7, 9]))
+boxplot((MedianSNR(2:end,:) - MedianSNR(1,:))','Colors','k','')
+xticks([3,7,9])
+xticklabels([0.1, 0.4, 1.6])
 xlabel('Window Size (Sec)'), ylabel('Detection Improvement (dB)')
 set(gca,'fontsize',15)
-%set(findobj(gca,'type','line'),'linew',1.5)
 fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 9 6];
-print([Fig_path 'IACsqTone_BP'],'-dsvg')
+
 
 %save([Data_path 'IACsquareTone_Processed.mat'],'WindowSizes','AcrossSubjectsSNR','AcrossSubjectsSEM','S211_SNR')
 
