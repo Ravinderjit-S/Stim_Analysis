@@ -13,6 +13,7 @@ import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn import preprocessing
 
 save_loc = '/media/ravinderjit/Data_Drive/Data/'
 
@@ -57,27 +58,32 @@ data_loc_aq = '/media/ravinderjit/Data_Drive/Data/AQ/AQscores.mat'
 
 aq = sio.loadmat(data_loc_aq,squeeze_me=True)
 
-Subjects_age = [ 'S072', 'S078', 'S088', 'S207', 'S211', 'S246', 'S259',
-                'S260', 'S268', 'S269', 'S270', 'S271', 'S272', 'S273',
-                'S274', 'S277', 'S279', 'S280', 'S281', 'S282', 'S284', 
-                'S285', 'S288', 'S290', 'S291', 'S303', 'S305', 'S308',
-                'S309', 'S310']
-age = [55, 47, 52, 25, 28, 26, 20, 33, 19, 19, 21, 21, 20, 18, 19, 20, 20, 
-       20, 21, 19, 26, 19, 30, 21, 66, 28, 27, 59, 33, 70]
+Subjects_age = [ 'S069', 'S072','S078','S088', 'S104', 'S105', 'S207','S211',
+            'S259', 'S260', 'S268', 'S269', 'S270','S271', 'S272', 'S273',
+            'S274', 'S277','S279', 'S280', 'S282', 'S284', 'S285', 'S288',
+            'S290' ,'S281','S291', 'S303', 'S305', 'S308', 'S309', 'S310',
+            'S312', 'S339', 'S340', 'S341', 'S344', 'S345']
 
-age_class = []
-for a in age:
+
+
+age = [49, 55, 47, 52, 51, 61, 25, 28, 20, 33, 19, 19, 21, 21, 20, 18,
+       19, 20, 20, 20, 19, 26, 19, 30, 21, 21, 66, 28, 27, 59, 33, 70,
+       37, 71, 39, 35, 60, 61]
+
+# age_class = []
+# for a in age:
     
-    if (a <= 35):
-        age_class.append(0)
-    elif((a >35) & (a <=55)):
-        age_class.append(1)
-    else:
-        age_class.append(2)
+#     if (a < 35):
+#         age_class.append(0)
+#     elif((a >=35) & (a <=55)):
+#         age_class.append(1)
+#     else:
+#         age_class.append(2)
 
 
 #Physiology
-data_loc_mtb_phys = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Model/Binding20TonesModelVars.mat'
+#data_loc_mtb_phys = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Model/Binding20TonesModelVars.mat'
+data_loc_mtb_phys = '/media/ravinderjit/Data_Drive/Data/EEGdata/MTB/Model/Binding20TonesModelVars_2.mat'
 #data_loc_ACR = []
 #data_loc_MEMR = []
 
@@ -111,12 +117,15 @@ memr_w[:] = np.nan
 memr_hp[:] = np.nan
 aud_dat[:] = np.nan
 
-data = pd.DataFrame(data={'Subjects': Subjects_age, 'age':age_class})
+data = pd.DataFrame(data={'Subjects': Subjects_age,})
+data['age'] = age
 
 #Add audiogram data
 index_sort, del_inds = SortSubjects(Subjects_age, aud['Subjects'])
 aud_r = aud['audiogram_R']
 aud_l = aud['audiogram_L']
+aud_r = np.delete(aud_r, del_inds,axis=1)
+aud_l = np.delete(aud_l, del_inds,axis=1)
 
 aud_min = np.zeros(aud_r.shape);
 aud_f = aud['f_fit']
@@ -175,16 +184,9 @@ data['aq'] = aq_dat
 # Add MTB Phys
 index_sort, del_inds = SortSubjects(Subjects_age,mtb_phys['Subjects'])
 
-feat_labels = ['Bon', 'Bon_diff','Bmn','Bmn_diff','Aall','Ball','Oall']
-Bon = mtb_phys['feats_Bon']
-Bmn = mtb_phys['feats_Bmn']
-Aall = mtb_phys['Aall_feat'] 
-Ball = mtb_phys['Ball_feat'] 
-On_f = mtb_phys['O_feature']
+feat_labels = mtb_phys['feat_labels']
 
-Bon[:,1] = -Bon[:,1] #make interpretation the 20 -12 ... already true for Bmn
-
-features = np.concatenate((Bon,Bmn,Aall.T,Ball.T,On_f.T),axis=1)
+features = mtb_phys['features']
 
 for ff in range(len(feat_labels)):
     feat = np.empty(len(Subjects_age))
@@ -282,11 +284,24 @@ ax[2].set_ylabel('Jane')
 
 # Plot MTB phys stuff
 
-fig,ax = plt.subplots(4)
-feat = data['Ball']
+#B12mean = data['MeanMid_B12'].to_numpy()
+#B12mean[B12mean>-1.5e-7] 
 
-ax[0].scatter(feat,data['spaced_coh'])
-ax[0].set_ylabel('Spaced acc')
+fig, ax1 = plt.subplots()
+ax2 = ax1.twinx()
+ax1.scatter(data['MeanMid_B12'], data['MeanMid_B20'])
+ax2.scatter(data['MeanMid_B12'], data['MeanMid_B20']/data['MeanMid_B12'],marker='x',color='r')
+
+
+
+
+fig,ax = plt.subplots(4,sharex=True)
+feat =  -data['MeanMid_B20'] - data['MeanMid_B12'] + data['VarON_B20']  + data['VarON_B12']
+#feat = data['VarON_B20'] / data['VarON_on'] #+ data['MeanMid_B12']
+feat = data['PCA_Ball']
+
+ax[0].scatter(feat,data['thresh_coh'])
+ax[0].set_ylabel('thresh acc')
 
 ax[1].scatter(feat,data['CMR'])
 ax[1].set_ylabel('CMR')
@@ -310,24 +325,32 @@ plt.scatter(data['aq'][mask],data['spaced_coh'][mask])
 plt.figure()
 plt.scatter(data['aq'],data['thresh_coh'])
 
-plt.figure()
-plt.scatter(data['aq'],data['Ball'])
+# plt.figure()
+# plt.scatter(data['aq'],data['Ball'])
 
 
 #%% Save as r data frame
-import pyarrow.feather as feather
+# import pyarrow.feather as feather
 
-data['sub_ind'] = np.arange(30)
-feather.write_feather(data, save_loc + 'MTB_dataframe')
+# data['sub_ind'] = np.arange(30)
+# feather.write_feather(data, save_loc + 'MTB_dataframe')
 
 #%% Convert to format for mixed effects analysis
 
 
-#sio.savemat(save_loc + 'MTB_dataframe.mat',data)
+#sio.savemat(save_loc + 'MTB_dataframe_2.mat',data)
 
-
-
-
+sio.savemat(save_loc + 'MTB_dataframe_2.mat',{'sid': data['Subjects'].to_numpy(), 'age': data['age'].to_numpy(),
+                                          'aud_4k': data['aud_4k'].to_numpy(), 'CMR': data['CMR'].to_numpy(),
+                                          'CMRlapse': data['CMRlapse'].to_numpy(), 'thresh_coh': data['thresh_coh'].to_numpy(),
+                                          'bind_lapse' : data['bind_lapse'].to_numpy(), 'spaced_coh': data['spaced_coh'].to_numpy(),
+                                          'Jane' : data['Jane'].to_numpy(), 'MRT': data['MRT'].to_numpy(),
+                                          'VarON_on': data['VarON_on'].to_numpy(), 'VarON_A12': data['VarON_A12'].to_numpy(), 
+                                          'VarON_A20': data['VarON_A20'].to_numpy(), 'VarON_B12': data['VarON_B12'].to_numpy(),
+                                          'VarON_B20': data['VarON_B20'].to_numpy(), 'MeanMid_A12': data['MeanMid_A12'].to_numpy(),
+                                          'MeanMid_A20': data['MeanMid_A20'].to_numpy(), 'MeanMid_B12':data['MeanMid_B12'].to_numpy(), 
+                                          'MeanMid_B20': data['MeanMid_B20'].to_numpy(), 'PCA_B': data['PCA_B'].to_numpy(),
+                                          'PCA_Ball': data['PCA_Ball'].to_numpy()})   
 
 
 

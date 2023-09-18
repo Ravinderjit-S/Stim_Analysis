@@ -16,8 +16,10 @@ from anlffr import spectral
 import scipy.io as sio
 
 
-folder = 'Q394_111620'
+#folder = 'Q394_111620'
+folder = 'Q394_111320'
 data_loc = '/media/ravinderjit/Storage2/ChinCap/SAM_noise/' + folder + '/SAM_'
+data_loc = '/media/ravinderjit/Data_Drive/Data/ChinCap/SAM_noise/' + folder + '/SAM_'
 pathThing = '/'
 nchans = 37
 # refchans = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19',
@@ -31,11 +33,12 @@ data_AM5.set_channel_types({'EXG4':'eeg','EXG3':'eeg','EXG5':'eeg'})
 
 
 #bad_chs = [0,5,8,9,16,24,25,26,27]
-bad_chs =[23,24,25,26,27]
-All_chs = np.arange(32)
-channels = np.delete(All_chs,bad_chs)
+bad_ind =[23,24,25,26,27,32,33,34,35,36]
+All_chs = np.arange(37)
+channels = np.delete(All_chs,bad_ind)
 bad_chs = ['A24','A25','A26','A27','A28','EXG1','EXG2','EXG3','EXG4','EXG5']
-data_AM5.drop_channels(bad_chs)
+data_AM5.info['bads'].extend(bad_chs)
+#data_AM5.drop_channels(bad_chs)
 data_AM5.set_eeg_reference(ref_channels='average')
 
 scalings = dict(eeg=20e-6,stim=1)
@@ -44,6 +47,12 @@ data_AM5.plot(events = evnts_AM5, scalings=scalings,show_options=True)
 epochs_AM5 = mne.Epochs(data_AM5,evnts_AM5,[255],tmin=-0.5,tmax=2.3,baseline=(-0.2,0),reject=dict(eeg=200e-6))
 evoked_AM5 = epochs_AM5.average()
 evoked_AM5.plot(titles = 'AM 4')
+
+dataEvkd_AM5 = evoked_AM5.data
+t = evoked_AM5.times
+sio.savemat('/media/ravinderjit/Data_Drive/Data/ChinCap/SAM_noise/DataForHannah.mat',{'data':dataEvkd_AM5, 't':t,
+                                                                                      'bad_chs':bad_chs, 'bad_ind':bad_ind,
+                                                                                      'good_ind':channels} )
 
 data_AM40,evnts_AM40 = EEGconcatenateFolder(data_loc + '40' + pathThing ,nchans,refchans,exclude)
 data_AM40.filter(2,100)

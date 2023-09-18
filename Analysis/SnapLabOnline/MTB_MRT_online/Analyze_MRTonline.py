@@ -98,6 +98,21 @@ for sub in range(len(subjects)):
     fitValues = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
     
     psCurves.append(fitValues)
+    
+#%% Clean subject names
+#Some subjects had to put modify subject name due to techincal difficulty. fixing here
+
+for sub in range(len(subjects)):
+    thisSub = list(subjects[sub])
+    
+    if thisSub[0] == 's':
+        thisSub[0] = 'S'
+    
+    if len(thisSub) > 4:
+        thisSub = thisSub[:4]
+        
+    subjects[sub] = "".join(thisSub)
+    
 
 #%% Plot average curves
 

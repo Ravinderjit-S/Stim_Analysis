@@ -15,10 +15,13 @@ from matplotlib import rcParams
 data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/MTB_beh/'
 fig_loc = '/media/ravinderjit/Data_Drive/Data/Figures/MTB/'
 
-Subjects = ['S072', 'S078', 'S088', 'S207', 'S211', 'S246', 'S259', 'S260',
-            'S268', 'S269', 'S270', 'S271', 'S272', 'S273', 'S274', 'S277',
-            'S279', 'S280', 'S281', 'S282', 'S284', 'S285', 'S288','S290',
-            'S291', 'S303', 'S305', 'S308', 'S309', 'S310']
+Subjects = ['S069', 'S072', 'S078', 'S088', 'S104', 'S105', 'S207',
+            'S211', 'S246', 'S259', 'S260', 'S268', 'S269', 'S270',
+            'S271', 'S272', 'S273', 'S274', 'S277', 'S279', 'S280',
+            'S281', 'S282', 'S284', 'S285', 'S288', 'S290', 'S291', 
+            'S303', 'S305', 'S308', 'S309', 'S310', 'S312', 'S337', 
+            'S339', 'S340', 'S341', 'S342', 'S344', 'S345', 'S347'
+            ]
 
 acc = np.zeros((7,len(Subjects)))
 for sub in range(len(Subjects)):
