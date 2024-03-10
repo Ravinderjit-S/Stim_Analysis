@@ -153,7 +153,7 @@ plt.ylabel('Amplitude',fontsize=12)
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.title('mod-TRF Ch. Cz',fontsize=14)
-plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+#plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
 #plt.xscale('log')
 
 #%% Plot Ch. Cz & FP1

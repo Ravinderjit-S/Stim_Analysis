@@ -36,6 +36,8 @@ A_Ht_epochs = []
 
 for sub in range(len(Subjects)):
     subject = Subjects[sub]
+    if subject == 'S250':
+        subject = 'S250_visit2'
     print('Loading ' + subject)
     with open(os.path.join(picklePassive_loc,subject +'_AMmseq10bits.pickle'),'rb') as file:
         [t, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
@@ -61,20 +63,18 @@ Cz_sub = []
 for sub in range(len(Subjects)):
     Cz_sub.append(A_Ht[sub][-1,:])
 
-Cz_sub = np.array(Cz_sub)
+Cz_sub = np.array(Cz_sub) * 1e6 #untis of microvolts
 Cz_mean = Cz_sub.mean(axis=0)
 Cz_sem = Cz_sub.std(axis=0) / np.sqrt(Cz_sub.shape[0])
-
-
 
 plt.figure()
 plt.plot(t,Cz_mean,color='k',linewidth=2)
 plt.fill_between(t,Cz_mean-Cz_sem,Cz_mean+Cz_sem,color='k',alpha=0.5)
 plt.xlim([-0.05,0.4])
 plt.xlabel('Time (sec)')
-plt.ylabel('Amplitude')
+plt.ylabel('\u03BCV')
 plt.xticks([0, 0.1, 0.2, 0.3, 0.4])
-plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+plt.ticklabel_format(axis='y') 
 plt.title('Average mod-TRF across 9 Particpants')
 
 
@@ -96,10 +96,11 @@ for tc in range(len(t_cuts)):
     plt.fill_between(t[t_1:t_2],Cz_mean[t_1:t_2]-Cz_sem[t_1:t_2],Cz_mean[t_1:t_2]+Cz_sem[t_1:t_2],color=colors[tc],alpha=0.5)
 plt.xlim([-0.05,0.3])
 plt.xlabel('Time (sec)',fontsize=12)
-plt.ylabel('Amplitude',fontsize=12)
+plt.ylabel('\u03BCV',fontsize=12)
 plt.xticks([0, 0.1, 0.2, 0.3])
-plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
-plt.tick_params(labelsize=11)
+#plt.yticks([-10, 0, 10])
+#plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+plt.tick_params(labelsize=12)
 #plt.title('Average mod-TRF across 9 Particpants',fontsize=14)
 
 plt.savefig(os.path.join(fig_path,'ModTRF_s_avg.svg'),format='svg')
@@ -141,49 +142,28 @@ for t_c in range(len(t_cuts)):
     pca_expVar = pca.explained_variance_ratio_
     pca_coeff = pca.components_
     
-    if pca_coeff[0,31] < 0:  # Expand this too look at mutlitple electrodes
+    if pca_coeff[0,31] < 0:  # correct polarity by looking at channel Cz
        pca_coeff = -pca_coeff
        pca_sp = -pca_sp
        
-    # Avg_demean = Avg_Ht[:,t_1:t_2] - Avg_Ht[:,t_1:t_2].mean(axis=1)[:,np.newaxis]
-    # H_tc_est = np.matmul(pca_sp[:,0][:,np.newaxis],pca_coeff[0,:][np.newaxis,:])
-    # pca_expVar2 = explained_variance_score(Avg_demean.T, H_tc_est,multioutput='variance_weighted')
-    
-    # pca_expVar2s.append(pca_expVar2)
     pca_sp_cuts.append(pca_sp)
     pca_expVar_cuts.append(pca_expVar)
     pca_coeff_cuts.append(pca_coeff)
     t_cutT.append(t[t_1:t_2])
-    
-    plt.figure()
-    # plt.plot(t[t_1:t_2], Avg_demean[31,:])
-    # plt.plot(t[t_1:t_2], H_tc_est[:,31])
-    
-    
+
     
 
-# plt.figure()
-# for t_c in range(len(t_cuts)):
-#     plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,0])
-# plt.plot(t,Avg_Ht[31,:] -Avg_Ht[31,:].mean(),color='k')
-# plt.xlim([0,0.5])
-    
-# plt.figure()
-# plt.title('2nd component')
-# for t_c in range(len(t_cuts)):
-#     plt.plot(t_cutT[t_c],pca_sp_cuts[t_c][:,1])
-    
 
 fig = plt.figure()
-fig.set_size_inches(9,4)
+fig.set_size_inches(8,3)
 labels = ['comp1', 'comp2']
 vmin = pca_coeff_cuts[-1][0,:].mean() - 2 * pca_coeff_cuts[-1][0,:].std()
 vmax = pca_coeff_cuts[-1][0,:].mean() + 2 * pca_coeff_cuts[-1][0,:].std()
 for t_c in range(len(t_cuts)):
-    plt.subplot(1,len(t_cuts),t_c+1)
-    plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][0]*100)) + '%')
-    mne.viz.plot_topomap(pca_coeff_cuts[t_c][0,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
-    
+    ax = plt.subplot(1,len(t_cuts),t_c+1)
+    plt.title(str(np.round(pca_expVar_cuts[t_c][0]*100)) + '%',{'horizontalalignment':'right'})
+    #mne.viz.plot_topomap(pca_coeff_cuts[t_c][0,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
+    mne.viz.plot_topomap(pca_coeff_cuts[t_c][0,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vlim=(vmin,vmax),axes=ax)
     # plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
     # plt.title('ExpVar ' + str(np.round(pca_expVar_cuts[t_c][1]*100)) + '%')
     # mne.viz.plot_topomap(pca_coeff_cuts[t_c][1,:], mne.pick_info(A_info_obj[1],A_ch_picks[1]),vmin=vmin,vmax=vmax)
@@ -211,7 +191,7 @@ f = f[f>=0]
 Cz_hf_sem = Cz_hf.std(axis=0) / np.sqrt(Cz_hf.shape[0])
 
 phase_mn = phase.mean(axis=0)
-phase_sem = phase.std(axis=0)
+phase_sem = phase.std(axis=0) / np.sqrt(phase.shape[0])
 
 fig,ax = plt.subplots(2,1,sharex=True)
 
@@ -225,8 +205,7 @@ ax2 = ax[1]
 ax2.plot(f,phase_mn,color='grey')
 ax2.fill_between(f,phase_mn-phase_sem,phase_mn+phase_sem,color='grey',alpha=0.5)
 ax[0].set_xlim([0,75])
-
-ax[0].set_ylabel('Magnitude')
+ax[0].set_ylabel('\u03BCV')
 ax[1].set_xlabel('Frequency (Hz)')
 ax[1].set_ylabel('Phase (Radians)')
 
@@ -238,13 +217,13 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_f.png'),format='png')
 fig,ax = plt.subplots()
 ax.plot(f,Cz_hf.mean(axis=0),color='black')
 ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='black')
-ax.set_ylabel('Magnitude',fontsize=16)
+ax.set_ylabel('\u03BCV',fontsize=16)
 ax.set_xlabel('Modulation Frequency (Hz)',fontsize=16)
 ax.set_xlim([0,75])
-ax.set_yticks([0, 2e-4, 4e-4])
+#ax.set_yticks([0, 2e-4, 4e-4])
 ax.set_xticks([0,10,20,30,40,50,60,70])
-ax.tick_params(labelsize=12)
-ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+ax.tick_params(labelsize=14)
+#ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
 #ax.set_title('Average mod-TRF across 9 participants',fontsize=14)
 
 
@@ -254,16 +233,67 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_fmag.svg'),format='svg')
 fig,ax = plt.subplots()
 ax.plot(f,phase_mn,color='grey')
 ax.fill_between(f,phase_mn-phase_sem,phase_mn+phase_sem,color='grey',alpha=0.5)
-ax.set_ylabel('Phase (Radians)',fontsize=16)
-ax.set_xlabel('Modulation Frequency (Hz)',fontsize=16)
+ax.set_ylabel('Phase (Radians)',fontsize=18)
+ax.set_xlabel('Modulation Frequency (Hz)',fontsize=18)
 ax.set_xlim([0,75])
-ax.tick_params(labelsize=12)
-ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
+ax.tick_params(labelsize=16)
+#ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
 ax.set_xticks([0,10,20,30,40,50,60,70])
 ax.set_yticks([-2e1, -1e1, 0])
-
-
+fig.set_size_inches(9,6)
 plt.savefig(os.path.join(fig_path,'ModTRF_avg_phase.svg'),format='svg')
+
+#compute group delay
+#from 10-20
+
+f_1 = np.where(f>=10)[0][0]
+f_2 = np.where(f>=20)[0][0]
+
+coeffs = np.zeros(phase.shape[0])
+coeffs1 = np.zeros(phase.shape[0])
+for pp in range(phase.shape[0]):
+    phz = phase[pp,:]
+    coeffs[pp] = np.polyfit(f[f_1:f_2],phase[pp,f_1:f_2],deg=1)[0]
+    coeffs1[pp] = np.polyfit(f[f_1:f_2],phase[pp,f_1:f_2],deg=1)[1]
+gd1 = -coeffs / (2*np.pi)
+
+gd1_mean = gd1.mean()
+gd1_sem = gd1.std() / np.sqrt(gd1.size)
+
+plt.figure()
+plt.plot(f,phase.T)
+
+plt.figure()
+plt.plot(f,phase[0,:].T)
+plt.plot(f,coeffs[0]*f+coeffs1[0],'k')
+plt.plot(f,phase[8,:].T)
+
+
+#from 30-70
+f_3 = np.where(f>=30)[0][0]
+f_4 = np.where(f>=70)[0][0]
+
+coeffs2 = np.zeros(phase.shape[0])
+coeffs3 = np.zeros(phase.shape[0])
+for pp in range(phase.shape[0]):
+    phz = phase[pp,:]
+    coeffs2[pp] = np.polyfit(f[f_3:f_4],phase[pp,f_3:f_4],deg=1)[0]
+    coeffs3[pp] = np.polyfit(f[f_3:f_4],phase[pp,f_3:f_4],deg=1)[1]
+gd2 = -coeffs2 / (2*np.pi)
+
+gd2_mean = gd2.mean()
+gd2_sem = gd2.std() / np.sqrt(gd2.size)
+
+
+plt.figure()
+plt.plot(f,phase.T)
+
+plt.figure()
+plt.plot(f,phase[2,:].T)
+plt.plot(f,coeffs2[2]*f+coeffs3[2],'k')
+
+plt.plot(f,phase[5,:].T)
+
 
 
 

@@ -153,11 +153,19 @@ def PCA_tcuts_topomap(pca_coeffCuts, t_cuts, pca_expVarCuts, infoObj, ch_picks, 
     for t_c in range(len(t_cuts)):
         plt.subplot(2,len(t_cuts),t_c+1)
         plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][0]*100)) + '%')
-        mne.viz.plot_topomap(pca_coeffCuts[t_c][0,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
+        
+        try:
+            mne.viz.plot_topomap(pca_coeffCuts[t_c][0,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
+
+        except:
+            mne.viz.plot_topomap(pca_coeffCuts[t_c][0,:], mne.pick_info(infoObj,ch_picks),vlim=(vmin,vmax))
         
         plt.subplot(2,len(t_cuts),t_c+1 + len(t_cuts))
         plt.title('ExpVar ' + str(np.round(pca_expVarCuts[t_c][1]*100)) + '%')
-        mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
+        try:
+            mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vmin=vmin,vmax=vmax)
+        except:
+            mne.viz.plot_topomap(pca_coeffCuts[t_c][1,:], mne.pick_info(infoObj,ch_picks),vlim=(vmin,vmax))
 
 def Average_Subjects(A_Ht, A_ch_picks, nchannels):
     #A_Ht: is list of system fucntions with shape channel x time

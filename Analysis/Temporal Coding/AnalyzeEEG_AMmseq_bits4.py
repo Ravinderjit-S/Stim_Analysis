@@ -49,7 +49,6 @@ data_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_bit
 pickle_loc = data_loc + 'Pickles/'
 
 Subjects = ['S211','S207','S236','S228','S238'] #S237 data is crazy noisy
-Subjects = ['S236', 'S228', 'S238']
 num_nfs = 50
 
 for subject in Subjects:

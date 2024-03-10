@@ -15,18 +15,9 @@ import pickle
 import numpy as np
 import mne
 import matplotlib.pyplot as plt
-from scipy.signal import freqz
 from sklearn.decomposition import PCA
-from sklearn.metrics import explained_variance_score
 import scipy.io as sio
-from scipy.signal import find_peaks
 
-import sys
-sys.path.append(os.path.abspath('../ACRanalysis/'))
-import ACR_helperFuncs
-
-sys.path.append(os.path.abspath('../mseqAnalysis/'))
-from mseqHelper import mseqXcorr
 
 #%% Load mseq
 mseq_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/mseqEEG_150_bits10_4096.mat'
@@ -36,7 +27,7 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 #%% Subjects
 
 Subjects = ['S207', 'S211', 'S228','S236','S238','S239','S246','S247','S250']
-Subjects_sd = ['S207', 'S211', 'S228', 'S236', 'S238', 'S239', 'S250'] #Leaving out S211 for now
+Subjects_sd = ['S207', 'S211', 'S228', 'S236', 'S238', 'S239', 'S250'] 
 
 
 dataPassive_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10bits/'
@@ -139,23 +130,23 @@ for sub in range(len(Subjects_sd)):
     
 print('Done loading shift detect data')
 
+
 #%% Plot Ch. Cz
-    
+
+t_epochs *= 1e3 #change to ms    
 fig,ax = plt.subplots(nrows=2,ncols=2,sharex=True)
 fig.set_size_inches(12,8)
 ax = np.reshape(ax,4)
 
 t_0 = np.where(t_epochs>=0)[0][0]
 
-t_epochs *= 1e3 #change to ms
-
 for sub in range(len(Subjects[:4])):
     subject = Subjects[sub]
     
     ch = 31
     
-    if sub !=2:
-        ax[sub].axes.yaxis.set_visible(False)
+    #if sub !=2:
+        #ax[sub].axes.yaxis.set_visible(False)
         
     # if sub < len(Subjects)/2:
     #     ax[sub].axes.xaxis.set_visible(False)
@@ -163,8 +154,8 @@ for sub in range(len(Subjects[:4])):
     ch_pass_ind = np.where(A_ch_picks_pass[sub] == ch)[0][0]
     ch_count_ind = np.where(A_ch_picks_count[sub] == ch)[0][0]
     
-    cz_pass = A_Ht_epochs_pass[sub][ch_pass_ind,:,:]
-    cz_count = A_Ht_epochs_count[sub][ch_count_ind,:,:]
+    cz_pass = A_Ht_epochs_pass[sub][ch_pass_ind,:,:] *1e6
+    cz_count = A_Ht_epochs_count[sub][ch_count_ind,:,:] * 1e6
     
     cz_pass_sem = cz_pass.std(axis=0) / np.sqrt(cz_pass.shape[0])
     cz_count_sem = cz_count.std(axis=0) / np.sqrt(cz_count.shape[0])
@@ -185,7 +176,7 @@ for sub in range(len(Subjects[:4])):
         sub_sd = Subjects_sd.index(subject)
         
         ch_sd_ind = np.where(A_ch_picks_sd[sub_sd] == ch)[0][0]
-        cz_sd = A_Ht_epochs_sd[sub_sd][ch_sd_ind,:,:]
+        cz_sd = A_Ht_epochs_sd[sub_sd][ch_sd_ind,:,:] * 1e6
         
         cz_sd_sem = cz_sd.std(axis=0) / np.sqrt(cz_sd.shape[0])
         cz_sd = cz_sd.mean(axis=0)
@@ -196,19 +187,22 @@ for sub in range(len(Subjects[:4])):
         ax[sub].fill_between(t_epochs,cz_sd - cz_sd_sem, cz_sd + cz_sd_sem, color='tab:orange',alpha=0.5)
     
     #ax[sub].set_title('S' + str(sub+1))
-    ax[sub].set_title('S' + str(sub+1),fontweight='bold',fontsize=15)
+    ax[sub].set_title('P' + str(sub+1),fontweight='bold',fontsize=14)
     ax[sub].set_xlim([-0.010*1e3,0.3*1e3])
     #ax[sub].set_xlim([-.005,0.050])
     #ax[sub].set_xticks([0,0.050,0.1])
     #ax[sub].set_xticks([0,0.2,0.4])
     
 ax[2].legend(fontsize=12)
-ax[2].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-ax[2].set_xlabel('Time (msec)',fontsize=12)
-ax[2].set_ylabel('Amplitude',fontsize=12)
-#ax[2].set_xticks([0,0.1,0.2,0.3])
-ax[2].set_yticks([-0.0075,0, .01])
-plt.tick_params(labelsize=11)
+#ax[2].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+ax[2].set_xlabel('Time (msec)',fontsize=14)
+ax[2].set_ylabel('\u03BCV',fontsize=14)
+ax[0].set_yticks([-15,0,15,30])
+ax[1].set_yticks([-20,-10,0,10])
+ax[2].set_yticks([-30,0,30,60])
+ax[3].set_yticks([-40,-20,0,20])
+for a_ in ax:
+    a_.tick_params(axis='both', labelsize=14)
 
 plt.savefig(os.path.join(fig_path,'ModTRF_active.svg'),format='svg')
 
@@ -277,41 +271,63 @@ plt.plot(t, Avg_Ht_count[31,:])
 plt.plot(t, Avg_Ht_sd[31,:])
 plt.xlim([-0.05,0.4])
 
-pass_mean = Ht_pass_cz.mean(axis=0)
-count_mean = Ht_count_cz.mean(axis=0)
-sd_mean = Ht_sd_cz.mean(axis=0)
+pass_mean = Ht_pass_cz.mean(axis=0) * 1e6
+count_mean = Ht_count_cz.mean(axis=0)* 1e6
+sd_mean = Ht_sd_cz.mean(axis=0)* 1e6
 
-pass_sem = Ht_pass_cz.std(axis=0) / np.sqrt(Ht_pass_cz.shape[0])
-count_sem = Ht_count_cz.std(axis=0) / np.sqrt(Ht_count_cz.shape[0])
-sd_sem = Ht_sd_cz.std(axis=0) / np.sqrt(Ht_sd_cz.shape[0])
+pass_sem = Ht_pass_cz.std(axis=0) / np.sqrt(Ht_pass_cz.shape[0])* 1e6
+count_sem = Ht_count_cz.std(axis=0) / np.sqrt(Ht_count_cz.shape[0])* 1e6
+sd_sem = Ht_sd_cz.std(axis=0) / np.sqrt(Ht_sd_cz.shape[0])* 1e6
 
 fig = plt.figure()
 t*=1e3
 fig.set_size_inches(10,5)
-plt.plot(t,pass_mean,color='k',linewidth=2)
+plt.plot(t,pass_mean,color='k',linewidth=2, label='Passive')
 plt.fill_between(t,pass_mean - pass_sem, pass_mean+pass_sem,color='k',alpha=0.5)
 
-plt.plot(t,count_mean, color='tab:blue',linewidth=2)
+plt.plot(t,count_mean, color='tab:blue',linewidth=2, label='Easy (Counting)')
 plt.fill_between(t,count_mean - count_sem, count_mean+pass_sem,color='tab:blue',alpha=0.5)
 
-plt.plot(t, sd_mean, color='tab:orange',linewidth=2)
+plt.plot(t, sd_mean, color='tab:orange',linewidth=2, label='Hard (Shift Detect)')
 plt.fill_between(t,sd_mean - sd_sem, sd_mean+ sd_sem,color='tab:orange',alpha=0.5)
 t/=1e3
 plt.xlim(-50,300)
-plt.xticks([0,50,100,200,300])
-plt.yticks([-.004,0, .004])
-plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-plt.ylabel('Amplitude',fontsize=14)
+#plt.xticks([0,50,100,200,300])
+plt.yticks([-15,0,15,30])
+plt.ylabel('\u03BCV',fontsize=14)
 plt.xlabel('Time (msec)',fontsize=14)
-plt.tick_params(labelsize=11)
-plt.legend(['Passive', 'Easy (Counting)', 'Hard (Shift Detect)'])
+plt.tick_params(labelsize=14)
+plt.legend(fontsize=12)
 
 plt.savefig(os.path.join(fig_path,'ModTRF_active_avg.svg'),format='svg')
+
+#Same Figure but zoom in on first 50 ms
+
+fig = plt.figure()
+t*=1e3
+fig.set_size_inches(12,6)
+plt.plot(t,pass_mean,color='k',linewidth=2, label='Passive')
+plt.fill_between(t,pass_mean - pass_sem, pass_mean+pass_sem,color='k',alpha=0.5)
+
+plt.plot(t,count_mean, color='tab:blue',linewidth=2, label='Easy (Counting)')
+plt.fill_between(t,count_mean - count_sem, count_mean+pass_sem,color='tab:blue',alpha=0.5)
+
+plt.plot(t, sd_mean, color='tab:orange',linewidth=2, label='Hard (Shift Detect)')
+plt.fill_between(t,sd_mean - sd_sem, sd_mean+ sd_sem,color='tab:orange',alpha=0.5)
+t/=1e3
+plt.xlim(-10,50)
+#plt.xticks([0,50,100,200,300])
+plt.yticks([-15,0,15,30])
+plt.ylabel('\u03BCV',fontsize=18)
+plt.xlabel('Time (msec)',fontsize=18)
+plt.tick_params(labelsize=18)
+#plt.legend()
+
+plt.savefig(os.path.join(fig_path,'ModTRF_active_avg_1st50.svg'),format='svg')
 
 
 
 #%% PCA on Average Attention Effects to get rough sources
-
 
 t_cuts_pass = [.016, .033, .066, .123, .268 ]
 t_cuts_count = [.015, .037, .068, .120, .260  ]
@@ -409,17 +425,17 @@ labels = ['comp1']
 vmin = pca_coeff_pass[-1].mean() - 2 * pca_coeff_pass[-1].std()
 vmax = pca_coeff_pass[-1].mean() + 2 * pca_coeff_pass[-1].std()
 for t_c in range(len(t_cuts_pass)):
-    plt.subplot(3,len(t_cuts_pass),t_c+1)
-    plt.title('ExpVar ' + str(np.round(pca_expVar_pass[t_c][0]*100)) + '%')
-    mne.viz.plot_topomap(pca_coeff_pass[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vmin=vmin,vmax=vmax)
+    ax = plt.subplot(3,len(t_cuts_pass),t_c+1)
+    plt.title( str(np.round(pca_expVar_pass[t_c][0]*100)) + '%',horizontalalignment='right')
+    mne.viz.plot_topomap(pca_coeff_pass[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vlim=(vmin,vmax),axes=ax)
     
-    plt.subplot(3,len(t_cuts_pass),t_c+1 + len(t_cuts_pass))
-    plt.title('ExpVar ' + str(np.round(pca_expVar_count[t_c][0]*100)) + '%')
-    mne.viz.plot_topomap(pca_coeff_count[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vmin=vmin,vmax=vmax)
+    ax = plt.subplot(3,len(t_cuts_pass),t_c+1 + len(t_cuts_pass))
+    plt.title(str(np.round(pca_expVar_count[t_c][0]*100)) + '%',horizontalalignment='right')
+    mne.viz.plot_topomap(pca_coeff_count[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vlim=(vmin,vmax),axes=ax)
     
-    plt.subplot(3,len(t_cuts_pass),t_c+1 + 2* len(t_cuts_pass))
-    plt.title('ExpVar ' + str(np.round(pca_expVar_sd[t_c][0]*100)) + '%')
-    mne.viz.plot_topomap(pca_coeff_sd[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vmin=vmin,vmax=vmax)
+    ax = plt.subplot(3,len(t_cuts_pass),t_c+1 + 2* len(t_cuts_pass))
+    plt.title( str(np.round(pca_expVar_sd[t_c][0]*100)) + '%',horizontalalignment='right')
+    mne.viz.plot_topomap(pca_coeff_sd[t_c][0,:], mne.pick_info(info_obj,A_ch_picks_pass[1]),vlim=(vmin,vmax),axes=ax)
     
 plt.savefig(os.path.join(fig_path,'topomaps.svg'),format='svg')
 

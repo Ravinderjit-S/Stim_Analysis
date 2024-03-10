@@ -81,7 +81,7 @@ for subject in Subjects:
     elif subject == 'S238':
         ocular_projs = [Projs[0]] #Projs[1]
     elif subject == 'S239':
-        ocular_projs = [Projs[0]] # Projs[2]
+        ocular_projs = [Projs[0]] # Projs[2
     elif subject == 'S246':
         ocular_projs = [Projs[0]] #Projs[1]
     elif subject == 'S247':
@@ -91,7 +91,6 @@ for subject in Subjects:
     elif subject == 'S211':
         ocular_projs = [Projs[0]] #Projs[2]
     
-    #ocular_projs = Projs
     
     data_eeg.add_proj(ocular_projs)
     data_eeg.plot_projs_topomap()

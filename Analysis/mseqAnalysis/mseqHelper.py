@@ -13,6 +13,9 @@ def mseqXcorr(epochs,mseq):
     resp_m = epochs.mean(axis=1)
     resp_m = resp_m - resp_m.mean(axis=1)[:,np.newaxis]
     Ht_m = np.zeros([resp_m.shape[0],resp_m.shape[1]+mseq.size-1])
+    
+    mseq = mseq / np.sqrt(np.sum(mseq**2)) #normalize mseq by sqrt of total power
+    
     for ch in range(resp_m.shape[0]):
         Ht_m[ch,:] = np.correlate(resp_m[ch,:],mseq,mode='full')#[mseq[m].size-1:]
     
@@ -21,6 +24,8 @@ def mseqXcorr(epochs,mseq):
 def mseqXcorrEpochs(epochs,mseq):
     
     Ht_epochs = np.zeros([epochs.shape[0], epochs.shape[1], epochs.shape[2] + mseq.size-1])
+    
+    mseq = mseq / np.sqrt(np.sum(mseq**2)) #normalize mseq by sqrt of total power
     for ep in range(epochs.shape[1]):
         resp_m = epochs[:,ep,:]
         resp_m = resp_m - resp_m.mean(axis=1)[:,np.newaxis]
@@ -32,8 +37,7 @@ def mseqXcorrEpochs(epochs,mseq):
         
     return Ht_epochs
 
-
-    
+ 
 def mseqXcorrEpochs_fft(epochs,mseq,fs):
     nfft = int(2**np.ceil(np.log2(mseq.size)))
     if mseq.size < fs:
@@ -45,6 +49,7 @@ def mseqXcorrEpochs_fft(epochs,mseq,fs):
     
     Ht_epochs = np.zeros([epochs.shape[0],epochs.shape[1],t_keep.size])
     
+    mseq = mseq / np.sqrt(np.sum(mseq**2)) #normalize mseq by sqrt of total power
     mseq_f = np.fft.fft(mseq,n=nfft)
     mseq_f = mseq_f[np.newaxis,:]
     for ep in range(epochs.shape[1]):

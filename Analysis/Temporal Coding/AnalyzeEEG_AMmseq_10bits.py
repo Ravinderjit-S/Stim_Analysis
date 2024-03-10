@@ -16,11 +16,9 @@ from mne.preprocessing.ssp import compute_proj_epochs
 import os
 import pickle
 import sys
-sys.path.append(os.path.abspath('../mseqAnalysis/'))
+sys.path.append(os.path.abspath('/media/ravinderjit/Data_Drive/Stim_Analysis/Analysis/mseqAnalysis/'))
 from mseqHelper import mseqXcorr
 from mseqHelper import mseqXcorrEpochs_fft
-
-
 from sklearn.decomposition import PCA
 
 
@@ -62,23 +60,23 @@ for subject in Subjects:
     Projs = compute_proj_epochs(blink_epochs,n_grad=0,n_mag=0,n_eeg=8)
     
     if subject == 'S207':
-        ocular_projs = [Projs[0]] #not using Projs[2] for now
+        ocular_projs = [Projs[0]] 
     elif subject == 'S211':
         ocular_projs = [Projs[0]]
     elif subject == 'S228':
-        ocular_projs = [Projs[0]] #not using Projs[2] cause its rotated
+        ocular_projs = [Projs[0]] 
     elif subject == 'S236':
         ocular_projs = [Projs[0]]
     elif subject == 'S238':
-        ocular_projs = [Projs[0]]  #not using Projs[2] for now
+        ocular_projs = [Projs[0]] 
     elif subject == 'S239':
-        ocular_projs = [Projs[0]]  #not using Projs[2] for now
+        ocular_projs = [Projs[0]]  
     elif subject == 'S246':
-        ocular_projs = [Projs[0]]  #not using Projs[2] for now
-    elif subject == 'S247':                      #S247 looks sleepy ... lot of alpha 
-        ocular_projs = [Projs[0]]   #not using Projs[2] for now
+        ocular_projs = [Projs[0]] 
+    elif subject == 'S247':                     
+        ocular_projs = [Projs[0]]  
     elif subject == 'S250':
-        ocular_projs = [Projs[0]]  #not using Projs[2] for now
+        ocular_projs = [Projs[0]]  
     elif subject == 'S250_visit2':
         ocular_projs = [Projs[0]]
     

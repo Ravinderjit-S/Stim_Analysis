@@ -90,39 +90,48 @@ for sub in range(len(Subjects)):
         trials_sem = trials_cz.std(axis=0) / np.sqrt(trials_cz.shape[0])
         trials_mean = trials_cz.mean(axis=0)
         
-        t_0 = np.where(t_epochs[k] >=0)[0][0]
-        trials_mean = trials_mean - trials_mean[t_0]
+        # t_0 = np.where(t_epochs[k] >=0)[0][0]
+        #trials_mean = trials_mean - trials_mean[t_0]
         
-        mean_nf = mean_nf - mean_nf[t_0]
+        # t_0_n = np.where(tdat[k] >=0)[0][0]
+        #mean_nf = mean_nf - mean_nf[t_0_n]
         
         
-        #ax[k,sub].plot(tdat[k], mean_nf,color='grey')
-        #ax[k,sub].fill_between(tdat[k], mean_nf - std_nf, mean_nf + std_nf,color='grey',alpha=0.5)
-        ax[k,sub].plot(tdat[k], cz_nf_k.T,color='grey',alpha=0.5)
+        ax[k,sub].plot(tdat[k], mean_nf *1e6,color='grey')
+        ax[k,sub].fill_between(tdat[k], (mean_nf - std_nf)*1e6, (mean_nf + std_nf)*1e6,color='grey',alpha=0.5)
+        #ax[k,sub].plot(tdat[k], cz_nf_k.T,color='grey',alpha=0.5)
         
-        ax[k,sub].plot(t_epochs[k],trials_mean,color=colors[k])
-        ax[k,sub].fill_between(t_epochs[k],trials_mean-trials_sem,trials_mean+trials_sem,alpha=0.5,color=colors[k])
-        ax[k,sub].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+        ax[k,sub].plot(t_epochs[k],trials_mean*1e6,color=colors[k])
+        ax[k,sub].fill_between(t_epochs[k],(trials_mean-trials_sem)*1e6,(trials_mean+trials_sem)*1e6,alpha=0.5,color=colors[k])
+        #ax[k,sub].axes.ticklabel_format(axis='y')
         
         
         ax[k,sub].locator_params(axis='y',nbins=3)
         
-    ax[0,sub].set_title('S' + str(sub+1),fontweight='bold')
+    ax[0,sub].set_title('P' + str(sub+1),fontweight='bold')
     
 ax[0,0].set_xlim(-0.050,0.4)
 ax[0,0].set_xticks([0,0.2,0.4])
-ax[3,0].set_xlabel('Time (s)')
-ax[0,0].set_ylabel('7 Bits',rotation=0,labelpad=15,fontweight='bold')
-ax[1,0].set_ylabel('8 Bits',rotation=0,labelpad=15,fontweight='bold')
-ax[2,0].set_ylabel('9 Bits',rotation=0,labelpad=15,fontweight='bold')
-ax[3,0].set_ylabel('10 Bits',rotation=0,labelpad=15,fontweight='bold')
+ax[3,0].set_ylabel('\u03BCV',fontsize=12)
+ax[3,0].set_xlabel('Time (s)',fontsize=12)
+# ax[0,0].set_ylabel('7 Bits',rotation=0,labelpad=15,fontweight='bold')
+# ax[1,0].set_ylabel('8 Bits',rotation=0,labelpad=15,fontweight='bold')
+# ax[2,0].set_ylabel('9 Bits',rotation=0,labelpad=15,fontweight='bold')
 
-#plt.savefig(os.path.join(fig_path,'ModTRF_4bits.svg'),format='svg')
+figtext_x = 0.04  # Adjust the x-coordinate as needed
+figtext_y = 0.85   # Adjust the y-coordinate as needed
+fig.text(0.04, 0.85 , '7 Bits', fontsize=12,weight='bold')
+fig.text(0.04, 0.65 , '8 Bits', fontsize=12,weight='bold')
+fig.text(0.04, 0.45 , '9 Bits', fontsize=12,weight='bold')
+fig.text(0.04, 0.25 , '10 Bits', fontsize=12,weight='bold')
+
+plt.savefig(os.path.join(fig_path,'ModTRF_4bits.svg'),format='svg')
 
 
 fig,ax = plt.subplots(2,2,sharex=True)
 ax = np.reshape(ax,[4])
 fig.set_size_inches(10,8)
+labels = ['7 bit','8 bit', '9bit','10 bit']
 for sub in range(len(Subjects)):
     for k in range(4):
         t_0 = np.where(t_epochs[k] >=0)[0][0]
@@ -135,22 +144,27 @@ for sub in range(len(Subjects)):
         trials_mean = trials_mean - trials_mean[t_0]
         norm_pk1 = trials_mean[t_0:t_1].max()
         
-        trials_mean /= norm_pk1
-        trials_sem /=norm_pk1
+        #trials_mean /= norm_pk1
+        #trials_sem /=norm_pk1
         
-        ax[sub].plot(t_epochs[k],trials_mean,color=colors[k])
-        ax[sub].fill_between(t_epochs[k],trials_mean-trials_sem,trials_mean+trials_sem,alpha=0.5,color=colors[k])
-        ax[sub].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+        ax[sub].plot(t_epochs[k],trials_mean * 1e6,color=colors[k],label=labels[k])
+        ax[sub].fill_between(t_epochs[k],(trials_mean-trials_sem)*1e6,(trials_mean+trials_sem)*1e6,alpha=0.5,color=colors[k])
+        #ax[sub].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
         ax[sub].locator_params(axis='y',nbins=3)
     
-    ax[sub].set_title('S' + str(sub+1), fontweight='bold')
+    ax[sub].set_title('P' + str(sub+1), fontweight='bold', fontsize=16)
         
 ax[2].set_xlim(-0.050,0.4) 
-ax[2].legend(['7 bit','8 bit', '9bit','10 bit'])     
-ax[2].set_xlabel('Time (sec)')
-ax[2].set_ylabel('Normalized Amplitude')           
+ax[2].set_ylim()
+ax[2].set_xticks([0,0.2,0.4],fontsize=16)
+ax[2].legend()     
+ax[2].set_xlabel('Time (sec)',fontsize=16)
+ax[2].set_ylabel('\u03BCV',fontsize=16)       
 
-#plt.savefig(os.path.join(fig_path,'ModTRF_compareBits.svg'),format='svg')
+for a_ in ax:
+    a_.tick_params(axis='both', labelsize=16)    
+
+plt.savefig(os.path.join(fig_path,'ModTRF_compareBits.svg'),format='svg')
 
 
 

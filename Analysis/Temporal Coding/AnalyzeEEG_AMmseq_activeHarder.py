@@ -73,7 +73,7 @@ for sub in range(len(Subjects)):
     ocular_projs = Projs
     
     if subject == 'S211':
-        ocular_projs = [Projs[0]] #Projs 1
+        ocular_projs = [Projs[0]] 
     
     if subject == 'S207':
         ocular_projs = [Projs[0]]
@@ -82,10 +82,10 @@ for sub in range(len(Subjects)):
         ocular_projs = [Projs[0]]
         
     if subject == 'S236':
-        ocular_projs = [Projs[0]] #Projs 1
+        ocular_projs = [Projs[0]] 
         
     if subject == 'S238':
-         ocular_projs = [Projs[0]] #Projs 2
+         ocular_projs = [Projs[0]] 
          
     if subject == 'S239':
          ocular_projs = [Projs[0]]

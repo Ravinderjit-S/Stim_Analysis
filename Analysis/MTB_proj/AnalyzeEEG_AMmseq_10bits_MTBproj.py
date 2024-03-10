@@ -39,7 +39,6 @@ Subjects = ['S069', 'S072', 'S078', 'S088', 'S104', 'S105', 'S259', 'S260', 'S26
             'S285', 'S288', 'S290', 'S291', 'S303', 'S305', 'S308', 'S310', 'S312', 'S337', 
             'S339', 'S340', 'S341', 'S342', 'S344', 'S345', 'S347', 'S352', 'S355', 'S358']
 
-Subjects = ['S305']
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
@@ -363,7 +362,7 @@ for subject in Subjects:
     
     #Ht_epochs = Ht_epochs[-1,:,:]
     with open(os.path.join(pickle_loc,subject+'_AMmseq10bits_epochs.pickle'),'wb') as file:
-        pickle.dump([Ht_epochs,t_epochs, refchans, ch_picks],file)
+        pickle.dump([Ht_epochs,t_epochs, refchans, ch_picks, info_obj],file)
     
     del data_eeg, data_evnt, epdat, t, Ht, info_obj, Ht_epochs,t_epochs #,Htnf
     
