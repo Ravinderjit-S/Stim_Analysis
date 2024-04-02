@@ -199,6 +199,7 @@ fig.set_size_inches(10,10)
 
 t_0 = np.where(t_epochs>=0)[0][0]
 colors = ['tab:blue','tab:orange','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
+colors = ['#E69F00', '#56B4E9', '#009E73', '#D55E00', '#CC79A7']
 
 source_numerals = ['I', 'II', 'III', 'IV', 'V']
 for sub in np.arange(len(Subjects[:3])):
