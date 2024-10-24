@@ -244,7 +244,6 @@ fig.set_size_inches(9,6)
 plt.savefig(os.path.join(fig_path,'ModTRF_avg_phase.svg'),format='svg')
 
 #compute group delay
-#from 10-20
 
 f_1 = np.where(f>=10)[0][0]
 f_2 = np.where(f>=20)[0][0]
