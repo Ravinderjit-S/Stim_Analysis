@@ -39,6 +39,8 @@ Subjects = ['S069', 'S072', 'S078', 'S088', 'S104', 'S105', 'S259', 'S260', 'S26
             'S285', 'S288', 'S290', 'S291', 'S303', 'S305', 'S308', 'S310', 'S312', 'S337', 
             'S339', 'S340', 'S341', 'S342', 'S344', 'S345', 'S347', 'S352', 'S355', 'S358']
 
+Subjects = ['S069']
+
 
 exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra external channels that are saved
 
@@ -54,7 +56,7 @@ for subject in Subjects:
     
     datapath =  os.path.join(data_loc, subject)
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
-    data_eeg.filter(l_freq=1,h_freq=200)
+    data_eeg.filter(l_freq=1,h_freq=100)
     #data_eeg.plot()
     
     
@@ -156,7 +158,7 @@ for subject in Subjects:
         plt.savefig(os.path.join(fig_loc,'OcularProjs', subject + '_OcularProjs.png'),format='png')
         plt.close()
 
-    #data_eeg.plot(events=blinks,show_options=True)
+    data_eeg.plot(events=blinks,show_options=True)
     
     del blinks, blink_epochs, Projs,ocular_projs
     
@@ -166,7 +168,7 @@ for subject in Subjects:
     epochs = mne.Epochs(data_eeg,data_evnt,1,tmin=-0.3,tmax=np.ceil(mseq.size/fs)+0.4, reject = reject, baseline=(-0.1,0.))     
     epochs.average().plot(picks=[31],titles='10 bit AMmseq')
     plt.savefig(os.path.join(fig_loc,'Evoked', subject + '_Cz.png'),format='png')
-    plt.close()
+    #plt.close()
     
     #%% Extract part of response when stim is on
     ch_picks = np.arange(32)
@@ -321,7 +323,7 @@ for subject in Subjects:
     plt.title(subject + ' ' + str(Tot_trials))
     plt.show()
     plt.savefig(os.path.join(fig_loc,'Rejection_Deflections', subject + '_P2P.png'),format='png')
-    plt.close()
+    #plt.close()
     
     # plt.figure()
     # plt.plot(Peak2Peak[:,mask_trials].T)
@@ -353,7 +355,7 @@ for subject in Subjects:
     plt.xlim([-0.1,0.6])
     plt.show()
     plt.savefig(os.path.join(fig_loc, 'ModTRF_cz', subject + '_modTRF_cz.png'),format='png')
-    plt.close()
+    #plt.close()
     
     #%% Save Data
     
