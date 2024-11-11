@@ -28,13 +28,13 @@ Subjects = [ 'S069', 'S072','S078','S088', 'S104', 'S105', 'S207','S211',
             'S259', 'S260', 'S268', 'S269', 'S270','S271', 'S272', 'S273',
             'S274', 'S277','S279', 'S280', 'S282', 'S284', 'S285', 'S288',
             'S290' ,'S281','S291', 'S303', 'S305', 'S308', 'S309', 'S310',
-            'S312', 'S339', 'S340', 'S341', 'S344', 'S345']
-
+            'S312', 'S339', 'S340', 'S341', 'S344', 'S345', 'S337', 'S352',
+            'S355', 'S358']
 
 
 age = [49, 55, 47, 52, 51, 61, 25, 28, 20, 33, 19, 19, 21, 21, 20, 18,
        19, 20, 20, 20, 19, 26, 19, 30, 21, 21, 66, 28, 27, 59, 33, 70,
-       37, 71, 39, 35, 60, 61]
+       37, 71, 39, 35, 60, 61, 66, 35, 49, 56]
 
 
 A_epochs = []
@@ -273,29 +273,33 @@ plot_nums = 10 #len(Subjects)
 fig,ax = plt.subplots(int(np.ceil(plot_nums/2)),2,sharex=True,sharey=True,figsize=(14,12))
 ax = np.reshape(ax,plot_nums)
 
-cnd_plot = 0
+cnd_plot = 1
 labels = ['Onset', 'AtoB', 'BtoA']
 conds_comp = [[0,1], [2,4], [3,5]]
    
 fig.suptitle(labels[cnd_plot])
 
-for sub in range(plot_nums):#range(len(Subjects)):
+subs_to_plot = np.random.choice(range(0, 40), plot_nums, replace=False)
+
+for sub in range(plot_nums):
     cnd1 = conds_comp[cnd_plot][0]
     cnd2 = conds_comp[cnd_plot][1]
     
-    ax[sub].set_title(Subjects[sub]) 
+    sub_p = subs_to_plot[sub]
     
-    sub_norm = np.max(np.abs((A_epochs[sub][0].mean(axis=0) + A_epochs[sub][1].mean(axis=0)) / 2))
+    ax[sub].set_title(Subjects[sub_p]) 
+    
+    sub_norm = np.max(np.abs((A_epochs[sub_p][0].mean(axis=0) + A_epochs[sub_p][1].mean(axis=0)) / 2))
     sub_norm = 1 # get rid of normalization in plot for now
     
-    onset12_mean = (A_epochs[sub][cnd1]).mean(axis=0) / sub_norm
-    onset12_sem = (A_epochs[sub][cnd1]).std(axis=0) / np.sqrt(A_epochs[sub][cnd1].shape[0])
+    onset12_mean = (A_epochs[sub_p][cnd1]).mean(axis=0) / sub_norm
+    onset12_sem = (A_epochs[sub_p][cnd1]).std(axis=0) / np.sqrt(A_epochs[sub_p][cnd1].shape[0])
     
     ax[sub].plot(t,onset12_mean,label='12')  
     ax[sub].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5)
     
-    onset20_mean = (A_epochs[sub][cnd2]).mean(axis=0) / sub_norm
-    onset20_sem = (A_epochs[sub][cnd2]).std(axis=0) / np.sqrt(A_epochs[sub][cnd2].shape[0])
+    onset20_mean = (A_epochs[sub_p][cnd2]).mean(axis=0) / sub_norm
+    onset20_sem = (A_epochs[sub_p][cnd2]).std(axis=0) / np.sqrt(A_epochs[sub_p][cnd2].shape[0])
     
     ax[sub].plot(t,onset20_mean, label='20')
     ax[sub].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)

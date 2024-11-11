@@ -19,19 +19,14 @@ import pickle
 nchans = 34;
 refchans = ['EXG1','EXG2']
 
-Subjects = ['S072','S078','S088','S207','S211', 'S259', 'S268', 'S269', 
-            'S270', 'S271', 'S272', 'S273', 'S274','S277','S279','S281', 
-            'S282', 'S284', 'S285', 'S288', 'S290' ,'S291','S303','S305',
-            'S308','S310']
-
-Subjects = ['S069', 'S104', 'S105','S260', 'S280','S309','S312',#'S337',
-            'S339', 'S340','S341','S344','S345']
 
 Subjects = [ 'S069', 'S072','S078','S088', 'S104', 'S105', 'S207','S211',
             'S259', 'S260', 'S268', 'S269', 'S270','S271', 'S272', 'S273',
             'S274', 'S277','S279', 'S280', 'S282', 'S284', 'S285', 'S288',
             'S290' ,'S281','S291', 'S303', 'S305', 'S308', 'S309', 'S310',
-            'S312', 'S339', 'S340', 'S341', 'S344', 'S345']
+            'S312', 'S339', 'S340', 'S341', 'S344', 'S345', 'S337', 'S352',
+            'S355', 'S358']
+Subjects = ['S358']
 
 
 fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/Binding/'
@@ -43,6 +38,10 @@ exclude = ['EXG3','EXG4','EXG5','EXG6','EXG7','EXG8']; #don't need these extra e
 for subject in Subjects:
     
     datapath = os.path.join(data_loc,subject + '_Binding')
+    
+    if subject == 'S337':
+        refchans = ['A7', 'A24']
+        data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans)
     
     data_eeg,data_evnt = EEGconcatenateFolder(datapath+'/',nchans,refchans,exclude)
     data_eeg.filter(l_freq=0.5,h_freq=40)
@@ -114,6 +113,18 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A6')
         data_eeg.info['bads'].append('A3')
         data_eeg.info['bads'].append('A18')
+        
+    if subject == 'S337':
+        data_eeg.info['bads'].append('A21')
+        data_eeg.info['bads'].append('A1')
+        data_eeg.info['bads'].append('A30')
+        data_eeg.info['bads'].append('A2')
+        data_eeg.info['bads'].append('A29')
+        
+    if subject == 'S352':
+        data_eeg.info['bads'].append('A17')
+        data_eeg.info['bads'].append('A9')
+        
 
 
 
@@ -130,6 +141,7 @@ for subject in Subjects:
     data_eeg.add_proj(ocular_projs)
     data_eeg.plot_projs_topomap()
     plt.savefig(os.path.join(fig_loc,'OcularProjs',subject + '_OcularProjs.png'),format='png')
+    #plt.close()
     #data_eeg.plot(events=blinks,show_options=True)
     
     #%% Add events for AB transitions at t = 1,2,3,4
@@ -236,6 +248,7 @@ for subject in Subjects:
     ax[2].set_ylabel('Amplitude \$uV')
     
     plt.savefig(os.path.join(fig_loc,subject + '_12vs20.png'),format='png')
+    #plt.close()
     
     
     
