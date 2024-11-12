@@ -87,25 +87,24 @@ for sub in range(len(Subjects)):
     #plt.figure()
     #ps.psigniplot.plot_psychometric_function(result_0ps)
     
+    fit_params_0 = result_0ps.parameter_estimate
+    fit_params_1 = result_1ps.parameter_estimate
+    
     percentCorr = 0.70
-    CMR[sub] = ps.getThreshold(result_0ps,percentCorr)[0] - ps.getThreshold(result_1ps,percentCorr)[0]
-    lapse[sub] = (result_0ps['Fit'][2] + result_1ps['Fit'][2]) / 2
+   
+    CMR[sub] = result_0ps.threshold(percentCorr)[0] - result_1ps.threshold(percentCorr)[0]
+    lapse[sub] = (fit_params_0['lambda'] + fit_params_1['lambda']) / 2
     
     #%% Pull out stuff to look at average 
     x_vals  = np.linspace(-60, 0, num=1000)
     
-    fit = result_0ps['Fit']
-    data = result_0ps['data']
-    options = result_0ps['options']
-
-    fitValues_0 = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
     
-
-    fit = result_1ps['Fit']
-    data = result_1ps['data']
-    options = result_1ps['options']
     
-    fitValues_1 = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
+    fitValues_0 = ps.tools.psychometric(x_vals, fit_params_0['threshold'], fit_params_0['width'],
+                          fit_params_0['gamma'], fit_params_0['lambda'], 'norm')
+
+    fitValues_1 = ps.tools.psychometric(x_vals, fit_params_1['threshold'], fit_params_1['width'],
+                          fit_params_1['gamma'], fit_params_1['lambda'], 'norm')
     
     psCurve_0.append(fitValues_0)
     psCurve_1.append(fitValues_1)

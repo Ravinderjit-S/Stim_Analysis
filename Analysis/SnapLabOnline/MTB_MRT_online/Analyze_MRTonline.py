@@ -65,11 +65,11 @@ accuracy = np.delete(accuracy,pilots,axis=1)
 
 #%% Fit psychometric curves with psignifit
 
-options = dict({
-    'sigmoidName': 'norm',
-    'expType': 'nAFC',
-    'expN': 6
-    })
+# options = dict({
+#     'sigmoidName': 'norm',
+#     'expType': 'nAFC',
+#     'expN': 6
+#     })
 
 result_ps = []
 thresh_70 = np.zeros(len(subjects))
@@ -80,22 +80,27 @@ psCurves = []
 plt.figure()
 for sub in range(len(subjects)):
     data_sub = np.concatenate((SNRs[:,np.newaxis], accuracy[:,sub][:,np.newaxis] *cond_trials[:,np.newaxis] , cond_trials[:,np.newaxis] ),axis=1)
-    result_sub = ps.psignifit(data_sub,options)
-    thresh_70[sub] = ps.getThreshold(result_sub,0.70)[0]
-    lapse[sub] = result_sub['Fit'][2]
+    
+    result_sub = ps.psignifit(data_sub,sigmoid='norm',experiment_type='nAFC',experiment_choices=6)
+    thresh_70[sub] = result_sub.threshold(0.7)[0]
+    lapse[sub] = result_sub.parameter_estimate['lambda']
     
     result_ps.append(result_sub)
-    ps.psigniplot.plotPsych(result_sub)
+    #ps.psigniplot.plotPsych(result_sub)
     
     
-    #%% Store curves to look at a verage
+    #%% Store curves to look at average
     x_vals  = np.linspace(-13, 13, num=1000)
     
-    fit = result_sub['Fit']
-    data = result_sub['data']
-    options = result_sub['options']
+    # fit = result_sub['Fit']
+    # data = result_sub['data']
+    # options = result_sub['options']
+    
+    fit_params = result_sub.parameter_estimate
 
-    fitValues = (1 - fit[2] - fit[3]) * options['sigmoidHandle'](x_vals,     fit[0], fit[1]) + fit[3]
+    fitValues = ps.tools.psychometric(x_vals, fit_params['threshold'], fit_params['width'],
+                          fit_params['gamma'], fit_params['lambda'], 'norm')
+    
     
     psCurves.append(fitValues)
     
