@@ -175,7 +175,7 @@ fig,ax = plt.subplots(3,1,sharex=True)
 young = np.array(age) < 35
 old = np.array(age) >= 35
 
-conds_comp = [[1,1], [2,2], [3,3]]
+conds_comp = [[1,1], [4,4], [3,3]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
 
 for jj in range(3):
@@ -643,6 +643,8 @@ plt.legend()
 plt.xticks(ticks=np.arange(7),labels=beh_conds)
 plt.xlabel('Behavior condition')
 
+
+
 #%% Plot good vs bad performers
 
 cond_bind = ['12 Onset', '20 Onset', '12AB', '12BA', '20AB', '20BA', '12 all','20 all']
@@ -655,8 +657,8 @@ fig,ax = plt.subplots(3,1,sharex=True)
 
 #beh = acc_bind[1:3,:].mean(axis=0)
 beh = acc_bind[beh_c,:]
-good = beh >= np.percentile(beh,75)
-bad = beh <= np.percentile(beh,25)
+good = beh >= np.percentile(beh,50)
+bad = beh < np.percentile(beh,50)
 
 # beh = acc_bind[4:5,:].mean(axis=0)
 # # good = beh >= np.median(beh)
@@ -669,7 +671,7 @@ print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' +
       'good: ' + str(np.round(np.percentile(beh,75)*100)) + '%' + 
       ' bad: ' + str(np.round(np.percentile(beh,25)*100)) + '%' )
 
-conds_comp = [[1,1], [2,2], [3,3]]
+conds_comp = [[1,1], [4,4], [5,5]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
 
 for jj in range(3):
@@ -698,6 +700,72 @@ ax[2].set_xlabel('Time')
 fig.suptitle('Beh Cond:'  + beh_conds[beh_c])
 
 #plt.savefig(os.path.join(fig_loc,'GoodvsBad_SpacedCoh_20.png'),format='png')
+
+#%% Load Jane
+data_loc_jane = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/SIN_Info_JANE/'
+
+jane = sio.loadmat(data_loc_jane + 'SINinfo_Jane.mat',squeeze_me=True)
+
+Subj_jane = list(jane['Subjects'])
+thresh_jane = jane['thresholds']
+
+#Sort behavioral data to be in same order as physio data
+jane_sort = np.zeros(len(Subjects),dtype=int)
+for s in range(len(Subjects)):
+    jane_sort[s] = Subj_jane.index(Subjects[s])
+    
+thresh_jane = thresh_jane[jane_sort]
+
+#%% Plot good vs bad performers Jane
+
+labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
+    
+fig,ax = plt.subplots(3,1,sharex=True)
+
+#beh = acc_bind[1:3,:].mean(axis=0)
+beh = thresh_jane
+good = beh <= np.percentile(beh,25)
+bad = beh > np.percentile(beh,75)
+
+# beh = acc_bind[4:5,:].mean(axis=0)
+# # good = beh >= np.median(beh)
+# # bad = beh < np.median(beh)
+# good = beh > np.percentile(beh,75)
+# bad = beh < np.percentile(beh,25)
+
+
+print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' + 
+      'bad: ' + str(np.round(np.percentile(beh,75)))  + 
+      ' good: ' + str(np.round(np.percentile(beh,25))) )
+
+conds_comp = [[1,1], [2,2], [5,5]]
+labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
+
+for jj in range(3):
+    cnd1 = conds_comp[jj][0]
+    cnd2 = conds_comp[jj][1]
+    
+    onset12_mean = A_evkd_cz[:,good,cnd1].mean(axis=1)
+    onset12_sem = A_evkd_cz[:,good,cnd1].std(axis=1) / np.sqrt(A_evkd_cz[:,good,cnd1].shape[1])
+    
+    ax[jj].plot(t,onset12_mean,label='Good',color='forestgreen')  
+    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5, color='forestgreen')
+    
+    onset20_mean = A_evkd_cz[:,bad,cnd2].mean(axis=1)
+    onset20_sem = A_evkd_cz[:,bad,cnd2].std(axis=1) / np.sqrt(A_evkd_cz[:,bad,cnd2].shape[1])
+    
+    ax[jj].plot(t,onset20_mean,label='Bad', color='indianred')  
+    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5,color='indianred')
+    
+    ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+    ax[jj].set_title(labels[jj])
+
+
+ax[0].legend()
+ax[2].set_xlabel('Time')
+#ax[2].set_ylabel('$\mu$V')
+fig.suptitle('Jane')
+
 
 
 #%% Plot stuff with raw features

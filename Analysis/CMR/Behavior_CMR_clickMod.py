@@ -17,22 +17,17 @@ import os
 
 data_loc = '/media/ravinderjit/Data_Drive/Data/MTB_Behavior/CMR_beh/'
 
-# Subjects = [ 'S072', 'S078', 'S088', 'S207', 'S211','S246', 'S259', 'S260',
-#             'S268', 'S269', 'S270', 'S271', 'S272', 'S273', 'S274', 'S277',
-#             'S279', 'S280', 'S281', 'S282', 'S284', 'S285', 'S288', 'S290',
-#             'S291', 'S303', 'S305', 'S308', 'S309', 'S310'] 
-
 Subjects = [ 'S069', 'S072','S078','S088', 'S104', 'S105', 'S207','S211',
             'S259', 'S260', 'S268', 'S269', 'S270','S271', 'S272', 'S273',
             'S274', 'S277','S279', 'S280', 'S282', 'S284', 'S285', 'S288',
             'S290' ,'S281','S291', 'S303', 'S305', 'S308', 'S309', 'S310',
-            'S312', 'S339', 'S340', 'S341', 'S344', 'S345']
-
+            'S312', 'S339', 'S340', 'S341', 'S344', 'S345', 'S337', 'S352',
+            'S355', 'S358']
 
 
 age = [49, 55, 47, 52, 51, 61, 25, 28, 20, 33, 19, 19, 21, 21, 20, 18,
        19, 20, 20, 20, 19, 26, 19, 30, 21, 21, 66, 28, 27, 59, 33, 70,
-       37, 71, 39, 35, 60, 61]
+       37, 71, 39, 35, 60, 61, 66, 35, 49, 56]
 
 
 CMR = np.zeros((len(Subjects)))
@@ -76,18 +71,21 @@ for sub in range(len(Subjects)):
     data_0ps = np.concatenate((SNRs_0[:,np.newaxis], acc_0[:,np.newaxis] * ntrials, 20*np.ones([7,1])),axis=1)
     data_1ps = np.concatenate((SNRs_1[:,np.newaxis], acc_1[:,np.newaxis] * ntrials, 20*np.ones([acc_1.size,1])),axis=1)
     
-    options = dict({
-        'sigmoidName': 'norm',
-        'expType': '3AFC'
-        })
+    # options = dict({
+    #     'sigmoidName': 'norm',
+    #     'expType': '3AFC'
+    #     })
     
-    result_0ps = ps.psignifit(data_0ps, options)
-    result_1ps = ps.psignifit(data_1ps, options)
+    result_0ps = ps.psignifit(data_0ps, sigmoid='norm',experiment_type ='3AFC')
+    result_1ps = ps.psignifit(data_1ps, sigmoid='norm',experiment_type ='3AFC')
     
     # plt.figure()
     # ps.psigniplot.plotPsych(result_0ps)
     # ps.psigniplot.plotPsych(result_1ps, dataColor='tab:orange',lineColor='tab:orange')
     # plt.title(Subjects[sub])
+    
+    #plt.figure()
+    #ps.psigniplot.plot_psychometric_function(result_0ps)
     
     percentCorr = 0.70
     CMR[sub] = ps.getThreshold(result_0ps,percentCorr)[0] - ps.getThreshold(result_1ps,percentCorr)[0]

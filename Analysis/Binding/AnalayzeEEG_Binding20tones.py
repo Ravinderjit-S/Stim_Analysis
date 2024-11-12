@@ -26,7 +26,6 @@ Subjects = [ 'S069', 'S072','S078','S088', 'S104', 'S105', 'S207','S211',
             'S290' ,'S281','S291', 'S303', 'S305', 'S308', 'S309', 'S310',
             'S312', 'S339', 'S340', 'S341', 'S344', 'S345', 'S337', 'S352',
             'S355', 'S358']
-Subjects = ['S358']
 
 
 fig_loc =  '/media/ravinderjit/Data_Drive/Data/Figures/MTBproj/Binding/'
