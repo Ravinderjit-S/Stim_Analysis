@@ -16,6 +16,10 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from scipy import signal
 import mne
+from scipy import stats
+
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
 
 #%% Functions
 
@@ -200,8 +204,8 @@ labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
     
 fig,ax = plt.subplots(3,1,sharex=True)
 
-young = np.array(age) < 35
-old = np.array(age) >= 35
+young = np.array(age) < 40
+old = np.array(age) >= 40
 
 conds_comp = [[1,1], [4,4], [3,3]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
@@ -638,7 +642,7 @@ plt.xlabel('Behavior condition')
 cond_bind = ['12 Onset', '20 Onset', '12AB', '12BA', '20AB', '20BA', '12 all','20 all']
         
 conds_comp = [[0,1], [2,4], [3,5]]
-beh_c = 6
+beh_c = 1
 labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
     
 fig,ax = plt.subplots(3,1,sharex=True)
@@ -661,8 +665,8 @@ print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' +
 
 conds_comp = [[1,1], [4,4], [5,5]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
-conds_comp = [[0,0], [2,2], [3,3]]
-labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
+# conds_comp = [[0,0], [2,2], [3,3]]
+# labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
 
 
 for jj in range(3):
@@ -710,19 +714,26 @@ data_loc_mrt = '/media/ravinderjit/Data_Drive/Stim_Analysis/Analysis/SnapLabOnli
 
 mrt = sio.loadmat(data_loc_mrt + 'MTB_MRT.mat', squeeze_me=True)
 
+
 Subj_mrt = list(mrt['Subjects'])
 thresh_mrt = mrt['thresholds']
+lapse_mrt = mrt['lapse']
 
 index_mrt = sortSubs_exception(Subj_mrt, Subjects)
 
 thresh_mrt_temp = np.zeros(42)
+lapse_mrt_temp = np.zeros(42)
 for k in range(42):
     if index_mrt[k] >=0:
         thresh_mrt_temp[k] = thresh_mrt[index_mrt[k]]
+        lapse_mrt_temp[k] = lapse_mrt[index_mrt[k]]
     else:
         thresh_mrt_temp[k] = -1000 #dummy value
+        lapse_mrt_temp[k] = -1000 #dummy value
         
 thresh_mrt = thresh_mrt_temp
+lapse_mrt = lapse_mrt_temp
+
 
 #%% Load CMR
 
@@ -732,9 +743,11 @@ cmr = sio.loadmat(data_loc_cmr + 'CMRclickMod.mat',squeeze_me=True)
 
 Subj_cmr = list(cmr['Subjects'])
 thresh_cmr = cmr['CMR']
+lapse_cmr = cmr['lapse']
 
 index_cmr = sortSubs(Subj_cmr, Subjects)
 thresh_cmr = thresh_cmr[index_cmr]
+lapse_cmr = lapse_cmr[index_cmr]
 
 
 #%% Plot good vs bad performers Jane
@@ -791,8 +804,8 @@ labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
 fig,ax = plt.subplots(3,1,sharex=True)
 
 beh = thresh_mrt
-good = np.logical_and(beh <= np.percentile(beh,25), beh > -100) #logical and to deal with exception that not all participants did MRT
-bad = np.logical_and(beh > np.percentile(beh,75), beh > -100)
+good = np.logical_and(beh <= np.percentile(beh,50), beh > -100) #logical and to deal with exception that not all participants did MRT
+bad = np.logical_and(beh > np.percentile(beh,50), beh > -100)
 
 print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' + 
       'bad: ' + str(np.round(np.percentile(beh,75)))  + 
@@ -800,8 +813,8 @@ print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' +
 
 conds_comp = [[1,1], [4,4], [5,5]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
-# conds_comp = [[0,0], [2,2], [3,3]]
-# labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
+conds_comp = [[0,0], [2,2], [3,3]]
+labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
 
 for jj in range(3):
     cnd1 = conds_comp[jj][0]
@@ -836,17 +849,17 @@ fig,ax = plt.subplots(3,1,sharex=True)
 
 #beh = acc_bind[1:3,:].mean(axis=0)
 beh = thresh_cmr
-good = beh <= np.percentile(beh,50)
-bad = beh > np.percentile(beh,50)
+good = beh >= np.percentile(beh,50)
+bad = beh < np.percentile(beh,50)
 
 print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' + 
-      'bad: ' + str(np.round(np.percentile(beh,75)))  + 
-      ' good: ' + str(np.round(np.percentile(beh,25))) )
+      'bad: ' + str(np.round(np.percentile(beh,25)))  + 
+      ' good: ' + str(np.round(np.percentile(beh,75))) )
 
 conds_comp = [[1,1], [4,4], [5,5]]
 labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
-conds_comp = [[0,0], [2,2], [3,3]]
-labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
+# conds_comp = [[0,0], [2,2], [3,3]]
+# labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
 
 for jj in range(3):
     cnd1 = conds_comp[jj][0]
@@ -894,8 +907,8 @@ plt.xticks([1.25, 2.25, 3.25, 4.25], feat_labels)
 
 #MRT
 beh = thresh_mrt
-good = np.logical_and(beh <= np.percentile(beh,25), beh > -100) #logical and to deal with exception that not all participants did MRT
-bad = np.logical_and(beh > np.percentile(beh,75), beh > -100)
+good = np.logical_and(beh <= np.percentile(beh,50), beh > -100) #logical and to deal with exception that not all participants did MRT
+bad = np.logical_and(beh > np.percentile(beh,50), beh > -100)
 
 plt.figure()
 gbox = plt.boxplot(features[good,:], positions = [1,2,3,4], widths=0.33*np.ones(4),patch_artist=True)
@@ -913,8 +926,8 @@ plt.xticks([1.25, 2.25, 3.25, 4.25], feat_labels)
 #CMR
 
 beh = thresh_cmr
-good = beh <= np.percentile(beh,50)
-bad = beh > np.percentile(beh,50)
+good = beh >= np.percentile(beh,50)
+bad = beh < np.percentile(beh,50)
 
 plt.figure()
 gbox = plt.boxplot(features[good,:], positions = [1,2,3,4], widths=0.33*np.ones(4),patch_artist=True)
@@ -983,8 +996,8 @@ plt.xticks([1.25, 2.25], ['PCA1', 'PCA2'])
 
 #MRT
 beh = thresh_mrt
-good = np.logical_and(beh <= np.percentile(beh,25), beh > -100) #logical and to deal with exception that not all participants did MRT
-bad = np.logical_and(beh > np.percentile(beh,75), beh > -100)
+good = np.logical_and(beh <= np.percentile(beh,50), beh > -100) #logical and to deal with exception that not all participants did MRT
+bad = np.logical_and(beh > np.percentile(beh,50), beh > -100)
 
 plt.figure()
 gbox = plt.boxplot(pca_feats[good,:], positions = [1,2], widths=0.33,patch_artist=True)
@@ -1049,6 +1062,156 @@ for el in bbox['boxes']:
     
 plt.title('age')
 plt.xticks([1.25, 2.25], ['PCA1', 'PCA2'])
+
+#%% Look at just average of 12 and 20 mean
+feat_ss2012 = features[:,2:].mean(axis=1)
+
+
+#Binding, Jane, MRT, CMR, Age
+
+beh_4bind = acc_bind[1,:]
+good_4bind = beh_4bind >= np.percentile(beh_4bind,50)
+bad_4bind = beh_4bind < np.percentile(beh_4bind,50)
+
+beh_6bind = acc_bind[2,:]
+good_6bind = beh_6bind >= np.percentile(beh_6bind,50)
+bad_6bind = beh_6bind < np.percentile(beh_6bind,50)
+
+plt.figure()
+gbox = plt.boxplot(feat_ss2012[good_4bind], positions=[1],widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[bad_4bind], positions=[1.5], widths=[0.33], patch_artist=True)
+
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[good_4bind], feat_ss2012[bad_4bind])
+print('For Bind 4: P-value is: ' +str(p/2))
+
+gbox = plt.boxplot(feat_ss2012[good_6bind], positions=[2],widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[bad_6bind], positions=[2.5], widths=[0.33], patch_artist=True)
+
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[good_6bind], feat_ss2012[bad_6bind])
+print('For Bind 6: P-value is: ' +str(p/2))
+
+#Jane
+beh = thresh_jane
+good_jane = beh <= np.percentile(beh,50)
+bad_jane = beh > np.percentile(beh,50)
+
+gbox = plt.boxplot(feat_ss2012[good_jane], positions=[3],widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[bad_jane], positions=[3.5], widths=[0.33], patch_artist=True)
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[good_jane], feat_ss2012[bad_jane])
+print('Jane P-value is: ' +str(p/2))
+
+#MRT
+beh = thresh_mrt
+good_mrt = np.logical_and(beh <= np.percentile(beh,50), beh > -100) #logical and to deal with exception that not all participants did MRT
+bad_mrt = np.logical_and(beh > np.percentile(beh,50), beh > -100)
+
+gbox = plt.boxplot(feat_ss2012[good_mrt], positions=[4],widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[bad_mrt], positions=[4.5], widths=[0.33], patch_artist=True)
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[good_mrt], feat_ss2012[bad_mrt])
+print('MRT P-value is: ' +str(p/2))
+
+#CMR
+beh = thresh_cmr
+good_cmr = beh >= np.percentile(beh,50)
+bad_cmr = beh < np.percentile(beh,50)
+
+gbox = plt.boxplot(feat_ss2012[good_cmr], positions=[5],widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[bad_cmr], positions=[5.5], widths=[0.33], patch_artist=True)
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[good_cmr], feat_ss2012[bad_cmr])
+print('CMR P-value is: ' +str(p/2))
+
+#Age
+
+gbox = plt.boxplot(feat_ss2012[young], positions = [6], widths=[0.33],patch_artist=True)
+bbox = plt.boxplot(feat_ss2012[old], positions = [6.5], widths=[0.33], patch_artist=True)
+gbox['boxes'][0].set(color='green')
+bbox['boxes'][0].set(color='red')
+
+[t_v, p] = stats.ttest_ind(feat_ss2012[young], feat_ss2012[old])
+print('Age P-value is: ' +str(p/2))
+
+
+plt.xticks([1.25,2.25,3.25,4.25,5.25,6.25],labels=['Bind 4', 'Bind 6', 'Jane', 'MRT', 'CMR', 'Age'])
+
+
+
+#%% MRT Stats
+
+feat_added = feat_ss2012#(-features[:,2] + -features[:,3]) / 2
+
+mrt_mask = thresh_mrt > -100
+y = thresh_mrt[mrt_mask]
+X = feat_added[mrt_mask]
+X = np.vstack((X,lapse_mrt[mrt_mask])).T
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+plt.figure()
+plt.scatter(feat_added[mrt_mask], y)
+
+#%% CMR stats
+feat_added = (-features[:,2] + -features[:,3]) / 2
+
+y = thresh_cmr
+X = np.vstack((feat_added,lapse_cmr)).T
+
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+plt.figure()
+plt.scatter(feat_added, y)
+plt.title('CMR')
+
+
+#%% Jane Stats
+feat_added = (-features[:,2] + -features[:,3]) / 2
+
+y = thresh_jane
+X = feat_added
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+plt.figure()
+plt.scatter(X[:,1],y)
+plt.title('Jane')
+
+#%% Jane Vs MRT
+
+plt.figure()
+plt.scatter(thresh_jane[mrt_mask], thresh_mrt[mrt_mask])
+
+y = thresh_jane[mrt_mask]
+X = thresh_mrt[mrt_mask]
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
 
 
 #%% Save stuff
