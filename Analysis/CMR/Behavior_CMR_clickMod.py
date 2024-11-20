@@ -31,6 +31,7 @@ age = [49, 55, 47, 52, 51, 61, 25, 28, 20, 33, 19, 19, 21, 21, 20, 18,
 
 
 CMR = np.zeros((len(Subjects)))
+coh_thresh = np.zeros((len(Subjects)))
 lapse = np.zeros((len(Subjects)))
 
 psCurve_0 = []
@@ -93,7 +94,9 @@ for sub in range(len(Subjects)):
     percentCorr = 0.70
    
     CMR[sub] = result_0ps.threshold(percentCorr)[0] - result_1ps.threshold(percentCorr)[0]
+    coh_thresh[sub] = result_1ps.threshold(percentCorr)[0]
     lapse[sub] = (fit_params_0['lambda'] + fit_params_1['lambda']) / 2
+    
     
     #%% Pull out stuff to look at average 
     x_vals  = np.linspace(-60, 0, num=1000)
@@ -173,7 +176,7 @@ plt.ylabel('CMR (dB)')
 
    
 #%% Save Data    
-sio.savemat(data_loc + 'CMRclickMod.mat',{'CMR':CMR, 'lapse':lapse, 'Subjects':Subjects})
+sio.savemat(data_loc + 'CMRclickMod.mat',{'CMR':CMR, 'lapse':lapse, 'Subjects':Subjects, 'coh_thresh':coh_thresh})
 
 
 

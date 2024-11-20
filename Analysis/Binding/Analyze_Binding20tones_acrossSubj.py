@@ -357,7 +357,7 @@ feat_condInds = [2, 4, 2, 4]
 features = np.zeros([len(Subjects), len(feat_labels)])
 
 t_0 = np.where(t>=0.000)[0][0]
-t_2 = np.where(t>=0.400)[0][0]
+t_2 = np.where(t>=0.300)[0][0]
 t_3 = np.where(t>=0.800)[0][0]
 
 for sub in range(len(Subjects)):
@@ -744,10 +744,12 @@ cmr = sio.loadmat(data_loc_cmr + 'CMRclickMod.mat',squeeze_me=True)
 Subj_cmr = list(cmr['Subjects'])
 thresh_cmr = cmr['CMR']
 lapse_cmr = cmr['lapse']
+cohthresh_cmr = -cmr['coh_thresh']
 
 index_cmr = sortSubs(Subj_cmr, Subjects)
 thresh_cmr = thresh_cmr[index_cmr]
 lapse_cmr = lapse_cmr[index_cmr]
+cohthresh_cmr = cohthresh_cmr[index_cmr]
 
 
 #%% Plot good vs bad performers Jane
@@ -885,6 +887,51 @@ ax[0].legend()
 ax[2].set_xlabel('Time')
 #ax[2].set_ylabel('$\mu$V')
 fig.suptitle('CMR')
+
+#%% Plot good vs bad performers CMR cohthresh
+
+labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
+    
+fig,ax = plt.subplots(3,1,sharex=True)
+
+#beh = acc_bind[1:3,:].mean(axis=0)
+beh = cohthresh_cmr
+good = beh >= np.percentile(beh,50)
+bad = beh < np.percentile(beh,50)
+
+print('good: ' + str(np.sum(good)) + ' bad: ' + str(np.sum(bad)) + '\n' + 
+      'bad: ' + str(np.round(np.percentile(beh,25)))  + 
+      ' good: ' + str(np.round(np.percentile(beh,75))) )
+
+conds_comp = [[1,1], [4,4], [5,5]]
+labels = ['Onset', 'Incoherent to Coherent 20', 'Coherent to Incoherent 20']
+# conds_comp = [[0,0], [2,2], [3,3]]
+# labels = ['Onset', 'Incoherent to Coherent 12', 'Coherent to Incoherent 12']
+
+for jj in range(3):
+    cnd1 = conds_comp[jj][0]
+    cnd2 = conds_comp[jj][1]
+    
+    onset12_mean = A_evkd_cz[:,good,cnd1].mean(axis=1)
+    onset12_sem = A_evkd_cz[:,good,cnd1].std(axis=1) / np.sqrt(A_evkd_cz[:,good,cnd1].shape[1])
+    
+    ax[jj].plot(t,onset12_mean,label='Good',color='forestgreen')  
+    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5, color='forestgreen')
+    
+    onset20_mean = A_evkd_cz[:,bad,cnd2].mean(axis=1)
+    onset20_sem = A_evkd_cz[:,bad,cnd2].std(axis=1) / np.sqrt(A_evkd_cz[:,bad,cnd2].shape[1])
+    
+    ax[jj].plot(t,onset20_mean,label='Bad', color='indianred')  
+    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5,color='indianred')
+    
+    ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+    ax[jj].set_title(labels[jj])
+
+
+ax[0].legend()
+ax[2].set_xlabel('Time')
+#ax[2].set_ylabel('$\mu$V')
+fig.suptitle('CMR coThresh')
 
 #%% Plot features for various conditions
 
@@ -1183,6 +1230,24 @@ plt.figure()
 plt.scatter(feat_added, y)
 plt.title('CMR')
 
+#%% CMR cothresh
+
+feat_added = (-features[:,2] + -features[:,3]) / 2
+
+y = cohthresh_cmr
+X = np.vstack((feat_added,lapse_cmr)).T
+
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+plt.figure()
+plt.scatter(feat_added, y)
+plt.title('CMR')
+
+
 
 #%% Jane Stats
 feat_added = (-features[:,2] + -features[:,3]) / 2
@@ -1206,6 +1271,32 @@ plt.scatter(thresh_jane[mrt_mask], thresh_mrt[mrt_mask])
 
 y = thresh_jane[mrt_mask]
 X = thresh_mrt[mrt_mask]
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+#%% CMR vs Jane
+
+plt.figure()
+plt.scatter(thresh_cmr, thresh_jane)
+
+y = thresh_jane
+X = thresh_cmr
+
+X = sm.add_constant(X)
+
+results = sm.OLS(y,X).fit()
+print(results.summary())
+
+#%% CMR Vs MRT
+
+plt.figure()
+plt.scatter(thresh_cmr[mrt_mask], thresh_mrt[mrt_mask])
+
+y = thresh_mrt[mrt_mask]
+X = thresh_cmr[mrt_mask]
 
 X = sm.add_constant(X)
 
