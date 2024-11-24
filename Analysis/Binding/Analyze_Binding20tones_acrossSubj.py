@@ -195,6 +195,48 @@ ax[2].set_xticks([0,0.2,0.4,0.6,0.8,1.0])
 
 plt.savefig(os.path.join(fig_loc,'All_12vs20_baselined.svg'),format='svg')
 
+#%% Plot single subject like above
+
+cond_bind = ['12 Onset', '20 Onset', '12AB', '12BA', '20AB', '20BA', '12 all','20 all']
+        
+conds_comp = [[0,1], [2,4], [3,5]]
+labels = ['Onset', 'Incoherent to Coherent', 'Coherent to Incoherent']
+    
+fig,ax = plt.subplots(3,1,sharex=True)
+#fig.set_size_inches(20,10)
+#plt.rcParams.update({'font.size': 26})
+
+Sub_to_plot = 'S273'
+sub_ind_p = Subjects.index(Sub_to_plot)
+
+for jj in range(3):
+    cnd1 = conds_comp[jj][0]
+    cnd2 = conds_comp[jj][1]
+    
+    onset12_mean = (A_evkd_cz[:,sub_ind_p,cnd1]*1e6)
+    
+    ax[jj].plot(t,onset12_mean,label='12')  
+    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5)
+    
+    onset20_mean = (A_evkd_cz[:,:,cnd2]*1e6).mean(axis=1)
+    onset20_sem = (A_evkd_cz[:,:,cnd2]*1e6).std(axis=1) / np.sqrt(A_evkd_cz.shape[1])
+    
+    ax[jj].plot(t,onset20_mean,label='20')  
+    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)
+    
+    ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+    #ax[jj].set_title(labels[jj])
+    ax[jj].tick_params(labelsize=12)
+
+
+ax[0].legend(fontsize=12)
+ax[2].set_xlabel('Time (s)',fontsize=14)
+ax[2].set_ylabel('\u03bcV',fontsize=14)
+ax[2].set_xlim([-0.050,1])
+ax[2].set_xticks([0,0.2,0.4,0.6,0.8,1.0])
+#ax[2].set_ylabel('$\mu$V')
+fig.suptitle(Sub_to_plot)
+
 #%% Young Vs Old
 
 cond_bind = ['12 Onset', '20 Onset', '12AB', '12BA', '20AB', '20BA', '12 all','20 all']
@@ -312,6 +354,7 @@ conds_comp = [[0,1], [2,4], [3,5]]
 fig.suptitle(labels[cnd_plot])
 
 subs_to_plot = np.random.choice(range(0, 40), plot_nums, replace=False)
+
 
 for sub in range(plot_nums):
     cnd1 = conds_comp[cnd_plot][0]
@@ -1205,7 +1248,7 @@ mrt_mask = thresh_mrt > -100
 y = thresh_mrt[mrt_mask]
 X = feat_added[mrt_mask]
 X = np.vstack((X,lapse_mrt[mrt_mask])).T
-
+s
 X = sm.add_constant(X)
 
 results = sm.OLS(y,X).fit()
