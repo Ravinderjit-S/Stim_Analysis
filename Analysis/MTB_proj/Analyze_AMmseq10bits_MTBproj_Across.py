@@ -25,6 +25,9 @@ from itertools import compress
 from scipy.signal import find_peaks
 from scipy.stats import pearsonr
 
+import seaborn as sns
+from scipy.stats import sem
+import pandas as pd
 
 #%% Functions
 
@@ -461,7 +464,7 @@ plt.xlim([-0.05,0.5])
 #%% Plot responses by age
 
 plot_age(t_epochs, Acz_evk, age, 'CZevkd')
-
+plt.ylabel('Amplitude re: subcortical')
 
 #%% Look at 5 Regions of Scalp
 
@@ -764,6 +767,38 @@ r_vals = [r_age1[0], r_age2[0], r_jane1[0], r_jane2[0], r_mrt1[0], r_mrt2[0]]
 p_vals = [r_age1[1], r_age2[1], r_jane1[1], r_jane2[1], r_mrt1[1], r_mrt2[0]]
 
 
+#%% CG and age box plot
+age_1 = age <25 
+age_2 = np.logical_and(age >=25, age < 36)
+age_3 = np.logical_and(age >35, age <56)
+age_4 = age >=56
+
+groups = ['<25', '25–35', '36–55', '56+']
+masks = [age_1, age_2, age_3, age_4]
+
+means_cg1 = [np.mean(Cg1[m]) for m in masks]
+sems_cg1  = [sem(Cg1[m]) for m in masks]
+
+means_cg2 = [np.mean(Cg2[m]) for m in masks]
+sems_cg2  = [sem(Cg2[m]) for m in masks]
+
+x = np.arange(len(groups))  # [0, 1, 2, 3]
+width = 0.35  # width of the bars
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 6))
+bars1 = ax.bar(x - width/2, means_cg1, width, yerr=sems_cg1, capsize=5, label='Cg1')
+bars2 = ax.bar(x + width/2, means_cg2, width, yerr=sems_cg2, capsize=5, label='Cg2')
+
+# Axis labels and formatting
+ax.set_xlabel('Age Group')
+ax.set_ylabel('Mean CG')
+ax.set_title('Mean ± SEM of Cg1 and Cg2 by Age Group')
+ax.set_xticks(x)
+ax.set_xticklabels(groups)
+ax.legend()
+plt.tight_layout()
+plt.show()
 
 
 

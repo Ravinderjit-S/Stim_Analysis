@@ -21,7 +21,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
-
+from scipy.stats import pearsonr
 
 
 fig_path = os.path.abspath('/media/ravinderjit/Data_Drive/Data/Figures/TemporalCoding/')
@@ -36,18 +36,23 @@ mseq = Mseq_dat['mseqEEG_4096'].astype(float)
 #%% Load Template
 template_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10bits/Pickles/PCA_passive_template.pickle'
 
-with open(template_loc,'rb') as file:
-    [pca_coeffs_cuts,pca_expVar_cuts,t_cuts] = pickle.load(file)
+# with open(template_loc,'rb') as file:
+#     [pca_coeffs_cuts,pca_expVar_cuts,t_cuts] = pickle.load(file)
     
-bstemTemplate  = pca_coeffs_cuts[0][0,:]
-cortexTemplate = pca_coeffs_cuts[2][0,:]
+# bstemTemplate  = pca_coeffs_cuts[0][0,:]
+# cortexTemplate = pca_coeffs_cuts[2][0,:]
 
 # vmin = bstemTemplate.mean() - 2 * bstemTemplate.std()
 # vmax = bstemTemplate.mean() + 2 * bstemTemplate.std()
 # plt.figure()
 # mne.viz.plot_topomap(cortexTemplate, mne.pick_info(info_obj,np.arange(32)),vmin=vmin,vmax=vmax)
         
-
+#%% Norm factor
+#This is the normalization factor to account for the extension of the mseq to the emseq
+cof = 150
+T = 1/150 #this is the amount each point is extended
+fs = 4096
+norm_fac = np.floor(fs*T)
 
 
 #%% Load data collected first
@@ -69,17 +74,18 @@ for sub in range(len(Subjects)):
     print('Loading ' + subject)
     with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4.pickle'),'rb') as file:
         [tdat, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
+        
     
     A_Tot_trials_old.append(Tot_trials[3])
-    A_Ht_old.append(Ht[3])
-    A_Htnf_old.append(Htnf[3])
+    A_Ht_old.append(Ht[3] / norm_fac)
+    A_Htnf_old.append(Htnf[3] / norm_fac)
     
     A_info_obj_old.append(info_obj)
     A_ch_picks_old.append(ch_picks)
     
     with open(os.path.join(pickle_loc_old,subject+'_AMmseqbits4_epochs.pickle'),'rb') as file:
         [Ht_epochs, t_epochs] = pickle.load(file)
-        A_Ht_old_epochs.append(Ht_epochs[3])
+        A_Ht_old_epochs.append(Ht_epochs[3] / norm_fac)
     
 t = tdat[3]
 
@@ -93,6 +99,9 @@ subject = 'S250'
 with open(os.path.join(pickle_loc,subject +'_AMmseq10bits.pickle'),'rb') as file:
     [t, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
     
+    Ht = Ht / norm_fac
+    Htnf = Htnf / norm_fac
+    
     A_Tot_trials_old.append(Tot_trials)
     A_Ht_old.append(Ht)
     A_Htnf_old.append(Htnf)
@@ -102,6 +111,9 @@ with open(os.path.join(pickle_loc,subject +'_AMmseq10bits.pickle'),'rb') as file
     
 with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
     [Ht_epochs, t_epochs] = pickle.load(file)
+    
+    Ht_epochs = Ht_epochs / norm_fac
+    
     A_Ht_old_epochs.append(Ht_epochs)
 
 
@@ -125,6 +137,9 @@ for sub in range(len(Subjects)):
     with open(os.path.join(pickle_loc,subject +'_AMmseq10bits.pickle'),'rb') as file:
         [t, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
         
+    Ht = Ht / norm_fac
+    Htnf = Htnf / norm_fac
+        
     A_Tot_trials.append(Tot_trials)
     A_Ht.append(Ht)
     A_Htnf.append(Htnf)
@@ -133,7 +148,8 @@ for sub in range(len(Subjects)):
     
     with open(os.path.join(pickle_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
         [Ht_epochs, t_epochs] = pickle.load(file)
-    
+        
+    Ht_epochs = Ht_epochs / norm_fac
     A_Ht_epochs.append(Ht_epochs)
     
 
@@ -195,19 +211,19 @@ cuts_tms.append([.016, .049, .123, .220, .334])
 
 fs = 4096
 fig,ax = plt.subplots(3,2)
-fig.set_size_inches(10,10)
+fig.set_size_inches(12,10)
 
 t_0 = np.where(t_epochs>=0)[0][0]
 colors = ['tab:blue','tab:orange','tab:green','tab:purple', 'tab:brown', 'tab:pink', 'tab:olive']
 colors = ['#E69F00', '#56B4E9', '#009E73', '#D55E00', '#CC79A7']
 
-source_numerals = ['I', 'II', 'III', 'IV', 'V']
+source_numerals = ['S1', 'S2', 'S3', 'S4', 'S5']
 for sub in np.arange(len(Subjects[:3])):
     #Plot Cz
     
-    if sub <2:
-        ax[sub,0].axes.xaxis.set_visible(False)
-        ax[sub,1].axes.xaxis.set_visible(False)
+    # if sub <2:
+    #     ax[sub,0].axes.xaxis.set_visible(False)
+    #     ax[sub,1].axes.xaxis.set_visible(False)
         
     Ht_mean_old = A_Ht_old_epochs[sub].mean(axis=1) 
     Ht_sem_old = A_Ht_old_epochs[sub].std(axis=1) / np.sqrt(A_Ht_old_epochs[sub].shape[1])
@@ -295,19 +311,34 @@ ind_set = 2
 ax[ind_set,0].set_xlim([-0.05,0.4])
 ax[ind_set,0].set_xlabel('Time (sec)',fontsize=14)
 ax[ind_set,0].set_ylabel('\u03BCV',fontsize=14)
+ax[0,0].set_ylabel('\u03BCV',fontsize=14)
+ax[1,0].set_ylabel('\u03BCV',fontsize=14)
 
-
-ax[ind_set,1].set_xticks([0,25, 50, 75])
 ax[ind_set,1].set_xlabel('Frequency (Hz)',fontsize=14)
 ax[ind_set,1].set_ylabel('\u03BCV',fontsize=14)
+ax[0,1].set_ylabel('\u03BCV',fontsize=14)
+ax[1,1].set_ylabel('\u03BCV',fontsize=14)
 
-ax[0,0].set_yticks([-15,0,15,30])
-ax[1,0].set_yticks([-5,0,5])
-ax[2,0].set_yticks([0,15,30])
+ax[0,0].set_xlim([-0.05,0.4])
+ax[1,0].set_xlim([-0.05,0.4])
+ax[2,0].set_xlim([-0.05,0.4])
 
-ax[0,1].set_yticks([-0,4,8])
-ax[1,1].set_yticks([0,2])
-ax[2,1].set_yticks([0,2,4])
+ax[0,1].set_xticks([0,25, 50, 75])
+ax[1,1].set_xticks([0,25, 50, 75])
+ax[2,1].set_xticks([0,25, 50, 75])
+
+ax[0,0].set_xticklabels([])
+ax[0,1].set_xticklabels([])
+ax[1,0].set_xticklabels([])
+ax[1,1].set_xticklabels([])
+
+ax[0,0].set_yticks([-0.5,0,0.5,1.0])
+ax[1,0].set_yticks([-0.2,0,0.2])
+ax[2,0].set_yticks([-0.5,0,0.5,1.0])
+
+ax[0,1].set_yticks([0, 0.1, 0.2, 0.3])
+ax[1,1].set_yticks([0, 0.05, 0.1])
+ax[2,1].set_yticks([0, 0.05, 0.1, 0.15])
 
 
 plt.tick_params(labelsize=12)
@@ -328,8 +359,8 @@ t_0 = np.where(t_epochs>=0)[0][0]
 for sub in np.arange(len(Subjects)):
     #Plot Cz
     
-    if sub !=3:
-        ax[sub].axes.xaxis.set_visible(False)
+    # if sub !=3:
+        #ax[sub].axes.xaxis.set_visible(False)
         #ax[sub].axes.yaxis.set_visible(False)
         
     Ht_mean_old = A_Ht_old_epochs[sub].mean(axis=1) *1e6
@@ -345,33 +376,51 @@ for sub in np.arange(len(Subjects)):
     
     cz_mean_v2 = Ht_mean[-1,:] - Ht_mean[-1,t_0] #Look at cz. Make time 0 start at 0
     
-    ax[sub].plot(t_epochs, cz_mean_v2,color='grey', label='2nd Visit')
-    ax[sub].fill_between(t_epochs,cz_mean_v2 -Ht_sem[-1,:],cz_mean_v2 + Ht_sem[-1,:], color='grey',alpha=0.4)
+    ax[sub].plot(t_epochs, cz_mean_v2,color='tab:blue', label='2nd Visit')
+    ax[sub].fill_between(t_epochs,cz_mean_v2 -Ht_sem[-1,:],cz_mean_v2 + Ht_sem[-1,:], color='tab:blue',alpha=0.4)
     
 
     #ax[sub].set_xscale('log')
-    ax[sub].set_title('P' + str(sub+1),fontweight='bold',fontsize=14)
+    ax[sub].set_title('P' + str(sub+1),fontweight='bold',fontsize=16)
     
 for a_ in ax:
-    a_.tick_params(axis='both', labelsize=14)
+    a_.tick_params(axis='both', labelsize=16)
 
 ax[3].set_xlim([-0.05,0.5])
-ax[3].set_xlabel('Time (s)',fontsize=14)
-ax[3].set_ylabel('\u03BCV',fontsize=14)
+ax[3].set_xlabel('Time (s)',fontsize=16)
+ax[4].set_xlabel('Time (s)',fontsize=16)
+ax[5].set_xlabel('Time (s)',fontsize=16)
+ax[3].set_ylabel('\u03BCV',fontsize=16)
+ax[0].set_ylabel('\u03BCV',fontsize=16)
 ax[3].set_xticks([0,0.1,0.2,0.3,0.4])
 #ax[3].set_yticks([-.002,0,.002,.004])
 ax[3].tick_params(labelsize=14)
 ax[0].legend(fontsize=14)
 
-ax[0].set_yticks([-15,0,15,30])
-ax[1].set_yticks([-5,0,5,10])
-ax[2].set_yticks([-10,0,15,30])
-ax[3].set_yticks([-15,0,15,30])
-ax[4].set_yticks([-10,0,10,20])
-ax[5].set_yticks([-15,0,15,30])
+ax[0].set_yticks([-0.5,0,0.5,1.0])
+ax[1].set_yticks([-0.2,0,0.2,0.4])
+ax[2].set_yticks([-0.5,0,0.5,1.0])
+ax[3].set_yticks([-0.5,0,0.5,1.0])
+ax[4].set_yticks([-0.5,0,0.5])
+ax[5].set_yticks([-0.5,0,0.5,1.0])
+
 
 plt.savefig(os.path.join(fig_path,'ModTRF_rep_t.svg'),format='svg')
 plt.savefig(os.path.join(fig_path,'ModTRF_rep_t.png'),format='png')
+
+#%% Compute similarity between repeats
+
+t_0 = np.where(t_epochs>=0)[0][0]
+t_300 = np.where(t_epochs>=0.3)[0][0]
+
+All_r = np.zeros((len(Subjects)))
+for sub in range(len(Subjects)):
+    Ht_mean_old = A_Ht_old_epochs[sub].mean(axis=1) *1e6
+    Ht_mean = A_Ht_epochs[sub].mean(axis=1) * 1e6
+    
+    r, pval = pearsonr(Ht_mean_old[-1,t_0:t_300],Ht_mean[-1,t_0:t_300])
+    All_r[sub] = r
+    
 
 
 #%% Look at epochs with t cuts and in freq domain

@@ -43,6 +43,12 @@ for m in mseq_locs:
 
 fs = 4096
 
+#%% Norm factor
+#This is the normalization factor to account for the extension of the mseq to the emseq
+cof = 150
+T = 1/150 #this is the amount each point is extended
+norm_fac = np.floor(fs*T)
+
 
 #%% Load data
 
@@ -73,20 +79,20 @@ for sub in range(len(Subjects)):
 colors = [ '#FDBEA0', '#F75D5D', '#BF0202', '#101010']
 
 fig,ax = plt.subplots(4,4,sharex=True)
-fig.set_size_inches(10,8)
+fig.set_size_inches(17,11)
 for sub in range(len(Subjects)):
     sub_nf = A_Htnf[sub]
     for k in range(4):
         cz_nf_k = []
         for nf in range(50):
-          cz_nf_k.append(A_Htnf[sub][nf + k*50][A_ch_picks[sub] ==31,:]) #ch cz
+          cz_nf_k.append(A_Htnf[sub][nf + k*50][A_ch_picks[sub] ==31,:] / norm_fac) #ch cz
         
         cz_nf_k = np.array(cz_nf_k)[:,0,:]
         
         mean_nf = cz_nf_k.mean(axis=0)
         std_nf = cz_nf_k.std(axis=0)
         
-        trials_cz = A_Ht_epochs[sub][k][A_ch_picks[sub] ==31,:,:].squeeze()
+        trials_cz = A_Ht_epochs[sub][k][A_ch_picks[sub] ==31,:,:].squeeze() / norm_fac
         trials_sem = trials_cz.std(axis=0) / np.sqrt(trials_cz.shape[0])
         trials_mean = trials_cz.mean(axis=0)
         
@@ -108,63 +114,72 @@ for sub in range(len(Subjects)):
         
         ax[k,sub].locator_params(axis='y',nbins=3)
         
-    ax[0,sub].set_title('P' + str(sub+1),fontweight='bold')
+    ax[0,sub].set_title('P' + str(sub+1),fontweight='bold',fontsize=16)
     
 ax[0,0].set_xlim(-0.050,0.4)
 ax[0,0].set_xticks([0,0.2,0.4])
-ax[3,0].set_ylabel('\u03BCV',fontsize=12)
-ax[3,0].set_xlabel('Time (s)',fontsize=12)
+ax[3,0].set_ylabel('\u03BCV',fontsize=16)
+ax[0,0].set_ylabel('\u03BCV',fontsize=16)
+ax[1,0].set_ylabel('\u03BCV',fontsize=16)
+ax[2,0].set_ylabel('\u03BCV',fontsize=16)
+ax[3,0].set_xlabel('Time (s)',fontsize=16)
+ax[3,1].set_xlabel('Time (s)',fontsize=16)
+ax[3,2].set_xlabel('Time (s)',fontsize=16)
+ax[3,3].set_xlabel('Time (s)',fontsize=16)
 # ax[0,0].set_ylabel('7 Bits',rotation=0,labelpad=15,fontweight='bold')
 # ax[1,0].set_ylabel('8 Bits',rotation=0,labelpad=15,fontweight='bold')
 # ax[2,0].set_ylabel('9 Bits',rotation=0,labelpad=15,fontweight='bold')
 
+for axx in ax.flat:  # works for multi-dimensional arrays like from plt.subplots()
+    axx.tick_params(axis='both', labelsize=14)
+
 figtext_x = 0.04  # Adjust the x-coordinate as needed
 figtext_y = 0.85   # Adjust the y-coordinate as needed
-fig.text(0.04, 0.85 , '7 Bits', fontsize=12,weight='bold')
-fig.text(0.04, 0.65 , '8 Bits', fontsize=12,weight='bold')
-fig.text(0.04, 0.45 , '9 Bits', fontsize=12,weight='bold')
-fig.text(0.04, 0.25 , '10 Bits', fontsize=12,weight='bold')
+fig.text(0.04, 0.85 , '7 Bits', fontsize=16,weight='bold')
+fig.text(0.04, 0.65 , '8 Bits', fontsize=16,weight='bold')
+fig.text(0.04, 0.45 , '9 Bits', fontsize=16,weight='bold')
+fig.text(0.04, 0.25 , '10 Bits', fontsize=16,weight='bold')
 
 plt.savefig(os.path.join(fig_path,'ModTRF_4bits.svg'),format='svg')
 
 
-fig,ax = plt.subplots(2,2,sharex=True)
-ax = np.reshape(ax,[4])
-fig.set_size_inches(10,8)
-labels = ['7 bit','8 bit', '9bit','10 bit']
-for sub in range(len(Subjects)):
-    for k in range(4):
-        t_0 = np.where(t_epochs[k] >=0)[0][0]
-        t_1 = np.where(t_epochs[k] >=0.010)[0][0]
+# fig,ax = plt.subplots(2,2,sharex=True)
+# ax = np.reshape(ax,[4])
+# fig.set_size_inches(10,8)
+# labels = ['7 bit','8 bit', '9bit','10 bit']
+# for sub in range(len(Subjects)):
+#     for k in range(4):
+#         t_0 = np.where(t_epochs[k] >=0)[0][0]
+#         t_1 = np.where(t_epochs[k] >=0.010)[0][0]
         
-        trials_cz = A_Ht_epochs[sub][k][A_ch_picks[sub] ==31,:,:].squeeze()
-        trials_mean = trials_cz.mean(axis=0)
-        trials_sem =  trials_cz.std(axis=0) / np.sqrt(trials_cz.shape[0])
+#         trials_cz = A_Ht_epochs[sub][k][A_ch_picks[sub] ==31,:,:].squeeze()
+#         trials_mean = trials_cz.mean(axis=0)
+#         trials_sem =  trials_cz.std(axis=0) / np.sqrt(trials_cz.shape[0])
         
-        trials_mean = trials_mean - trials_mean[t_0]
-        norm_pk1 = trials_mean[t_0:t_1].max()
+#         trials_mean = trials_mean - trials_mean[t_0]
+#         norm_pk1 = trials_mean[t_0:t_1].max()
         
-        #trials_mean /= norm_pk1
-        #trials_sem /=norm_pk1
+#         #trials_mean /= norm_pk1
+#         #trials_sem /=norm_pk1
         
-        ax[sub].plot(t_epochs[k],trials_mean * 1e6,color=colors[k],label=labels[k])
-        ax[sub].fill_between(t_epochs[k],(trials_mean-trials_sem)*1e6,(trials_mean+trials_sem)*1e6,alpha=0.5,color=colors[k])
-        #ax[sub].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-        ax[sub].locator_params(axis='y',nbins=3)
+#         ax[sub].plot(t_epochs[k],trials_mean * 1e6,color=colors[k],label=labels[k])
+#         ax[sub].fill_between(t_epochs[k],(trials_mean-trials_sem)*1e6,(trials_mean+trials_sem)*1e6,alpha=0.5,color=colors[k])
+#         #ax[sub].axes.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+#         ax[sub].locator_params(axis='y',nbins=3)
     
-    ax[sub].set_title('P' + str(sub+1), fontweight='bold', fontsize=16)
+#     ax[sub].set_title('P' + str(sub+1), fontweight='bold', fontsize=16)
         
-ax[2].set_xlim(-0.050,0.4) 
-ax[2].set_ylim()
-ax[2].set_xticks([0,0.2,0.4],fontsize=16)
-ax[2].legend()     
-ax[2].set_xlabel('Time (sec)',fontsize=16)
-ax[2].set_ylabel('\u03BCV',fontsize=16)       
+# ax[2].set_xlim(-0.050,0.4) 
+# ax[2].set_ylim()
+# ax[2].set_xticks([0,0.2,0.4],fontsize=16)
+# ax[2].legend()     
+# ax[2].set_xlabel('Time (sec)',fontsize=16)
+# ax[2].set_ylabel('\u03BCV',fontsize=16)       
 
-for a_ in ax:
-    a_.tick_params(axis='both', labelsize=16)    
+# for a_ in ax:
+#     a_.tick_params(axis='both', labelsize=16)    
 
-plt.savefig(os.path.join(fig_path,'ModTRF_compareBits.svg'),format='svg')
+# plt.savefig(os.path.join(fig_path,'ModTRF_compareBits.svg'),format='svg')
 
 
 

@@ -124,9 +124,6 @@ for subject in Subjects:
         data_eeg.info['bads'].append('A17')
         data_eeg.info['bads'].append('A9')
         
-
-
-
     
     #%% Remove Blinks
     
@@ -291,9 +288,9 @@ for subject in Subjects:
         epochs_save.append(epochs[si].get_data()[:,31,:]) # Only save epochs for channel 31 
     
     with open(os.path.join(pickle_loc,subject+'_Binding.pickle'),'wb') as file:
-        pickle.dump([t, t_full, conds_save, epochs_save,evkd_save],file)
+        pickle.dump([t, t_full, conds_save, epochs_save,evkd_save, ],file)
         
-    del epochs, evkd, evkd_save,epochs_save
+    #del epochs, evkd, evkd_save,epochs_save
     
     
     

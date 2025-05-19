@@ -24,11 +24,18 @@ Subjects = ['S207', 'S211', 'S228','S236','S238','S239','S246','S247','S250']
 dataPassive_loc = '/media/ravinderjit/Data_Drive/Data/EEGdata/TemporalCoding/AMmseq_10bits/'
 picklePassive_loc = dataPassive_loc + 'Pickles/'
 
+#%% Norm factor
+#This is the normalization factor to account for the extension of the mseq to the emseq
+cof = 150
+T = 1/150 #this is the amount each point is extended
+fs = 4096
+norm_fac = np.floor(fs*T)
+
 #%% Load Data
 
 A_Tot_trials = []
 A_Ht = []
-A_Htnf = []
+#A_Htnf = []
 A_info_obj = []
 A_ch_picks = []
 
@@ -42,14 +49,19 @@ for sub in range(len(Subjects)):
     with open(os.path.join(picklePassive_loc,subject +'_AMmseq10bits.pickle'),'rb') as file:
         [t, Tot_trials, Ht, Htnf, info_obj, ch_picks] = pickle.load(file)
         
+    Ht = Ht / norm_fac
+    #Htnf = Htnf / norm_fac
+    
     A_Tot_trials.append(Tot_trials)
     A_Ht.append(Ht)
-    A_Htnf.append(Htnf)
+    #A_Htnf.append(Htnf)
     A_info_obj.append(info_obj)
     A_ch_picks.append(ch_picks)
     
     with open(os.path.join(picklePassive_loc,subject +'_AMmseq10bits_epochs.pickle'),'rb') as file:
         [Ht_epochs, t_epochs] = pickle.load(file)
+        
+    Ht_epochs = Ht_epochs / norm_fac
     
     A_Ht_epochs.append(Ht_epochs)
 
@@ -215,6 +227,7 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_f.png'),format='png')
 # Just magnitude
 
 fig,ax = plt.subplots()
+fig.set_size_inches(8,6)
 ax.plot(f,Cz_hf.mean(axis=0),color='black')
 ax.fill_between(f,Cz_hf.mean(axis=0)-Cz_hf_sem, Cz_hf.mean(axis=0) + Cz_hf_sem,alpha=0.5,color='black')
 ax.set_ylabel('\u03BCV',fontsize=16)
@@ -233,10 +246,10 @@ plt.savefig(os.path.join(fig_path,'ModTRF_avg_fmag.svg'),format='svg')
 fig,ax = plt.subplots()
 ax.plot(f,phase_mn,color='grey')
 ax.fill_between(f,phase_mn-phase_sem,phase_mn+phase_sem,color='grey',alpha=0.5)
-ax.set_ylabel('Phase (Radians)',fontsize=18)
-ax.set_xlabel('Modulation Frequency (Hz)',fontsize=18)
+ax.set_ylabel('Phase (Radians)',fontsize=20)
+ax.set_xlabel('Modulation Frequency (Hz)',fontsize=20)
 ax.set_xlim([0,75])
-ax.tick_params(labelsize=16)
+ax.tick_params(labelsize=18)
 #ax.ticklabel_format(axis='y',style='sci',scilimits=(0,0)) 
 ax.set_xticks([0,10,20,30,40,50,60,70])
 ax.set_yticks([-2e1, -1e1, 0])
@@ -294,6 +307,96 @@ plt.plot(f,coeffs2[2]*f+coeffs3[2],'k')
 plt.plot(f,phase[5,:].T)
 
 
+#%% Freq response for each source
+
+# Manual Peak Cutoff Reading CZ and FP
+    
+cuts_tms = []
+#S207
+cuts_tms.append([.0185, .036, .067, .136 ,.266])
+
+#S211
+cuts_tms.append([.016, .037, .063, .123, .300])
+
+#S228
+cuts_tms.append([.016, .043, .069, .125, .238])
+
+#S236
+cuts_tms.append([.014, .031, .066, .124, .249])
+
+#238
+cuts_tms.append([.0155, .045, .062, .124, .287])
+
+#S239
+cuts_tms.append([.016, .036, .063, .118, .240])
+
+#S246
+cuts_tms.append([.016, .030, .060, .131, .257])
+
+#S247
+cuts_tms.append([.018, .050, .0693, .120, .214])
+
+#S250
+cuts_tms.append([.016, .049, .123, .220, .334])
+
+t_0 = np.where(t>=0)[0][0]
+
+S1 = []
+S2 = []
+S3 = []
+S4 = []
+S5 = []
+
+for sub in range(len(Subjects)):
+    t_s1 = int(cuts_tms[sub][0]*fs + t_0)
+    t_s2 = int(cuts_tms[sub][1]*fs + t_0)
+    t_s3 = int(cuts_tms[sub][2]*fs + t_0)
+    t_s4 = int(cuts_tms[sub][3]*fs + t_0)
+    t_s5 = int(cuts_tms[sub][4]*fs + t_0)
+    
+    S1.append(Cz_sub[sub,t_0:t_s1])
+    S2.append(Cz_sub[sub,t_s1:t_s2])
+    S3.append(Cz_sub[sub,t_s2:t_s3])
+    S4.append(Cz_sub[sub,t_s3:t_s4])
+    S5.append(Cz_sub[sub,t_s4:t_s5])
+
+
+# plt.figure()
+# for wf in S5:
+#     plt.plot(wf)
+    
+Hf_sources = np.zeros((1229,9,5))
+for sub in range(len(Subjects)):
+    Hf_sources[:,sub,0] = np.abs(np.fft.fft(S1[sub] - S1[sub].mean(),n=int(np.round(0.3*fs))))  / (np.round(0.3*fs))
+    Hf_sources[:,sub,1] = np.abs(np.fft.fft(S2[sub] - S2[sub].mean(),n=int(np.round(0.3*fs))))  / (np.round(0.3*fs))
+    Hf_sources[:,sub,2] = np.abs(np.fft.fft(S3[sub] - S3[sub].mean(),n=int(np.round(0.3*fs))))  / (np.round(0.3*fs))
+    Hf_sources[:,sub,3] = np.abs(np.fft.fft(S4[sub] - S4[sub].mean(),n=int(np.round(0.3*fs))))  / (np.round(0.3*fs))
+    Hf_sources[:,sub,4] = np.abs(np.fft.fft(S5[sub] - S5[sub].mean(),n=int(np.round(0.3*fs))))  / (np.round(0.3*fs))
+
+f_s = np.fft.fftfreq(1229,d=1/fs)
+Hf_sources = Hf_sources[f_s>=0,:,:]
+f_s = f_s[f_s>=0]
+
+Hf_sMeans = Hf_sources.mean(axis=1)
+Hf_sSem = Hf_sources.std(axis=1) / np.sqrt(Hf_sources.shape[1])
+
+colors = ['#E69F00', '#56B4E9', '#009E73', '#D55E00', '#CC79A7']
+s_names = ['S1', 'S2', 'S3', 'S4','S5']
+plt.figure(figsize=(8,6))
+
+for s in range(5):
+    plt.plot(f_s,Hf_sMeans[:,s],color=colors[s],label=s_names[s])
+    plt.fill_between(f_s,Hf_sMeans[:,s]-Hf_sSem[:,s],Hf_sMeans[:,s]+Hf_sSem[:,s],color=colors[s],alpha=0.5)
+
+
+plt.xlim([0,75])
+plt.xlabel('Modulation Frequency (Hz)',fontsize=16)
+plt.xticks(fontsize=16)
+plt.yticks([0, 0.02, .04, .06],fontsize=16)
+plt.legend(fontsize=16)
+plt.ylabel('\u03BCV',fontsize=16)
+
+plt.savefig(os.path.join(fig_path,'ModTRF_avg_sources.svg'),format='svg')
 
 
 

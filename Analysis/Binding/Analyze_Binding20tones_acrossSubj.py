@@ -72,6 +72,11 @@ age = [49, 55, 47, 52, 51, 61, 25, 28, 20, 33, 19, 19, 21, 21, 20, 18,
 A_epochs = []
 A_evkd = []
 
+# ind = Subjects.index('S281')
+# age = age[ind]
+# Subjects = [Subjects[ind]]
+
+
 #%% Load data
 
 for subject in Subjects:
@@ -206,7 +211,7 @@ fig,ax = plt.subplots(3,1,sharex=True)
 #fig.set_size_inches(20,10)
 #plt.rcParams.update({'font.size': 26})
 
-Sub_to_plot = 'S273'
+Sub_to_plot = 'S281'
 sub_ind_p = Subjects.index(Sub_to_plot)
 
 for jj in range(3):
@@ -216,18 +221,14 @@ for jj in range(3):
     onset12_mean = (A_evkd_cz[:,sub_ind_p,cnd1]*1e6)
     
     ax[jj].plot(t,onset12_mean,label='12')  
-    ax[jj].fill_between(t,onset12_mean - onset12_sem, onset12_mean + onset12_sem,alpha=0.5)
     
-    onset20_mean = (A_evkd_cz[:,:,cnd2]*1e6).mean(axis=1)
-    onset20_sem = (A_evkd_cz[:,:,cnd2]*1e6).std(axis=1) / np.sqrt(A_evkd_cz.shape[1])
+    onset20_mean = (A_evkd_cz[:,sub_ind_p,cnd2]*1e6)
     
     ax[jj].plot(t,onset20_mean,label='20')  
-    ax[jj].fill_between(t,onset20_mean - onset20_sem, onset20_mean + onset20_sem,alpha=0.5)
     
     ax[jj].ticklabel_format(axis='y',style='sci',scilimits=(0,0))
     #ax[jj].set_title(labels[jj])
     ax[jj].tick_params(labelsize=12)
-
 
 ax[0].legend(fontsize=12)
 ax[2].set_xlabel('Time (s)',fontsize=14)
